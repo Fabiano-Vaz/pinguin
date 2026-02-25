@@ -26,61 +26,67 @@
         <path d="M72 148 C48 175, 64 208, 93 215 C97 202, 94 165, 72 148 Z" fill="#0a0a0a" />
         <path d="M188 148 C212 175, 196 208, 167 215 C163 202, 166 165, 188 148 Z" fill="#0a0a0a" />
 
-        <!-- PESCOÇO -->
-        <ellipse cx="130" cy="66" rx="20" ry="28" fill="#0a0a0a" />
+        <g transform="translate(0, 10)">
 
-        <!-- CABEÇA -->
-        <ellipse cx="130" cy="56" rx="45" ry="35" fill="#0a0a0a" />
+            <!-- PESCOÇO -->
+            <ellipse cx="130" cy="66" rx="20" ry="28" fill="#0a0a0a" />
 
-        <!-- CABELO FOFO -->
-        <g fill="#0a0a0a">
-            <ellipse cx="130" cy="21" rx="7" ry="12" transform="rotate(-5 130 21)" />
-            <ellipse cx="113" cy="26" rx="6" ry="10" transform="rotate(-20 113 26)" />
-            <ellipse cx="147" cy="26" rx="6" ry="10" transform="rotate(20 147 26)" />
-        </g>
+            <!-- CABEÇA -->
+            <ellipse cx="130" cy="56" rx="45" ry="35" fill="#0a0a0a" />
 
-        <!-- SOBRANCELHAS tristes (centro baixo) -->
-        <line x1="107" y1="37" x2="120" y2="42" stroke="#3a3a3a" stroke-width="3"
-            stroke-linecap="round" />
-        <line x1="140" y1="42" x2="153" y2="37" stroke="#3a3a3a" stroke-width="3"
-            stroke-linecap="round" />
+            <!-- CABELO FOFO -->
+            <g fill="#0a0a0a">
+                <ellipse cx="130" cy="21" rx="7" ry="12" transform="rotate(-5 130 21)" />
+                <ellipse cx="113" cy="26" rx="6" ry="10" transform="rotate(-20 113 26)" />
+                <ellipse cx="147" cy="26" rx="6" ry="10" transform="rotate(20 147 26)" />
+            </g>
 
-        <!-- OLHOS -->
-        <circle cx="116" cy="51" r="12" fill="#ffffff" />
-        <circle cx="144" cy="51" r="12" fill="#ffffff" />
-        <!-- pupilas olhando pra baixo -->
-        <circle cx="116" cy="54" r="5" fill="#000000" />
-        <circle cx="144" cy="54" r="5" fill="#000000" />
-        <!-- pálpebras semi-fechadas fixas -->
-        <ellipse cx="116" cy="41" rx="12" ry="6" fill="#0a0a0a" />
-        <ellipse cx="144" cy="41" rx="12" ry="6" fill="#0a0a0a" />
 
-        <!-- BICO -->
-        <path
-            d="M108 64 C108 58, 121 55, 130 55 C139 55, 152 58, 152 64 C152 72, 141 78, 130 78 C119 78, 108 72, 108 64 Z"
-            fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+            <!-- SOBRANCELHAS tristes (centro baixo) -->
+            <line x1="107" y1="37" x2="120" y2="42" stroke="#3a3a3a" stroke-width="3"
+                stroke-linecap="round" />
+            <line x1="140" y1="42" x2="153" y2="37" stroke="#3a3a3a" stroke-width="3"
+                stroke-linecap="round" />
 
-        <!-- BOCA curvada pra baixo -->
-        <path d="M118 73 C122 68, 138 68, 142 73" fill="none" stroke="#c8960a" stroke-width="2.2"
-            stroke-linecap="round" />
+            <!-- OLHOS -->
+            <circle cx="116" cy="51" r="12" fill="#ffffff" />
+            <circle cx="144" cy="51" r="12" fill="#ffffff" />
+            <!-- pupilas olhando pra baixo -->
+            <circle cx="116" cy="54" r="5" fill="#000000" />
+            <circle cx="144" cy="54" r="5" fill="#000000" />
+            <!-- pálpebras semi-fechadas fixas -->
+            <ellipse cx="116" cy="41" rx="12" ry="6" fill="#0a0a0a" />
+            <ellipse cx="144" cy="41" rx="12" ry="6" fill="#0a0a0a" />
 
-        <!-- LÁGRIMA esquerda -->
-        <ellipse cx="109" cy="60" rx="2.5" ry="3" fill="#7ec8e3" opacity="0">
-            <animate attributeName="cy" values="60; 95" dur="1.1s" repeatCount="indefinite" />
-            <animate attributeName="ry" values="3; 5" dur="1.1s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0; 1; 0.8; 0" keyTimes="0; 0.1; 0.7; 1"
-                dur="1.1s" repeatCount="indefinite" />
-        </ellipse>
+            <!-- BICO -->
+            <path
+                d="M108 64 C108 58, 121 55, 130 55 C139 55, 152 58, 152 64 C152 72, 141 78, 130 78 C119 78, 108 72, 108 64 Z"
+                fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
 
-        <!-- LÁGRIMA direita (defasada) -->
-        <ellipse cx="151" cy="60" rx="2.5" ry="3" fill="#7ec8e3" opacity="0">
-            <animate attributeName="cy" values="60; 95" dur="1.1s" begin="0.5s"
-                repeatCount="indefinite" />
-            <animate attributeName="ry" values="3; 5" dur="1.1s" begin="0.5s"
-                repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0; 1; 0.8; 0" keyTimes="0; 0.1; 0.7; 1"
-                dur="1.1s" begin="0.5s" repeatCount="indefinite" />
-        </ellipse>
+            <!-- BOCA curvada pra baixo -->
+            <path d="M118 73 C122 68, 138 68, 142 73" fill="none" stroke="#c8960a"
+                stroke-width="2.2"
+                stroke-linecap="round" />
+
+            <!-- LÁGRIMA esquerda -->
+            <ellipse cx="109" cy="60" rx="2.5" ry="3" fill="#7ec8e3" opacity="0">
+                <animate attributeName="cy" values="60; 95" dur="1.1s" repeatCount="indefinite" />
+                <animate attributeName="ry" values="3; 5" dur="1.1s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0; 1; 0.8; 0" keyTimes="0; 0.1; 0.7; 1"
+                    dur="1.1s" repeatCount="indefinite" />
+            </ellipse>
+
+            <!-- LÁGRIMA direita (defasada) -->
+            <ellipse cx="151" cy="60" rx="2.5" ry="3" fill="#7ec8e3" opacity="0">
+                <animate attributeName="cy" values="60; 95" dur="1.1s" begin="0.5s"
+                    repeatCount="indefinite" />
+                <animate attributeName="ry" values="3; 5" dur="1.1s" begin="0.5s"
+                    repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0; 1; 0.8; 0" keyTimes="0; 0.1; 0.7; 1"
+                    dur="1.1s" begin="0.5s" repeatCount="indefinite" />
+            </ellipse>
+        </g>  <!--
+        end translate head -->
 
     </g>
 </svg>

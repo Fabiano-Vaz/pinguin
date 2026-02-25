@@ -26,7 +26,7 @@
         <path d="M190 148 C214 172, 198 206, 169 213 C164 201, 166 166, 190 148 Z" fill="#0a0a0a" />
 
         <!-- PESCOÇO + CABEÇA inclinada dormindo -->
-        <g transform="rotate(18 130 95)">
+        <g transform="translate(0, 10) rotate(18 130 95)">
 
             <!-- PESCOÇO -->
             <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />

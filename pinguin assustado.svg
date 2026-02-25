@@ -18,6 +18,7 @@
     <path
       d="M130 110 C105 110, 85 135, 85 175 C85 205, 105 225, 130 230 C155 225, 175 205, 175 175 C175 135, 155 110, 130 110 Z"
       fill="#ffffff" />
+    <g transform="translate(0, 10)">
     <ellipse cx="130" cy="66" rx="20" ry="28" fill="#0a0a0a" />
 
     <g>
@@ -37,6 +38,7 @@
         fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
       <ellipse cx="130" cy="78" rx="15" ry="12" fill="#f2c400" stroke="#e1b600" stroke-width="1.2" />
     </g>
+    </g>  <!-- end translate head -->
 
     <g>
       <path d="M68 144 C36 166, 56 204, 94 211 C102 194, 98 160, 68 144 Z" fill="#0a0a0a" />

@@ -59,6 +59,7 @@
                     fill="#ffffff" />
 
                 <!-- PESCOÇO -->
+                <g transform="translate(0, 10)">
                 <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
 
                 <!-- CABEÇA -->
@@ -88,7 +89,8 @@
                C156 72, 144 78, 134 78
                C124 78, 112 72, 112 65 Z"
                         fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
-                </g>
+                </g>                </g>
+
 
                 <!-- ASAS (leve swing) -->
                 <g>

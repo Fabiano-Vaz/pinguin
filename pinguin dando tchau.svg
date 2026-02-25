@@ -28,6 +28,7 @@
     </path>
 
     <!-- PESCOÇO (subido) -->
+    <g transform="translate(0, 10)">
     <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
 
     <!-- CABEÇA (mais alta) -->
@@ -66,7 +67,8 @@
        C85 205, 105 225, 130 230
        C155 225, 175 205, 175 175
        C175 135, 155 110, 130 110 Z"
-        fill="#ffffff" />
+        fill="#ffffff" />    </g>
+
 
     <!-- ASA ESQUERDA (parada) -->
     <path

@@ -36,6 +36,7 @@
         </g>
 
         <!-- PESCOÇO -->
+        <g transform="translate(0, 10)">
         <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
 
         <!-- CABEÇA -->
@@ -72,7 +73,8 @@
 
         <!-- BOCA aberta de raiva -->
         <path d="M116 74 C120 80, 140 80, 144 74" fill="#c8310a" stroke="#c8310a" stroke-width="1"
-            stroke-linecap="round" />
+            stroke-linecap="round" />        </g>
+
 
         <!-- VAPOR saindo da cabeça (esquerda e direita) -->
         <g opacity="0">

@@ -39,8 +39,9 @@
         </g>
 
         <!-- PESCOÇO + CABEÇA jogada levemente para trás -->
-        <g>
+        <g transform="translate(0, 10)">
             <animateTransform attributeName="transform" type="rotate"
+                                additive="sum"
                 values="-8 130 95; -12 130 95; -8 130 95" dur="0.45s" repeatCount="indefinite" />
 
             <!-- PESCOÇO -->

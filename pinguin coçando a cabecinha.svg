@@ -40,8 +40,9 @@
         </g>
 
         <!-- PESCOÇO + CABEÇA — inclina ao coçar -->
-        <g>
+        <g transform="translate(0, 10)">
             <animateTransform attributeName="transform" type="rotate"
+                                additive="sum"
                 values="0 130 95; 0 130 90; 30 130 95; 17 130 95; 20 130 95; 0 130 95; 0 130 95"
                 keyTimes="0; 0.2; 0.4; 0.55; 0.65; 0.8; 1"
                 dur="2.5s" repeatCount="indefinite" />

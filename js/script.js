@@ -33,7 +33,7 @@ const penguinSize =
     ? window.PENGUIN_CONFIG.size
     : defaultPenguinSize;
 const halfPenguinSize = penguinSize / 2;
-const SPEECH_COOLDOWN_MS = 5000;
+const SPEECH_COOLDOWN_MS = 12000;
 const BEHAVIOR_DELAY_MIN_MS = 5000;
 const BEHAVIOR_DELAY_VARIATION_MS = 3000;
 const SPEED_WALK = 1.2;

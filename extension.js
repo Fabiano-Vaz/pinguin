@@ -1,11 +1,26 @@
 const vscode = require("vscode");
 
-let panel;
+const SIDEBAR_VIEW_ID = "pinguinPet.sidebar";
 
 function activate(context) {
-  const openCommand = vscode.commands.registerCommand("pinguin.openPet", () => {
-    openPenguinPanel(context);
-  });
+  const provider = new PenguinSidebarProvider(context.extensionUri);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(SIDEBAR_VIEW_ID, provider, {
+      webviewOptions: { retainContextWhenHidden: true },
+    }),
+  );
+
+  const openCommand = vscode.commands.registerCommand(
+    "pinguin.openPet",
+    async () => {
+      await vscode.commands.executeCommand("workbench.view.explorer");
+      try {
+        await vscode.commands.executeCommand(`${SIDEBAR_VIEW_ID}.focus`);
+      } catch {
+        // Sem foco explícito disponível, abrir o Explorer já torna a view acessível.
+      }
+    },
+  );
 
   context.subscriptions.push(openCommand);
 
@@ -13,36 +28,29 @@ function activate(context) {
   const autoOpen = config.get("pinguin.autoOpenOnStartup", true);
 
   if (autoOpen) {
-    openPenguinPanel(context);
+    void vscode.commands.executeCommand("pinguin.openPet");
   }
 }
 
-function openPenguinPanel(context) {
-  if (panel) {
-    panel.reveal(vscode.ViewColumn.Beside, true);
-    return;
+class PenguinSidebarProvider {
+  constructor(extensionUri) {
+    this.extensionUri = extensionUri;
   }
 
-  panel = vscode.window.createWebviewPanel(
-    "pinguinPet",
-    "Pinguim Pet",
-    vscode.ViewColumn.Beside,
-    {
+  resolveWebviewView(webviewView) {
+    webviewView.webview.options = {
       enableScripts: true,
-      retainContextWhenHidden: true,
       localResourceRoots: [
-        vscode.Uri.joinPath(context.extensionUri, "assets"),
-        vscode.Uri.joinPath(context.extensionUri, "css"),
-        vscode.Uri.joinPath(context.extensionUri, "js"),
+        vscode.Uri.joinPath(this.extensionUri, "assets"),
+        vscode.Uri.joinPath(this.extensionUri, "css"),
+        vscode.Uri.joinPath(this.extensionUri, "js"),
       ],
-    },
-  );
-
-  panel.webview.html = getWebviewContent(panel.webview, context.extensionUri);
-
-  panel.onDidDispose(() => {
-    panel = undefined;
-  });
+    };
+    webviewView.webview.html = getWebviewContent(
+      webviewView.webview,
+      this.extensionUri,
+    );
+  }
 }
 
 function getWebviewContent(webview, extensionUri) {
@@ -96,7 +104,7 @@ function getWebviewContent(webview, extensionUri) {
   <script nonce="${nonce}">
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
     window.PENGUIN_CONFIG = {
-      size: 48,
+      size: 40,
       groundRatio: 0.74,
       backgroundImage: "${backgroundUri}",
     };

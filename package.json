@@ -2,8 +2,9 @@
   "name": "pinguin-pet",
   "displayName": "Pinguim Pet",
   "description": "Um pinguim animado que anda no VS Code enquanto o editor estiver aberto.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "Pingocode",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -13,15 +14,25 @@
   "main": "./extension.js",
   "activationEvents": [
     "onStartupFinished",
-    "onCommand:pinguin.openPet"
+    "onCommand:pinguin.openPet",
+    "onView:pinguinPet.sidebar"
   ],
   "contributes": {
     "commands": [
       {
         "command": "pinguin.openPet",
-        "title": "Pinguim: Abrir Pet"
+        "title": "Pinguim: Mostrar no Explorador"
       }
     ],
+    "views": {
+      "explorer": [
+        {
+          "id": "pinguinPet.sidebar",
+          "name": "Pinguim Pet",
+          "type": "webview"
+        }
+      ]
+    },
     "configuration": {
       "title": "Pinguim Pet",
       "properties": {

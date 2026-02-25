@@ -1,5 +1,5 @@
 // Mapeamento de ações para SVGs específicos
-const actionStates = {
+const defaultActionStates = {
   idle: "assets/pinguin.svg",
   running: "assets/pinguin correndo.svg",
   jumping: "assets/pinguin pulando feliz.svg",
@@ -14,7 +14,59 @@ const actionStates = {
   peeking: "assets/pinguin espiando curioso.svg",
   laughing: "assets/pinguin gargalhando.svg",
   thinking: "assets/pinguin pensando.svg",
+  flying: "assets/pinguin voando.svg",
 };
+
+const actionStates =
+  typeof window !== "undefined" &&
+  window.PENGUIN_ASSETS &&
+  typeof window.PENGUIN_ASSETS === "object"
+    ? window.PENGUIN_ASSETS
+    : defaultActionStates;
+
+const defaultPenguinSize = 120;
+const penguinSize =
+  typeof window !== "undefined" &&
+  window.PENGUIN_CONFIG &&
+  Number.isFinite(window.PENGUIN_CONFIG.size) &&
+  window.PENGUIN_CONFIG.size > 0
+    ? window.PENGUIN_CONFIG.size
+    : defaultPenguinSize;
+const halfPenguinSize = penguinSize / 2;
+const SPEECH_COOLDOWN_MS = 12000;
+const BEHAVIOR_DELAY_MIN_MS = 5000;
+const BEHAVIOR_DELAY_VARIATION_MS = 3000;
+const SPEED_WALK = 1.2;
+const SPEED_WALK_FAST = 1.8;
+const SPEED_CHASE = 2.2;
+const SPEED_FLEE = 2.8;
+const defaultSnowTopRatio = 0.74;
+const snowTopRatio =
+  typeof window !== "undefined" &&
+  window.PENGUIN_CONFIG &&
+  Number.isFinite(window.PENGUIN_CONFIG.groundRatio) &&
+  window.PENGUIN_CONFIG.groundRatio > 0 &&
+  window.PENGUIN_CONFIG.groundRatio <= 1
+    ? window.PENGUIN_CONFIG.groundRatio
+    : defaultSnowTopRatio;
+const backgroundImage =
+  typeof window !== "undefined" &&
+  window.PENGUIN_CONFIG &&
+  typeof window.PENGUIN_CONFIG.backgroundImage === "string" &&
+  window.PENGUIN_CONFIG.backgroundImage.length > 0
+    ? window.PENGUIN_CONFIG.backgroundImage
+    : "assets/backgroung.png";
+
+if (typeof document !== "undefined" && document.body) {
+  const backgroundTargetElements = [document.documentElement, document.body];
+  backgroundTargetElements.forEach((element) => {
+    if (!element) return;
+    element.style.backgroundImage = `url("${backgroundImage}")`;
+    element.style.backgroundSize = "cover";
+    element.style.backgroundPosition = "center bottom";
+    element.style.backgroundRepeat = "no-repeat";
+  });
+}
 
 const phrases = {
   idle: [
@@ -23,16 +75,12 @@ const phrases = {
     "Tô aqui... só sendo fofo.",
     "Hm... e agora?",
     "Tô esperando o Wi-Fi carregar a vida.",
-    "Não tô fazendo nada. E tô ótimo com isso.",
     "Bom dia! Ou boa tarde. Tanto faz.",
   ],
   running: [
     "WHEEE! Não me para!",
     "Correr é minha terapia!",
-    "Vou buscar pizza... volta já!",
     "Alguém soltou o pinguim!!",
-    "Tô atrasado pra nada, mas corro mesmo assim!",
-    "Turbo mode: ATIVADO!",
   ],
   jumping: [
     "YAAAY!",
@@ -44,16 +92,13 @@ const phrases = {
   ],
   dancing: [
     "Isso é vida, minha gente!",
-    "Sinto o ritmo na alma... e na barriga.",
     "Ninguém me para na pista!",
     "La la laaaa! 🎵",
-    "Minha dança é artística. Não questione.",
     "Dança, pinguim, dança!",
   ],
   sleeping: [
     "Zzz...",
     "Tô só descansando os olhos...",
-    "Pode me acordar... mas não me acorde.",
     "Sonhando com peixe fresco...",
     "Zzz... mais cinco minutinhos...",
   ],
@@ -62,7 +107,6 @@ const phrases = {
     "Minha alma saiu pelo bico!!",
     "Eu vi alguma coisa! Juro!",
     "Socorroooo!",
-    "Meu coração saiu correndo sem mim!",
     "Faz isso não!!",
   ],
   crying: [
@@ -78,8 +122,9 @@ const phrases = {
     "Tô com a cabeça fumegando aqui!",
     "Quem fez isso?! QUEM FOI?!",
     "Não, não e NÃO!",
-    "Tô com raiva, mas sou fofo. Conflito interno.",
-    "Deixa eu respirar... fundo... mais fundo...",
+    "Caramba! Que tombo foi esse?!",
+    "Ei! Mais cuidado comigo, pô!",
+    "Que queda desnecessária... droga!",
   ],
   scratching: [
     "Coça coça coça...",
@@ -121,6 +166,14 @@ const phrases = {
     "KEK KEK KEK!",
   ],
   thinking: [""],
+  flying: [
+    "Vou conseguir! Só mais um pouquinho!",
+    "Os pinguins PODEM voar. Hoje é o dia!",
+    "Bate! Bate! BATE as asas!",
+    "Eu juro que tô saindo do chão...",
+    "A gravidade é fake news!",
+    "Weeeeee!! (quase)",
+  ],
 };
 
 // Sequências de comportamentos autônomos
@@ -139,7 +192,7 @@ const behaviors = [
   ],
   () => [
     { type: "walk" },
-    { type: "act", state: "sleeping", duration: 5000 },
+    { type: "act", state: "sleeping", duration: 15000 },
     { type: "walk" },
   ],
   () => [
@@ -159,7 +212,7 @@ const behaviors = [
     { type: "walk" },
   ],
   () => [
-    { type: "act", state: "jumping", duration: 1200, anim: "bounce 0.8s ease" },
+    { type: "jumpMove", duration: 1300 },
     { type: "act", state: "waving", duration: 2000 },
     { type: "walk" },
   ],
@@ -184,6 +237,11 @@ const behaviors = [
     { type: "walk" },
     { type: "act", state: "waving", duration: 2000 },
   ],
+  () => [
+    { type: "flyMove", duration: 1800 },
+    { type: "jumpMove", duration: 1000 },
+    { type: "walk" },
+  ],
 ];
 
 let mouseX = window.innerWidth / 2;
@@ -197,18 +255,22 @@ class Penguin {
     this.element.appendChild(this.img);
     document.body.appendChild(this.element);
 
-    this.x = window.innerWidth / 2 - 60;
-    this.y = window.innerHeight / 2 - 60;
+    this.x = window.innerWidth / 2 - halfPenguinSize;
+    this.y = this.getGroundTopY();
     this.targetX = this.x;
     this.targetY = this.y;
 
-    this.currentState = "idle";
+    this.currentState = "";
     this.facingRight = true;
     this.isMoving = false;
-    this.speed = 4;
+    this.speed = SPEED_WALK_FAST;
+    this.allowAirMovement = false;
+    this.customMotion = null;
+    this.lastUpdateTime = performance.now();
 
     this.bubble = null;
     this.bubbleTimeout = null;
+    this.lastSpeechAt = 0;
 
     // Controle da IA
     this.aiLocked = false;
@@ -218,23 +280,115 @@ class Penguin {
     this.lastMouseZone = "far";
     this.mouseReactionCooldown = 0;
     this.isChasing = false;
+    this.isDragging = false;
+    this.dragMoved = false;
+    this.dragOffsetX = 0;
+    this.dragOffsetY = 0;
+    this.suppressClickUntil = 0;
 
     this.setState("idle");
     this.setupEventListeners();
-    this.update();
-    this.scheduleNextBehavior();
+    this.update(this.lastUpdateTime);
+    setTimeout(() => this.startNextBehavior(), 500);
   }
 
   // ── Estado ────────────────────────────────────────────────────────────────
 
   setState(state) {
+    if (this.currentState === state) return;
     this.currentState = state;
     this.img.src = actionStates[state];
+  }
+
+  startWingFlap() {
+    this.img.style.animation = "wingFlap 0.18s ease-in-out infinite";
+  }
+
+  stopWingFlap() {
+    this.img.style.animation = "";
+  }
+
+  startJumpArc(targetX, targetY) {
+    const clampedX = Math.max(0, Math.min(targetX, window.innerWidth - penguinSize));
+    const clampedY = this.clampY(targetY);
+    const horizontalDistance = Math.abs(clampedX - this.x);
+    const apex = Math.max(28, Math.min(100, 36 + horizontalDistance * 0.18));
+
+    this.customMotion = {
+      type: "jumpArc",
+      startX: this.x,
+      startY: this.y,
+      targetX: clampedX,
+      targetY: clampedY,
+      duration: 900,
+      elapsed: 0,
+      apex,
+    };
+
+    this.isMoving = true;
+    this.allowAirMovement = true;
+    this.setState("jumping");
+  }
+
+  startDropFall() {
+    this.customMotion = {
+      type: "fall",
+      vy: 0,
+      gravity: 1900,
+      maxVy: 1400,
+      targetY: this.getWalkMinY(),
+    };
+    this.isMoving = true;
+    this.allowAirMovement = true;
+    this.setState("flying");
+    this.startWingFlap();
+  }
+
+  updateCustomMotion(dtSeconds) {
+    if (!this.customMotion) return;
+
+    if (this.customMotion.type === "jumpArc") {
+      const motion = this.customMotion;
+      motion.elapsed += dtSeconds * 1000;
+      const t = Math.min(1, motion.elapsed / motion.duration);
+      const arc = 4 * motion.apex * t * (1 - t);
+
+      this.x = motion.startX + (motion.targetX - motion.startX) * t;
+      this.y = motion.startY + (motion.targetY - motion.startY) * t - arc;
+
+      if (t >= 1) {
+        this.x = motion.targetX;
+        this.y = motion.targetY;
+        this.customMotion = null;
+        this.isMoving = false;
+        this.allowAirMovement = false;
+        this.setState("idle");
+      }
+      return;
+    }
+
+    if (this.customMotion.type === "fall") {
+      const motion = this.customMotion;
+      motion.vy = Math.min(motion.maxVy, motion.vy + motion.gravity * dtSeconds);
+      this.y += motion.vy * dtSeconds;
+
+      if (this.y >= motion.targetY) {
+        this.y = motion.targetY;
+        this.customMotion = null;
+        this.isMoving = false;
+        this.allowAirMovement = false;
+        this.stopWingFlap();
+        this.setState("idle");
+      }
+    }
   }
 
   // ── Fala ──────────────────────────────────────────────────────────────────
 
   speak() {
+    const now = Date.now();
+    if (now - this.lastSpeechAt < SPEECH_COOLDOWN_MS) return;
+
     if (this.bubble) this.bubble.remove();
     if (this.bubbleTimeout) clearTimeout(this.bubbleTimeout);
 
@@ -242,6 +396,7 @@ class Penguin {
     const text = list[Math.floor(Math.random() * list.length)];
 
     if (!text) return;
+    this.lastSpeechAt = now;
 
     this.bubble = document.createElement("div");
     this.bubble.className = "speech-bubble";
@@ -277,26 +432,40 @@ class Penguin {
   updateBubblePosition() {
     if (!this.bubble) return;
 
-    // Balão deslocado para cima-direita do pinguim (estilo quadrinho)
-    const bubbleLeft = this.x + 55;
-    const bubbleTop = this.y - 80;
+    const content = this.bubble.querySelector(".bubble-content");
+    if (!content) return;
+
+    const cw = content.offsetWidth || penguinSize;
+    const ch = content.offsetHeight || 47;
+    const viewportMargin = 8;
+
+    // Centraliza o balão no pinguim e mantém dentro da viewport.
+    let bubbleLeft = this.x + halfPenguinSize - cw / 2;
+    bubbleLeft = Math.max(
+      viewportMargin,
+      Math.min(bubbleLeft, window.innerWidth - cw - viewportMargin),
+    );
+
+    // Prioriza acima do pinguim; se faltar espaço, posiciona abaixo.
+    let bubbleTop = this.y - ch - 24;
+    if (bubbleTop < viewportMargin) {
+      bubbleTop = this.y + penguinSize + 16;
+    }
+
     this.bubble.style.left = bubbleLeft + "px";
     this.bubble.style.top = bubbleTop + "px";
 
     const dots = this.bubble.querySelectorAll(".bubble-dot");
     if (dots.length < 3) return;
 
-    const content = this.bubble.querySelector(".bubble-content");
-    const cw = (content && content.offsetWidth) || 120;
-    const ch = (content && content.offsetHeight) || 47;
-
-    // Ponto de partida: centro-inferior do conteúdo (relativo ao .speech-bubble)
+    const isBelowPenguin = bubbleTop > this.y;
+    // Ponto de partida da cauda: embaixo quando o balão está acima, em cima quando está abaixo.
     const startX = cw / 2;
-    const startY = ch;
+    const startY = isBelowPenguin ? 0 : ch;
 
     // Centro do pinguim em coordenadas locais do .speech-bubble
-    const penguinCX = this.x + 60 - bubbleLeft;
-    const penguinCY = this.y + 60 - bubbleTop;
+    const penguinCX = this.x + halfPenguinSize - bubbleLeft;
+    const penguinCY = this.y + halfPenguinSize - bubbleTop;
 
     const dx = penguinCX - startX;
     const dy = penguinCY - startY;
@@ -305,9 +474,9 @@ class Penguin {
     const ny = dy / dist;
 
     const specs = [
-      { size: 14, gap: 14 },
-      { size: 9, gap: 26 },
-      { size: 5, gap: 36 },
+      { size: 10, gap: 10 },
+      { size: 7, gap: 19 },
+      { size: 4, gap: 27 },
     ];
 
     dots.forEach((dot, i) => {
@@ -321,34 +490,82 @@ class Penguin {
 
   // ── Movimento ─────────────────────────────────────────────────────────────
 
-  moveToPosition(tx, ty, speed) {
-    this.targetX = tx - 60;
-    this.targetY = ty - 60;
+  getFloorY() {
+    return window.innerHeight * snowTopRatio;
+  }
+
+  getGroundTopY() {
+    return Math.max(
+      0,
+      Math.min(
+        this.getFloorY() - penguinSize,
+        window.innerHeight - penguinSize,
+      ),
+    );
+  }
+
+  getWalkMinY() {
+    return this.getGroundTopY();
+  }
+
+  getWalkMaxY() {
+    return Math.max(this.getWalkMinY(), window.innerHeight - penguinSize);
+  }
+
+  getFlyMinY() {
+    return Math.max(0, this.getWalkMinY() - 90);
+  }
+
+  clampY(y, allowAir = false) {
+    const minY = allowAir ? this.getFlyMinY() : this.getWalkMinY();
+    return Math.max(minY, Math.min(y, this.getWalkMaxY()));
+  }
+
+  randomWalkY() {
+    const minY = this.getWalkMinY();
+    const maxY = this.getWalkMaxY();
+    return minY + Math.random() * Math.max(1, maxY - minY);
+  }
+
+  randomFlyY() {
+    const minY = this.getFlyMinY();
+    const maxY = Math.max(minY, this.getWalkMinY() + 20);
+    return minY + Math.random() * Math.max(1, maxY - minY);
+  }
+
+  moveToPosition(tx, ty, speed, allowAir = false) {
+    this.targetX = tx - halfPenguinSize;
+    this.allowAirMovement = allowAir;
+    this.targetY =
+      typeof ty === "number"
+        ? this.clampY(ty - halfPenguinSize, allowAir)
+        : this.getWalkMinY();
     this.isMoving = true;
     if (speed) this.speed = speed;
   }
 
   randomTarget(nearEdge) {
     const margin = 80;
-    const w = window.innerWidth - 120;
-    const h = window.innerHeight - 120;
+    const w = window.innerWidth - penguinSize;
+    const randomY = this.randomWalkY();
     if (nearEdge) {
       const edge = Math.floor(Math.random() * 4);
-      if (edge === 0) return { x: Math.random() * w + margin, y: margin };
-      if (edge === 1) return { x: Math.random() * w + margin, y: h - margin };
-      if (edge === 2) return { x: margin, y: Math.random() * h };
-      return { x: w - margin, y: Math.random() * h };
+      if (edge === 0) return { x: Math.random() * w + margin, y: randomY };
+      if (edge === 1) return { x: Math.random() * w + margin, y: randomY };
+      if (edge === 2) return { x: margin, y: randomY };
+      return { x: w - margin, y: randomY };
     }
     return {
       x: margin + Math.random() * (w - margin * 2),
-      y: margin + Math.random() * (h - margin * 2),
+      y: randomY,
     };
   }
 
   // ── IA autônoma ───────────────────────────────────────────────────────────
 
   scheduleNextBehavior() {
-    const delay = 2500 + Math.random() * 4000;
+    const delay =
+      BEHAVIOR_DELAY_MIN_MS + Math.random() * BEHAVIOR_DELAY_VARIATION_MS;
     setTimeout(() => this.startNextBehavior(), delay);
   }
 
@@ -373,19 +590,67 @@ class Penguin {
       step.type === "walkFast" ||
       step.type === "walkEdge"
     ) {
-      const sp = step.type === "walkFast" ? 3 : 2;
+      const sp = step.type === "walkFast" ? SPEED_WALK_FAST : SPEED_WALK;
       const t =
         step.type === "walkEdge"
           ? this.randomTarget(true)
           : this.randomTarget(false);
       this.speed = sp;
-      this.moveToPosition(t.x + 60, t.y + 60);
+      this.moveToPosition(t.x + halfPenguinSize, t.y + halfPenguinSize);
 
       const waitArrival = setInterval(() => {
         if (!this.isMoving) {
           clearInterval(waitArrival);
-          this.speed = 2;
-          setTimeout(() => this.runNextStep(), 600);
+          this.speed = SPEED_WALK;
+          setTimeout(() => this.runNextStep(), 1000);
+        }
+      }, 100);
+    } else if (step.type === "jumpMove") {
+      const target = this.randomTarget(false);
+      this.speed = SPEED_WALK_FAST;
+      this.speak();
+      this.element.style.animation = "";
+      this.startJumpArc(target.x, target.y);
+
+      const waitArrival = setInterval(() => {
+        if (!this.isMoving) {
+          clearInterval(waitArrival);
+          this.speed = SPEED_WALK;
+          if (!this.isMoving) this.setState("idle");
+          setTimeout(() => this.runNextStep(), step.duration || 600);
+        }
+      }, 100);
+    } else if (step.type === "flyMove") {
+      const targetX = Math.max(
+        halfPenguinSize,
+        Math.min(
+          this.x + (Math.random() - 0.5) * 260 + halfPenguinSize,
+          window.innerWidth - halfPenguinSize,
+        ),
+      );
+      const targetY = this.randomFlyY() + halfPenguinSize;
+      this.speed = SPEED_WALK_FAST + 0.6;
+      this.setState("flying");
+      this.speak();
+      this.element.style.animation = "bounce 1s ease-in-out infinite";
+      this.moveToPosition(targetX, targetY, this.speed, true);
+
+      const waitArrival = setInterval(() => {
+        if (!this.isMoving) {
+          clearInterval(waitArrival);
+          this.element.style.animation = "";
+          this.speed = SPEED_WALK;
+          this.moveToPosition(
+            this.x + halfPenguinSize,
+            this.randomWalkY() + halfPenguinSize,
+          );
+          const backToSnow = setInterval(() => {
+            if (!this.isMoving) {
+              clearInterval(backToSnow);
+              if (!this.isMoving) this.setState("idle");
+              setTimeout(() => this.runNextStep(), step.duration || 600);
+            }
+          }, 100);
         }
       }, 100);
     } else if (step.type === "act") {
@@ -405,8 +670,8 @@ class Penguin {
   // ── Interação com o mouse ─────────────────────────────────────────────────
 
   handleMouseProximity() {
-    const mdx = mouseX - (this.x + 60);
-    const mdy = mouseY - (this.y + 60);
+    const mdx = mouseX - (this.x + halfPenguinSize);
+    const mdy = mouseY - (this.y + halfPenguinSize);
     const dist = Math.sqrt(mdx * mdx + mdy * mdy);
 
     if (this.mouseReactionCooldown > 0) {
@@ -442,14 +707,14 @@ class Penguin {
     this.aiLocked = true;
     this.stepQueue = [];
     this.isChasing = true;
-    this.speed = 4;
+    this.speed = SPEED_CHASE;
     this.setState("running");
     this.speak();
 
     // Para de perseguir após 4 segundos
     setTimeout(() => {
       this.isChasing = false;
-      this.speed = 2;
+      this.speed = SPEED_WALK;
       if (!this.isMoving) this.setState("idle");
       this.aiLocked = false;
       this.scheduleNextBehavior();
@@ -462,17 +727,26 @@ class Penguin {
     this.setState("scared");
     this.speak();
 
-    const angle = Math.atan2(this.y + 60 - mouseY, this.x + 60 - mouseX);
-    const fleeX = this.x + 60 + Math.cos(angle) * 280;
-    const fleeY = this.y + 60 + Math.sin(angle) * 280;
-    this.speed = 5;
+    const angle = Math.atan2(
+      this.y + halfPenguinSize - mouseY,
+      this.x + halfPenguinSize - mouseX,
+    );
+    const fleeX = this.x + halfPenguinSize + Math.cos(angle) * 280;
+    const fleeY = this.y + halfPenguinSize + Math.sin(angle) * 280;
+    this.speed = SPEED_FLEE;
     this.moveToPosition(
-      Math.max(60, Math.min(fleeX, window.innerWidth - 60)),
-      Math.max(60, Math.min(fleeY, window.innerHeight - 60)),
+      Math.max(
+        halfPenguinSize,
+        Math.min(fleeX, window.innerWidth - halfPenguinSize),
+      ),
+      Math.max(
+        halfPenguinSize,
+        Math.min(fleeY, this.getWalkMaxY() + halfPenguinSize),
+      ),
     );
 
     setTimeout(() => {
-      this.speed = 2;
+      this.speed = SPEED_WALK;
       this.aiLocked = false;
       this.scheduleNextBehavior();
     }, 2500);
@@ -507,10 +781,103 @@ class Penguin {
   // ── Interação manual ──────────────────────────────────────────────────────
 
   setupEventListeners() {
+    this.element.addEventListener("pointerdown", (e) => {
+      this.onDragStart(e);
+    });
+
+    window.addEventListener("pointermove", (e) => {
+      this.onDragMove(e);
+    });
+
+    window.addEventListener("pointerup", (e) => {
+      this.onDragEnd(e);
+    });
+    window.addEventListener("pointercancel", (e) => {
+      this.onDragEnd(e);
+    });
+
     this.element.addEventListener("click", (e) => {
       e.stopPropagation();
+      if (Date.now() < this.suppressClickUntil) return;
       this.onClickPenguin();
     });
+  }
+
+  onDragStart(e) {
+    e.preventDefault();
+    this.isDragging = true;
+    this.dragMoved = false;
+    this.dragOffsetX = e.clientX - this.x;
+    this.dragOffsetY = e.clientY - this.y;
+    this.isChasing = false;
+    this.aiLocked = true;
+    this.stepQueue = [];
+    this.isMoving = false;
+    this.customMotion = null;
+    this.allowAirMovement = true;
+    this.element.style.animation = "";
+    this.setState("flying");
+    this.startWingFlap();
+  }
+
+  onDragMove(e) {
+    if (!this.isDragging) return;
+    e.preventDefault();
+
+    this.dragMoved = true;
+    this.x = Math.max(
+      0,
+      Math.min(e.clientX - this.dragOffsetX, window.innerWidth - penguinSize),
+    );
+    this.y = Math.max(
+      0,
+      Math.min(e.clientY - this.dragOffsetY, window.innerHeight - penguinSize),
+    );
+    this.targetX = this.x;
+    this.targetY = this.y;
+
+    this.element.style.left = this.x + "px";
+    this.element.style.top = this.y + "px";
+    this.updateBubblePosition();
+  }
+
+  onDragEnd() {
+    if (!this.isDragging) return;
+    this.isDragging = false;
+    this.stopWingFlap();
+
+    if (!this.dragMoved) {
+      this.allowAirMovement = false;
+      this.setState("idle");
+      this.aiLocked = false;
+      return;
+    }
+
+    this.suppressClickUntil = Date.now() + 250;
+    this.dropWithFlap();
+  }
+
+  dropWithFlap() {
+    this.aiLocked = true;
+    this.isChasing = false;
+    this.stepQueue = [];
+    this.speed = SPEED_WALK;
+    this.startDropFall();
+
+    const waitLanding = setInterval(() => {
+      if (!this.isMoving) {
+        clearInterval(waitLanding);
+        this.speed = SPEED_WALK;
+        this.setState("angry");
+        this.lastSpeechAt = 0;
+        this.speak();
+        setTimeout(() => {
+          if (!this.isMoving) this.setState("idle");
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        }, 1800);
+      }
+    }, 100);
   }
 
   onClickPenguin() {
@@ -530,7 +897,7 @@ class Penguin {
 
     this.setState(reaction);
     this.speak();
-    createClickEffect(this.x + 60, this.y + 60);
+    createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
 
     const anims = {
       jumping: "bounce 0.8s ease",
@@ -550,22 +917,44 @@ class Penguin {
 
   // ── Loop de animação ──────────────────────────────────────────────────────
 
-  update() {
+  update(now = performance.now()) {
+    const dtSeconds = Math.min(0.05, Math.max(0.001, (now - this.lastUpdateTime) / 1000));
+    this.lastUpdateTime = now;
+
+    if (this.isDragging) {
+      requestAnimationFrame((ts) => this.update(ts));
+      return;
+    }
+
+    if (this.customMotion) {
+      this.updateCustomMotion(dtSeconds);
+      this.x = Math.max(0, Math.min(this.x, window.innerWidth - penguinSize));
+      this.y = Math.max(0, Math.min(this.y, this.getWalkMaxY()));
+      this.element.style.left = this.x + "px";
+      this.element.style.top = this.y + "px";
+      this.updateBubblePosition();
+      this.handleMouseProximity();
+      requestAnimationFrame((ts) => this.update(ts));
+      return;
+    }
+
     const dx = this.targetX - this.x;
     const dy = this.targetY - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     // Se estiver perseguindo, atualiza o alvo para a posição atual do mouse
     if (this.isChasing) {
-      this.targetX = mouseX - 60;
-      this.targetY = mouseY - 60;
+      this.targetX = mouseX - halfPenguinSize;
+      this.targetY = this.clampY(mouseY - halfPenguinSize);
     }
 
     if (distance > 5) {
       this.x += (dx / distance) * this.speed;
       this.y += (dy / distance) * this.speed;
 
-      if (this.currentState !== "running") this.setState("running");
+      if (this.currentState !== "jumping" && this.currentState !== "flying") {
+        this.setState("running");
+      }
 
       if (dx < 0 && this.facingRight) {
         this.facingRight = false;
@@ -576,23 +965,24 @@ class Penguin {
       }
     } else if (this.isMoving) {
       this.isMoving = false;
+      this.allowAirMovement = false;
       this.setState("idle");
     }
 
-    this.x = Math.max(0, Math.min(this.x, window.innerWidth - 120));
-    this.y = Math.max(0, Math.min(this.y, window.innerHeight - 120));
-    this.targetX = Math.max(0, Math.min(this.targetX, window.innerWidth - 120));
-    this.targetY = Math.max(
+    this.x = Math.max(0, Math.min(this.x, window.innerWidth - penguinSize));
+    this.y = this.clampY(this.y, this.allowAirMovement);
+    this.targetX = Math.max(
       0,
-      Math.min(this.targetY, window.innerHeight - 120),
+      Math.min(this.targetX, window.innerWidth - penguinSize),
     );
+    this.targetY = this.clampY(this.targetY, this.allowAirMovement);
 
     this.element.style.left = this.x + "px";
     this.element.style.top = this.y + "px";
     this.updateBubblePosition();
     this.handleMouseProximity();
 
-    requestAnimationFrame(() => this.update());
+    requestAnimationFrame((ts) => this.update(ts));
   }
 }
 

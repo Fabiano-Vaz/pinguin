@@ -4,9 +4,20 @@
     box-sizing: border-box;
 }
 
+html,
 body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    --penguin-size: 120px;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: #ffffff;
+    background-image: url('../assets/backgroung.png');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
     font-family: 'Comic Sans MS', cursive, sans-serif;
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="20" font-size="20">🐟</text></svg>'), auto;
 }
@@ -14,8 +25,8 @@ body {
 /* Pinguim */
 .penguin {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: var(--penguin-size);
+    height: var(--penguin-size);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
     z-index: 10;
     cursor: pointer;
@@ -44,10 +55,8 @@ body {
 .bubble-content {
     background: white;
     border-radius: 999px;
-    padding: 14px 22px;
-    left: 35px;
-    top: 10px;
-    font-size: 15px;
+    padding: 10px 15px;
+    font-size: 10px;
     color: #333;
     font-weight: bold;
     white-space: nowrap;
@@ -157,6 +166,20 @@ body {
     }
 }
 
+@keyframes wingFlap {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-1px) rotate(-8deg);
+    }
+
+    100% {
+        transform: translateY(0) rotate(6deg);
+    }
+}
+
 /* Partículas */
 .particle {
     position: absolute;
@@ -210,13 +233,17 @@ body {
 
 /* Responsivo */
 @media (max-width: 768px) {
+    body {
+        --penguin-size: 90px;
+    }
+
     .penguin {
-        width: 90px;
-        height: 90px;
+        width: var(--penguin-size);
+        height: var(--penguin-size);
     }
 
     .speech-bubble {
-        font-size: 14px;
+        font-size: 12px;
         padding: 10px 15px;
     }
 }

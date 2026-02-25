@@ -200,6 +200,17 @@ body.fish-cursor-enabled {
     }
 }
 
+@keyframes waddle {
+    0%,
+    100% {
+        transform: rotate(-6deg) translateY(0);
+    }
+
+    50% {
+        transform: rotate(6deg) translateY(-4px);
+    }
+}
+
 /* Partículas */
 .particle {
     position: absolute;

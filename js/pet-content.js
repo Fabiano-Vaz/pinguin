@@ -113,10 +113,21 @@
       "A gravidade é fake news!",
       "Weeeeee!! (quase)",
     ],
+    turningBack: [
+      "Psst... tô de costas, não tô te ignorando.",
+      "Hm? Tinha alguém aí?",
+      "Só virando pra ver o outro lado...",
+      "Nada a ver aqui. Pode passar.",
+      "Olha o que achei por aqui...",
+      "Relaxa, volto já!",
+    ],
   };
 
   window.PenguinPet.behaviors = [
-    () => [{ type: "walk" }, { type: "act", state: "thinking", duration: 3000 }],
+    () => [
+      { type: "walk" },
+      { type: "act", state: "thinking", duration: 3000 },
+    ],
     () => [
       { type: "walk" },
       {
@@ -125,7 +136,20 @@
         duration: 3000,
         anim: "dance 0.7s ease-in-out infinite",
       },
-      { type: "act", state: "laughing", duration: 2000 },
+      { type: "act", state: "turningBack", duration: 2500, anim: "waddle 0.4s ease-in-out infinite" },
+      { type: "act", state: "waving", duration: 2000 },
+      {
+        type: "act",
+        state: "flying",
+        duration: 2500,
+        anim: "bounce 1s ease-in-out infinite",
+      },
+      {
+        type: "act",
+        state: "dancing",
+        duration: 3000,
+        anim: "dance 0.7s ease-in-out infinite",
+      },
     ],
     () => [
       { type: "walk" },
@@ -177,6 +201,17 @@
     () => [
       { type: "flyMove", duration: 1800 },
       { type: "jumpMove", duration: 1000 },
+      { type: "walk" },
+    ],
+    () => [
+      { type: "walk" },
+      { type: "act", state: "turningBack", duration: 2500 },
+      { type: "walk" },
+    ],
+    () => [
+      { type: "walkFast" },
+      { type: "act", state: "turningBack", duration: 3500 },
+      { type: "act", state: "idle", duration: 1000 },
       { type: "walk" },
     ],
   ];

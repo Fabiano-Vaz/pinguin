@@ -16,6 +16,7 @@
     thinking: "assets/pinguin-apaixonado.svg",
     eating: "assets/pinguin comendo peixe.svg",
     flying: "assets/pinguin voando.svg",
+    turningBack: "assets/pinguin de costas.svg",
   };
 
   const actionStates =

@@ -94,6 +94,7 @@ function getWebviewContent(webview, extensionUri) {
     thinking: "pinguin-apaixonado.svg",
     eating: "pinguin comendo peixe.svg",
     flying: "pinguin voando.svg",
+    turningBack: "pinguin de costas.svg",
   };
 
   const webviewAssets = {};

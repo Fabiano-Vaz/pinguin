@@ -71,20 +71,6 @@
             <!-- interior da boca aberta -->
             <path d="M114 68 C118 80, 142 80, 146 68" fill="#c8310a" />
 
-            <!-- Estrelinhas/brilhos de alegria -->
-            <g opacity="0">
-                <animate attributeName="opacity" values="0; 1; 0" dur="0.45s"
-                    repeatCount="indefinite" />
-                <line x1="92" y1="32" x2="86" y2="24" stroke="#f2c400" stroke-width="2"
-                    stroke-linecap="round" />
-                <line x1="168" y1="32" x2="174" y2="24" stroke="#f2c400" stroke-width="2"
-                    stroke-linecap="round" />
-                <line x1="88" y1="28" x2="94" y2="22" stroke="#f2c400" stroke-width="1.5"
-                    stroke-linecap="round" />
-                <line x1="172" y1="28" x2="166" y2="22" stroke="#f2c400" stroke-width="1.5"
-                    stroke-linecap="round" />
-            </g>
-
         </g>
     </g>
 </svg>

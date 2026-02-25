@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- PÉS (virados para fora, vistos de trás) -->
+    <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+        <path
+            d="M80 218
+             C58 212, 44 224, 54 236
+             C64 248, 90 248, 106 240
+             C116 234, 106 220, 80 218 Z" />
+        <path
+            d="M180 218
+             C202 212, 216 224, 206 236
+             C196 248, 170 248, 154 240
+             C144 234, 154 220, 180 218 Z" />
+    </g>
+
+    <!-- CORPO (todo preto visto de trás) -->
+    <path
+        d="M130 100
+           C85 100, 60 135, 60 165
+           C60 190, 85 220, 130 240
+           C175 220, 200 190, 200 165
+           C200 135, 175 100, 130 100 Z"
+        fill="#0a0a0a" />
+
+    <!-- ASAS vistas de trás (mais achatadas, viradas para fora) -->
+    <path
+        d="M68 138
+           C40 158, 48 198, 78 212
+           C86 204, 88 168, 68 138 Z"
+        fill="#1a1a1a" />
+    <path
+        d="M192 138
+           C220 158, 212 198, 182 212
+           C174 204, 172 168, 192 138 Z"
+        fill="#1a1a1a" />
+
+    <!-- REFLEXO DE LUZ nas asas (brilho sutil de costas) -->
+    <path
+        d="M72 150 C62 165, 65 185, 74 198"
+        fill="none" stroke="#2e2e2e" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+    <path
+        d="M188 150 C198 165, 195 185, 186 198"
+        fill="none" stroke="#2e2e2e" stroke-width="3" stroke-linecap="round" opacity="0.7" />
+
+    <!-- CABEÇA (de costas, toda preta) -->
+    <ellipse cx="130" cy="72" rx="45" ry="38" fill="#0a0a0a" />
+
+    <!-- CABELO FOFO no topo da cabeça -->
+    <g fill="#0a0a0a">
+        <ellipse cx="130" cy="32" rx="7" ry="13" transform="rotate(-5 130 32)" />
+        <ellipse cx="113" cy="37" rx="6" ry="11" transform="rotate(-20 113 37)" />
+        <ellipse cx="147" cy="37" rx="6" ry="11" transform="rotate(20 147 37)" />
+        <ellipse cx="101" cy="44" rx="5" ry="9" transform="rotate(-35 101 44)" />
+        <ellipse cx="159" cy="44" rx="5" ry="9" transform="rotate(35 159 44)" />
+    </g>
+
+</svg>

@@ -30,7 +30,7 @@
     <!-- PESCOÇO + CABEÇA inclinando ao pensar -->
     <g transform="translate(0, 10)">
         <animateTransform attributeName="transform" type="rotate"
-                        additive="sum"
+            additive="sum"
             values="-8 130 95; -12 130 95; -8 130 95" dur="2.5s" repeatCount="indefinite" />
 
         <!-- PESCOÇO -->
@@ -64,16 +64,16 @@
             <animate attributeName="opacity" values="0; 0; 0.7; 0.7; 0"
                 keyTimes="0; 0.3; 0.5; 0.8; 1" dur="2.5s" repeatCount="indefinite" />
         </circle>
-        <circle cx="175" cy="17" r="5" fill="#ffffff" opacity="0">
+        <circle cx="175" cy="20" r="5" fill="#ffffff" opacity="0">
             <animate attributeName="opacity" values="0; 0; 0.7; 0.7; 0"
                 keyTimes="0; 0.35; 0.55; 0.8; 1" dur="2.5s" repeatCount="indefinite" />
         </circle>
         <!-- Balão de pensamento -->
-        <rect x="175" y="-5" width="55" height="30" rx="10" ry="10" fill="#ffffff" opacity="0">
+        <rect x="175" y="6" width="55" height="30" rx="10" ry="10" fill="#ffffff" opacity="0">
             <animate attributeName="opacity" values="0; 0; 0.9; 0.9; 0"
                 keyTimes="0; 0.4; 0.6; 0.8; 1" dur="2.5s" repeatCount="indefinite" />
         </rect>
-        <text x="178" y="14" font-size="18" fill="#555" font-family="sans-serif" opacity="0">
+        <text x="184" y="28" font-size="18" fill="#555" font-family="sans-serif" opacity="0">
             <animate attributeName="opacity" values="0; 0; 0.9; 0.9; 0"
                 keyTimes="0; 0.4; 0.6; 0.8; 1" dur="2.5s" repeatCount="indefinite" /> ... </text>
 

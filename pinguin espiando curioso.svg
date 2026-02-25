@@ -26,19 +26,37 @@
            C205 135, 170 105, 120 105 Z"
         fill="#0a0a0a" />
 
-    <!-- PESCOÇO -->
-    <ellipse cx="150" cy="70" rx="20" ry="28" fill="#0a0a0a" />
+    <g transform="translate(0, 10)">
 
-    <!-- CABEÇA -->
-    <ellipse cx="155" cy="60" rx="45" ry="35" fill="#0a0a0a" />
+        <!-- PESCOÇO -->
+        <ellipse cx="150" cy="70" rx="20" ry="28" fill="#0a0a0a" />
 
-    <!-- CABELO -->
-    <g fill="#0a0a0a">
-        <ellipse cx="155" cy="25" rx="7" ry="12" transform="rotate(-5 155 25)" />
-        <ellipse cx="138" cy="30" rx="6" ry="10" transform="rotate(-20 138 30)" />
-        <ellipse cx="172" cy="30" rx="6" ry="10" transform="rotate(20 172 30)" />
+        <!-- CABEÇA -->
+        <ellipse cx="155" cy="60" rx="45" ry="35" fill="#0a0a0a" />
+
+        <!-- CABELO -->
+        <g fill="#0a0a0a">
+            <ellipse cx="155" cy="25" rx="7" ry="12" transform="rotate(-5 155 25)" />
+            <ellipse cx="138" cy="30" rx="6" ry="10" transform="rotate(-20 138 30)" />
+            <ellipse cx="172" cy="30" rx="6" ry="10" transform="rotate(20 172 30)" />
+        </g>
+
+
+        <!-- OLHOS (olhando para direita) -->
+        <circle cx="145" cy="55" r="12" fill="#ffffff" />
+        <circle cx="175" cy="55" r="12" fill="#ffffff" />
+        <circle cx="150" cy="57" r="5" fill="#000000" />
+        <circle cx="180" cy="57" r="5" fill="#000000" />
+
+        <!-- BICO -->
+        <path
+            d="M140 70
+           C140 63, 155 60, 165 60
+           C175 60, 190 63, 190 70
+           C190 78, 175 85, 165 85
+           C155 85, 140 78, 140 70 Z"
+            fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
     </g>
-
     <!-- BARRIGA -->
     <path
         d="M135 115
@@ -62,18 +80,4 @@
            C170 190, 175 160, 200 150 Z"
         fill="#0a0a0a" />
 
-    <!-- OLHOS (olhando para direita) -->
-    <circle cx="145" cy="55" r="12" fill="#ffffff" />
-    <circle cx="175" cy="55" r="12" fill="#ffffff" />
-    <circle cx="150" cy="57" r="5" fill="#000000" />
-    <circle cx="180" cy="57" r="5" fill="#000000" />
-
-    <!-- BICO -->
-    <path
-        d="M140 70
-           C140 63, 155 60, 165 60
-           C175 60, 190 63, 190 70
-           C190 78, 175 85, 165 85
-           C155 85, 140 78, 140 70 Z"
-        fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
 </svg>

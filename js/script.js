@@ -40,8 +40,11 @@ const EMOTION_DURATION_MULTIPLIER = 1.35;
 const PRELUDE_EMOTIONS = ["crying", "shy", "angry"];
 const PRELUDE_EMOTION_DURATION_MS = 2200;
 const PRELUDE_IDLE_DURATION_MS = 900;
-const BEHAVIOR_DELAY_MIN_MS = 600;
-const BEHAVIOR_DELAY_VARIATION_MS = 1000;
+const PRELUDE_CHANCE = 0.35;
+const BEHAVIOR_DELAY_MIN_MS = 2400;
+const BEHAVIOR_DELAY_VARIATION_MS = 2600;
+const STEP_TRANSITION_DELAY_MS = 700;
+const STEP_TRANSITION_DELAY_VARIATION_MS = 450;
 const SPEED_WALK = 1.5;
 const SPEED_WALK_FAST = 2.2;
 const SPEED_CHASE = 2.2;
@@ -171,7 +174,7 @@ const phrases = {
     "Minha barriga tá doendo de rir!",
     "KEK KEK KEK!",
   ],
-  thinking: [""],
+  thinking: ["Te amo!", "Acho que apaixonei!", "Vc é um xuxuzinho!"],
   flying: [
     "Vou conseguir! Só mais um pouquinho!",
     "Os pinguins PODEM voar. Hoje é o dia!",
@@ -252,6 +255,7 @@ const behaviors = [
 
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
+let isMouseInsideViewport = true;
 
 class Penguin {
   constructor() {
@@ -301,6 +305,7 @@ class Penguin {
   // ── Estado ────────────────────────────────────────────────────────────────
 
   setState(state) {
+    if (this.isDragging && state !== "flying") return;
     if (this.currentState === state) return;
     this.currentState = state;
     this.img.src = actionStates[state];
@@ -627,6 +632,37 @@ class Penguin {
     };
   }
 
+  randomShortWalkTarget() {
+    const maxOffset = 120;
+    const minX = halfPenguinSize;
+    const maxX = window.innerWidth - halfPenguinSize;
+    const targetCenterX = Math.max(
+      minX,
+      Math.min(
+        this.x + halfPenguinSize + (Math.random() * 2 - 1) * maxOffset,
+        maxX,
+      ),
+    );
+
+    return {
+      x: targetCenterX - halfPenguinSize,
+      y: this.randomWalkY(),
+    };
+  }
+
+  insertWalkBetweenEmotionSteps(currentStep) {
+    if (!currentStep || currentStep.type !== "act") return;
+    if (currentStep.state === "idle") return;
+    if (this.stepQueue.length === 0) return;
+
+    const nextStep = this.stepQueue[0];
+    if (!nextStep || nextStep.type !== "act" || nextStep.state === "idle") {
+      return;
+    }
+
+    this.stepQueue.unshift({ type: "walkShort" });
+  }
+
   // ── IA autônoma ───────────────────────────────────────────────────────────
 
   scheduleNextBehavior() {
@@ -635,20 +671,32 @@ class Penguin {
     setTimeout(() => this.startNextBehavior(), delay);
   }
 
+  getStepTransitionDelay() {
+    return (
+      STEP_TRANSITION_DELAY_MS +
+      Math.random() * STEP_TRANSITION_DELAY_VARIATION_MS
+    );
+  }
+
   startNextBehavior() {
     if (this.aiLocked) return;
-    const preludeEmotion =
-      PRELUDE_EMOTIONS[Math.floor(Math.random() * PRELUDE_EMOTIONS.length)];
     const seq = behaviors[Math.floor(Math.random() * behaviors.length)]();
-    this.stepQueue = [
-      {
-        type: "act",
-        state: preludeEmotion,
-        duration: PRELUDE_EMOTION_DURATION_MS,
-      },
-      { type: "act", state: "idle", duration: PRELUDE_IDLE_DURATION_MS },
-      ...seq,
-    ];
+    const withPrelude = Math.random() < PRELUDE_CHANCE;
+
+    this.stepQueue = withPrelude
+      ? [
+          {
+            type: "act",
+            state:
+              PRELUDE_EMOTIONS[
+                Math.floor(Math.random() * PRELUDE_EMOTIONS.length)
+              ],
+            duration: PRELUDE_EMOTION_DURATION_MS,
+          },
+          { type: "act", state: "idle", duration: PRELUDE_IDLE_DURATION_MS },
+          ...seq,
+        ]
+      : seq;
     this.runNextStep();
   }
 
@@ -664,13 +712,16 @@ class Penguin {
     if (
       step.type === "walk" ||
       step.type === "walkFast" ||
-      step.type === "walkEdge"
+      step.type === "walkEdge" ||
+      step.type === "walkShort"
     ) {
       const sp = step.type === "walkFast" ? SPEED_WALK_FAST : SPEED_WALK;
       const t =
         step.type === "walkEdge"
           ? this.randomTarget(true)
-          : this.randomTarget(false);
+          : step.type === "walkShort"
+            ? this.randomShortWalkTarget()
+            : this.randomTarget(false);
       this.speed = sp;
       this.moveToPosition(t.x + halfPenguinSize, t.y + halfPenguinSize);
 
@@ -678,7 +729,7 @@ class Penguin {
         if (!this.isMoving) {
           clearInterval(waitArrival);
           this.speed = SPEED_WALK;
-          setTimeout(() => this.runNextStep(), 250);
+          setTimeout(() => this.runNextStep(), this.getStepTransitionDelay());
         }
       }, 100);
     } else if (step.type === "jumpMove") {
@@ -698,7 +749,10 @@ class Penguin {
           clearInterval(waitArrival);
           this.speed = SPEED_WALK;
           if (!this.isMoving) this.setState("idle");
-          setTimeout(() => this.runNextStep(), step.duration || 600);
+          setTimeout(
+            () => this.runNextStep(),
+            step.duration || this.getStepTransitionDelay(),
+          );
         }
       }, 100);
     } else if (step.type === "flyMove") {
@@ -729,7 +783,10 @@ class Penguin {
             if (!this.isMoving) {
               clearInterval(backToSnow);
               if (!this.isMoving) this.setState("idle");
-              setTimeout(() => this.runNextStep(), step.duration || 600);
+              setTimeout(
+                () => this.runNextStep(),
+                step.duration || this.getStepTransitionDelay(),
+              );
             }
           }, 100);
         }
@@ -752,6 +809,7 @@ class Penguin {
       setTimeout(() => {
         this.element.style.animation = "";
         if (!this.isMoving) this.setState("idle");
+        this.insertWalkBetweenEmotionSteps(step);
         this.runNextStep();
       }, actDuration);
     }
@@ -760,6 +818,8 @@ class Penguin {
   // ── Interação com o mouse ─────────────────────────────────────────────────
 
   handleMouseProximity() {
+    if (!isMouseInsideViewport) return;
+
     const mdx = mouseX - (this.x + halfPenguinSize);
     const mdy = mouseY - (this.y + halfPenguinSize);
     const dist = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -885,6 +945,9 @@ class Penguin {
     window.addEventListener("pointercancel", (e) => {
       this.onDragEnd(e);
     });
+    document.addEventListener("mouseleave", () => {
+      this.onDragEnd();
+    });
 
     this.element.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -912,6 +975,17 @@ class Penguin {
 
   onDragMove(e) {
     if (!this.isDragging) return;
+
+    if (
+      e.clientX < 0 ||
+      e.clientX > window.innerWidth ||
+      e.clientY < 0 ||
+      e.clientY > window.innerHeight
+    ) {
+      this.onDragEnd();
+      return;
+    }
+
     e.preventDefault();
 
     this.dragMoved = true;
@@ -1041,7 +1115,7 @@ class Penguin {
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     // Se estiver perseguindo, atualiza o alvo para a posição atual do mouse
-    if (this.isChasing) {
+    if (this.isChasing && isMouseInsideViewport) {
       this.targetX = mouseX - halfPenguinSize;
       this.targetY = this.clampY(mouseY - halfPenguinSize);
     }
@@ -1135,8 +1209,19 @@ function createBackgroundParticles() {
 const penguin = new Penguin();
 
 document.addEventListener("mousemove", (e) => {
+  isMouseInsideViewport = true;
   mouseX = e.clientX;
   mouseY = e.clientY;
+});
+
+document.addEventListener("mouseenter", (e) => {
+  isMouseInsideViewport = true;
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+document.addEventListener("mouseleave", () => {
+  isMouseInsideViewport = false;
 });
 
 // Neve de fundo

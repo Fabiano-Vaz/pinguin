@@ -3,7 +3,7 @@
   "displayName": "Pinguim Pet",
   "description": "Um pinguim animado que anda no VS Code enquanto o editor estiver aberto.",
   "version": "0.0.1",
-  "publisher": "local",
+  "publisher": "Pingocode",
   "engines": {
     "vscode": "^1.85.0"
   },

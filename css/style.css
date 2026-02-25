@@ -14,7 +14,7 @@ body {
     --penguin-size: 120px;
     overflow: hidden;
     background-color: #ffffff;
-    background-image: url('../assets/backgroung.png');
+    background-image: url('../assets/backgroung-dark.png');
     background-size: cover;
     background-position: center bottom;
     background-repeat: no-repeat;

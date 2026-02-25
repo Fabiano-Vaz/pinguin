@@ -61,7 +61,7 @@ function getWebviewContent(webview, extensionUri) {
     vscode.Uri.joinPath(extensionUri, "js", "script.js"),
   );
   const backgroundUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "assets", "backgroung.png"),
+    vscode.Uri.joinPath(extensionUri, "assets", "backgroung-dark.png"),
   );
 
   const assets = {
@@ -105,7 +105,7 @@ function getWebviewContent(webview, extensionUri) {
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
     window.PENGUIN_CONFIG = {
       size: 40,
-      groundRatio: 0.74,
+      groundRatio: 0.86,
       backgroundImage: "${backgroundUri}",
     };
   </script>

@@ -40,7 +40,7 @@ const SPEED_WALK = 1.2;
 const SPEED_WALK_FAST = 1.8;
 const SPEED_CHASE = 2.2;
 const SPEED_FLEE = 2.8;
-const defaultSnowTopRatio = 0.74;
+const defaultSnowTopRatio = 0.86;
 const snowTopRatio =
   typeof window !== "undefined" &&
   window.PENGUIN_CONFIG &&
@@ -55,7 +55,7 @@ const backgroundImage =
   typeof window.PENGUIN_CONFIG.backgroundImage === "string" &&
   window.PENGUIN_CONFIG.backgroundImage.length > 0
     ? window.PENGUIN_CONFIG.backgroundImage
-    : "assets/backgroung.png";
+    : "assets/backgroung-dark.png";
 
 if (typeof document !== "undefined" && document.body) {
   const backgroundTargetElements = [document.documentElement, document.body];
@@ -309,7 +309,10 @@ class Penguin {
   }
 
   startJumpArc(targetX, targetY) {
-    const clampedX = Math.max(0, Math.min(targetX, window.innerWidth - penguinSize));
+    const clampedX = Math.max(
+      0,
+      Math.min(targetX, window.innerWidth - penguinSize),
+    );
     const clampedY = this.clampY(targetY);
     const horizontalDistance = Math.abs(clampedX - this.x);
     const apex = Math.max(28, Math.min(100, 36 + horizontalDistance * 0.18));
@@ -369,7 +372,10 @@ class Penguin {
 
     if (this.customMotion.type === "fall") {
       const motion = this.customMotion;
-      motion.vy = Math.min(motion.maxVy, motion.vy + motion.gravity * dtSeconds);
+      motion.vy = Math.min(
+        motion.maxVy,
+        motion.vy + motion.gravity * dtSeconds,
+      );
       this.y += motion.vy * dtSeconds;
 
       if (this.y >= motion.targetY) {
@@ -509,7 +515,8 @@ class Penguin {
   }
 
   getWalkMaxY() {
-    return Math.max(this.getWalkMinY(), window.innerHeight - penguinSize);
+    // Limita a caminhada à faixa do "chão" (topo da neve), evitando descer para o rodapé.
+    return this.getWalkMinY() + 10;
   }
 
   getFlyMinY() {
@@ -918,7 +925,10 @@ class Penguin {
   // ── Loop de animação ──────────────────────────────────────────────────────
 
   update(now = performance.now()) {
-    const dtSeconds = Math.min(0.05, Math.max(0.001, (now - this.lastUpdateTime) / 1000));
+    const dtSeconds = Math.min(
+      0.05,
+      Math.max(0.001, (now - this.lastUpdateTime) / 1000),
+    );
     this.lastUpdateTime = now;
 
     if (this.isDragging) {
@@ -948,9 +958,12 @@ class Penguin {
       this.targetY = this.clampY(mouseY - halfPenguinSize);
     }
 
+    let movedThisFrame = false;
+
     if (distance > 5) {
       this.x += (dx / distance) * this.speed;
       this.y += (dy / distance) * this.speed;
+      movedThisFrame = true;
 
       if (this.currentState !== "jumping" && this.currentState !== "flying") {
         this.setState("running");
@@ -966,6 +979,11 @@ class Penguin {
     } else if (this.isMoving) {
       this.isMoving = false;
       this.allowAirMovement = false;
+      this.setState("idle");
+    }
+
+    // Garante que o sprite de corrida só apareça com deslocamento real.
+    if (!movedThisFrame && this.currentState === "running") {
       this.setState("idle");
     }
 
@@ -1034,4 +1052,28 @@ document.addEventListener("mousemove", (e) => {
 });
 
 // Neve de fundo
-setInterval(createBackgroundParticles, 400);
+const SNOW_ACTIVE_DURATION_MS = 15_000;
+const SNOW_COOLDOWN_DURATION_MS = 3_600_000;
+const SNOW_SPAWN_INTERVAL_MS = 400;
+
+let snowSpawnIntervalId = null;
+
+function startSnowCycle() {
+  if (snowSpawnIntervalId !== null) return;
+
+  snowSpawnIntervalId = setInterval(
+    createBackgroundParticles,
+    SNOW_SPAWN_INTERVAL_MS,
+  );
+
+  setTimeout(() => {
+    if (snowSpawnIntervalId !== null) {
+      clearInterval(snowSpawnIntervalId);
+      snowSpawnIntervalId = null;
+    }
+
+    setTimeout(startSnowCycle, SNOW_COOLDOWN_DURATION_MS);
+  }, SNOW_ACTIVE_DURATION_MS);
+}
+
+startSnowCycle();

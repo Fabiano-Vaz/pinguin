@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- Grupo inteiro: ladinho + caminhada -->
+    <g transform="translate(0 0)">
+
+        <!-- “caminhada”: mexe o corpo todo levemente -->
+        <g>
+            <animateTransform attributeName="transform" type="translate"
+                values="0 0; 2 -2; 0 0; 2 -2; 0 0"
+                dur="0.9s" repeatCount="indefinite" />
+
+            <!-- Estilo “de ladinho” (um tilt + leve achatado) -->
+            <g transform="translate(10 0) rotate(-8 130 150) scale(0.93 1)">
+
+                <!-- PÉS (alternando) -->
+                <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+                    <!-- pé traseiro -->
+                    <g>
+                        <path
+                            d="M85 220
+                 C65 225, 60 238, 75 243
+                 C92 248, 114 242, 120 235
+                 C125 228, 110 220, 85 220 Z" />
+                        <animateTransform attributeName="transform" type="translate"
+                            values="0 0; -3 2; 0 0; -3 2; 0 0"
+                            dur="0.9s" repeatCount="indefinite" />
+                    </g>
+
+                    <!-- pé dianteiro -->
+                    <g>
+                        <path
+                            d="M165 214
+                 C186 218, 197 232, 180 238
+                 C162 244, 138 238, 130 230
+                 C124 223, 142 214, 165 214 Z" />
+                        <animateTransform attributeName="transform" type="translate"
+                            values="0 0; 6 -2; 0 0; 6 -2; 0 0"
+                            dur="0.9s" repeatCount="indefinite" />
+                    </g>
+                </g>
+
+                <!-- CORPO -->
+                <path
+                    d="M130 100
+             C85 100, 60 135, 60 165
+             C60 190, 85 220, 130 240
+             C175 220, 200 190, 200 165
+             C200 135, 175 100, 130 100 Z"
+                    fill="#0a0a0a" />
+
+                <!-- BARRIGA -->
+                <path
+                    d="M130 110
+             C105 110, 85 135, 85 175
+             C85 205, 105 225, 130 230
+             C155 225, 175 205, 175 175
+             C175 135, 155 110, 130 110 Z"
+                    fill="#ffffff" />
+
+                <!-- PESCOÇO -->
+                <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
+
+                <!-- CABEÇA -->
+                <g>
+                    <ellipse cx="130" cy="55" rx="45" ry="35" fill="#0a0a0a" />
+
+                    <!-- CABELO FOFO -->
+                    <g fill="#0a0a0a">
+                        <ellipse cx="130" cy="20" rx="7" ry="12" transform="rotate(-5 130 20)" />
+                        <ellipse cx="113" cy="25" rx="6" ry="10" transform="rotate(-20 113 25)" />
+                        <ellipse cx="147" cy="25" rx="6" ry="10" transform="rotate(20 147 25)" />
+                        <ellipse cx="101" cy="32" rx="5" ry="8" transform="rotate(-35 101 32)" />
+                        <ellipse cx="159" cy="32" rx="5" ry="8" transform="rotate(35 159 32)" />
+                    </g>
+
+                    <!-- OLHOS (olhando pra direita, pra combinar com “de ladinho”) -->
+                    <circle cx="118" cy="50" r="12" fill="#ffffff" />
+                    <circle cx="148" cy="50" r="12" fill="#ffffff" />
+                    <circle cx="122" cy="52" r="5" fill="#000000" />
+                    <circle cx="152" cy="52" r="5" fill="#000000" />
+
+                    <!-- BICO (um pouco mais à direita) -->
+                    <path
+                        d="M112 65
+               C112 58, 124 55, 134 55
+               C144 55, 156 58, 156 65
+               C156 72, 144 78, 134 78
+               C124 78, 112 72, 112 65 Z"
+                        fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+                </g>
+
+                <!-- ASAS (leve swing) -->
+                <g>
+                    <path
+                        d="M70 140
+               C45 165, 60 200, 90 210
+               C95 200, 95 160, 70 140 Z"
+                        fill="#0a0a0a" />
+                    <animateTransform attributeName="transform" type="rotate"
+                        values="0 85 160; 6 85 160; 0 85 160; -6 85 160; 0 85 160"
+                        dur="0.9s" repeatCount="indefinite" />
+                </g>
+
+                <g>
+                    <path
+                        d="M190 140
+               C215 165, 200 200, 170 210
+               C165 200, 165 160, 190 140 Z"
+                        fill="#0a0a0a" />
+                    <animateTransform attributeName="transform" type="rotate"
+                        values="0 175 160; -6 175 160; 0 175 160; 6 175 160; 0 175 160"
+                        dur="0.9s" repeatCount="indefinite" />
+                </g>
+
+            </g>
+        </g>
+
+    </g>
+</svg>

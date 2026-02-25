@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+  <rect width="260" height="260" fill="transparent" />
+
+  <g>
+    <animateTransform attributeName="transform" type="translate"
+      values="0 0; -2 0; 2 0; -2 0; 2 0; 0 0" dur="0.26s" repeatCount="indefinite" />
+
+    <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+      <path
+        d="M70 216 C50 221, 45 235, 62 240 C80 245, 104 238, 112 230 C118 223, 100 215, 70 216 Z" />
+      <path
+        d="M190 216 C210 221, 215 235, 198 240 C180 245, 156 238, 148 230 C142 223, 160 215, 190 216 Z" />
+    </g>
+
+    <path
+      d="M130 100 C85 100, 60 135, 60 165 C60 190, 85 220, 130 240 C175 220, 200 190, 200 165 C200 135, 175 100, 130 100 Z"
+      fill="#0a0a0a" />
+    <path
+      d="M130 110 C105 110, 85 135, 85 175 C85 205, 105 225, 130 230 C155 225, 175 205, 175 175 C175 135, 155 110, 130 110 Z"
+      fill="#ffffff" />
+    <ellipse cx="130" cy="66" rx="20" ry="28" fill="#0a0a0a" />
+
+    <g>
+      <ellipse cx="130" cy="56" rx="45" ry="35" fill="#0a0a0a" />
+      <g fill="#0a0a0a">
+        <ellipse cx="130" cy="20" rx="7" ry="12" transform="rotate(-5 130 20)" />
+        <ellipse cx="112" cy="24" rx="6" ry="11" transform="rotate(-35 112 24)" />
+        <ellipse cx="148" cy="24" rx="6" ry="11" transform="rotate(35 148 24)" />
+      </g>
+
+      <circle cx="114" cy="50" r="14" fill="#ffffff" />
+      <circle cx="146" cy="50" r="14" fill="#ffffff" />
+      <circle cx="114" cy="52" r="4.5" fill="#000000" />
+      <circle cx="146" cy="52" r="4.5" fill="#000000" />
+
+      <path
+        fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+      <ellipse cx="130" cy="78" rx="15" ry="12" fill="#f2c400" stroke="#e1b600" stroke-width="1.2" />
+    </g>
+
+    <g>
+      <path d="M68 144 C36 166, 56 204, 94 211 C102 194, 98 160, 68 144 Z" fill="#0a0a0a" />
+      <animateTransform attributeName="transform" type="rotate"
+        values="-8 84 165; -2 84 165; -8 84 165" dur="0.26s" repeatCount="indefinite" />
+    </g>
+
+    <g>
+      <path d="M192 144 C224 166, 204 204, 166 211 C158 194, 162 160, 192 144 Z" fill="#0a0a0a" />
+      <animateTransform attributeName="transform" type="rotate"
+        values="8 176 165; 2 176 165; 8 176 165" dur="1.26s" repeatCount="indefinite" />
+    </g>
+  </g>
+</svg>

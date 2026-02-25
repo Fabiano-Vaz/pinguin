@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- PÉS (um à frente) -->
+    <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+        <!-- pé traseiro -->
+        <path
+            d="M85 225
+             C65 230, 60 242, 75 247
+             C92 252, 115 245, 120 238
+             C125 232, 110 225, 85 225 Z" />
+        <!-- pé da frente -->
+        <path
+            d="M165 215
+             C185 220, 195 235, 178 240
+             C160 245, 135 238, 128 230
+             C122 223, 140 215, 165 215 Z" />
+    </g>
+
+    <!-- CORPO (levemente inclinado para frente) -->
+    <path
+        d="M120 105
+           C75 110, 55 145, 60 175
+           C65 200, 90 225, 135 240
+           C175 225, 205 195, 205 165
+           C205 135, 170 105, 120 105 Z"
+        fill="#0a0a0a" />
+
+    <!-- PESCOÇO -->
+    <ellipse cx="150" cy="70" rx="20" ry="28" fill="#0a0a0a" />
+
+    <!-- CABEÇA -->
+    <ellipse cx="155" cy="60" rx="45" ry="35" fill="#0a0a0a" />
+
+    <!-- CABELO -->
+    <g fill="#0a0a0a">
+        <ellipse cx="155" cy="25" rx="7" ry="12" transform="rotate(-5 155 25)" />
+        <ellipse cx="138" cy="30" rx="6" ry="10" transform="rotate(-20 138 30)" />
+        <ellipse cx="172" cy="30" rx="6" ry="10" transform="rotate(20 172 30)" />
+    </g>
+
+    <!-- BARRIGA -->
+    <path
+        d="M135 115
+           C110 120, 90 145, 95 180
+           C100 210, 120 225, 145 230
+           C170 220, 185 200, 185 170
+           C185 135, 165 115, 135 115 Z"
+        fill="#ffffff" />
+
+    <!-- ASA TRASEIRA (movimento para trás) -->
+    <path
+        d="M75 150
+           C40 170, 55 210, 95 215
+           C100 195, 95 160, 75 150 Z"
+        fill="#0a0a0a" />
+
+    <!-- ASA DIANTEIRA -->
+    <path
+        d="M200 150
+           C230 170, 215 205, 175 210
+           C170 190, 175 160, 200 150 Z"
+        fill="#0a0a0a" />
+
+    <!-- OLHOS (olhando para direita) -->
+    <circle cx="145" cy="55" r="12" fill="#ffffff" />
+    <circle cx="175" cy="55" r="12" fill="#ffffff" />
+    <circle cx="150" cy="57" r="5" fill="#000000" />
+    <circle cx="180" cy="57" r="5" fill="#000000" />
+
+    <!-- BICO -->
+    <path
+        d="M140 70
+           C140 63, 155 60, 165 60
+           C175 60, 190 63, 190 70
+           C190 78, 175 85, 165 85
+           C155 85, 140 78, 140 70 Z"
+        fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+</svg>

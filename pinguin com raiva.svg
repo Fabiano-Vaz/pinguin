@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- Tremor de raiva -->
+    <g>
+        <animateTransform attributeName="transform" type="translate"
+            values="0 0; -2 0; 2 0; -2 0; 2 0; 0 0" dur="0.18s" repeatCount="indefinite" />
+
+        <!-- PÉS -->
+        <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+            <path
+                d="M78 222 C58 228, 52 240, 68 246 C86 252, 110 244, 116 236 C121 229, 105 221, 78 222 Z" />
+            <path
+                d="M182 222 C202 228, 208 240, 192 246 C174 252, 150 244, 144 236 C139 229, 155 221, 182 222 Z" />
+        </g>
+
+        <!-- CORPO inclinado pra frente -->
+        <path
+            d="M130 100 C85 100, 60 135, 60 165 C60 190, 85 220, 130 240 C175 220, 200 190, 200 165 C200 135, 175 100, 130 100 Z"
+            fill="#0a0a0a" />
+        <path
+            d="M130 110 C105 110, 85 135, 85 175 C85 205, 105 225, 130 230 C155 225, 175 205, 175 175 C175 135, 155 110, 130 110 Z"
+            fill="#ffffff" />
+
+        <!-- ASAS levantadas de raiva -->
+        <g>
+            <path d="M70 140 C45 165, 60 200, 90 210 C95 200, 95 160, 70 140 Z" fill="#0a0a0a" />
+            <animateTransform attributeName="transform" type="rotate"
+                values="-25 84 164; -35 84 164; -25 84 164" dur="0.18s" repeatCount="indefinite" />
+        </g>
+        <g>
+            <path d="M190 140 C215 165, 200 200, 170 210 C165 200, 165 160, 190 140 Z"
+                fill="#0a0a0a" />
+            <animateTransform attributeName="transform" type="rotate"
+                values="25 176 164; 35 176 164; 25 176 164" dur="0.18s" repeatCount="indefinite" />
+        </g>
+
+        <!-- PESCOÇO -->
+        <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
+
+        <!-- CABEÇA -->
+        <ellipse cx="130" cy="55" rx="45" ry="35" fill="#0a0a0a" />
+
+        <!-- CABELO FOFO em pé de raiva -->
+        <g fill="#0a0a0a">
+            <ellipse cx="130" cy="18" rx="7" ry="14" transform="rotate(-5 130 18)" />
+            <ellipse cx="113" cy="22" rx="6" ry="12" transform="rotate(-25 113 22)" />
+            <ellipse cx="147" cy="22" rx="6" ry="12" transform="rotate(25 147 22)" />
+            <ellipse cx="100" cy="30" rx="5" ry="10" transform="rotate(-40 100 30)" />
+            <ellipse cx="160" cy="30" rx="5" ry="10" transform="rotate(40 160 30)" />
+        </g>
+
+        <!-- SOBRANCELHAS raivosas (V invertido, grossas) -->
+        <line x1="106" y1="42" x2="122" y2="36" stroke="#3a3a3a" stroke-width="4"
+            stroke-linecap="round" />
+        <line x1="138" y1="36" x2="154" y2="42" stroke="#3a3a3a" stroke-width="4"
+            stroke-linecap="round" />
+
+        <!-- OLHOS semi-fechados de raiva -->
+        <circle cx="116" cy="50" r="12" fill="#ffffff" />
+        <circle cx="144" cy="50" r="12" fill="#ffffff" />
+        <circle cx="117" cy="51" r="5" fill="#000000" />
+        <circle cx="143" cy="51" r="5" fill="#000000" />
+        <!-- pálpebras de raiva (mais pesadas em cima, do lado das sobrancelhas) -->
+        <ellipse cx="116" cy="40" rx="12" ry="8" fill="#0a0a0a" />
+        <ellipse cx="144" cy="40" rx="12" ry="8" fill="#0a0a0a" />
+
+        <!-- BICO -->
+        <path
+            d="M108 64 C108 58, 121 55, 130 55 C139 55, 152 58, 152 64 C152 72, 141 78, 130 78 C119 78, 108 72, 108 64 Z"
+            fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+
+        <!-- BOCA aberta de raiva -->
+        <path d="M116 74 C120 80, 140 80, 144 74" fill="#c8310a" stroke="#c8310a" stroke-width="1"
+            stroke-linecap="round" />
+
+        <!-- VAPOR saindo da cabeça (esquerda e direita) -->
+        <g opacity="0">
+            <animate attributeName="opacity" values="0; 1; 0" dur="0.9s" repeatCount="indefinite" />
+            <path d="M100 18 C97 14, 103 10, 100 6" fill="none" stroke="#ffffff" stroke-width="2.5"
+                stroke-linecap="round" />
+            <path d="M160 18 C163 14, 157 10, 160 6" fill="none" stroke="#ffffff" stroke-width="2.5"
+                stroke-linecap="round" />
+        </g>
+        <g opacity="0">
+            <animate attributeName="opacity" values="0; 1; 0" dur="0.9s" begin="0.45s"
+                repeatCount="indefinite" />
+            <path d="M112 12 C109 8, 115 4, 112 0" fill="none" stroke="#ffffff" stroke-width="2"
+                stroke-linecap="round" />
+            <path d="M148 12 C151 8, 145 4, 148 0" fill="none" stroke="#ffffff" stroke-width="2"
+                stroke-linecap="round" />
+        </g>
+
+    </g>
+</svg>

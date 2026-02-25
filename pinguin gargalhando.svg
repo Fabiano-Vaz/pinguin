@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- Chacoalhada de riso -->
+    <g>
+        <animateTransform attributeName="transform" type="rotate"
+            values="0 130 160; 3 130 160; -3 130 160; 3 130 160; 0 130 160" dur="0.45s"
+            repeatCount="indefinite" />
+
+        <!-- PÉS -->
+        <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+            <path
+                d="M78 222 C58 228, 52 240, 68 246 C86 252, 110 244, 116 236 C121 229, 105 221, 78 222 Z" />
+            <path
+                d="M182 222 C202 228, 208 240, 192 246 C174 252, 150 244, 144 236 C139 229, 155 221, 182 222 Z" />
+        </g>
+
+        <!-- CORPO -->
+        <path
+            d="M130 100 C85 100, 60 135, 60 165 C60 190, 85 220, 130 240 C175 220, 200 190, 200 165 C200 135, 175 100, 130 100 Z"
+            fill="#0a0a0a" />
+        <path
+            d="M130 110 C105 110, 85 135, 85 175 C85 205, 105 225, 130 230 C155 225, 175 205, 175 175 C175 135, 155 110, 130 110 Z"
+            fill="#ffffff" />
+
+        <!-- ASAS abertas gargalhando -->
+        <g>
+            <path d="M70 140 C45 165, 60 200, 90 210 C95 200, 95 160, 70 140 Z" fill="#0a0a0a" />
+            <animateTransform attributeName="transform" type="rotate"
+                values="-30 84 164; -40 84 164; -30 84 164; -40 84 164; -30 84 164" dur="0.45s"
+                repeatCount="indefinite" />
+        </g>
+        <g>
+            <path d="M190 140 C215 165, 200 200, 170 210 C165 200, 165 160, 190 140 Z"
+                fill="#0a0a0a" />
+            <animateTransform attributeName="transform" type="rotate"
+                values="30 176 164; 40 176 164; 30 176 164; 40 176 164; 30 176 164" dur="0.45s"
+                repeatCount="indefinite" />
+        </g>
+
+        <!-- PESCOÇO + CABEÇA jogada levemente para trás -->
+        <g>
+            <animateTransform attributeName="transform" type="rotate"
+                values="-8 130 95; -12 130 95; -8 130 95" dur="0.45s" repeatCount="indefinite" />
+
+            <!-- PESCOÇO -->
+            <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
+
+            <!-- CABEÇA -->
+            <ellipse cx="130" cy="55" rx="45" ry="35" fill="#0a0a0a" />
+
+            <!-- CABELO FOFO -->
+            <g fill="#0a0a0a">
+                <ellipse cx="130" cy="20" rx="7" ry="12" transform="rotate(-5 130 20)" />
+                <ellipse cx="113" cy="25" rx="6" ry="10" transform="rotate(-20 113 25)" />
+                <ellipse cx="147" cy="25" rx="6" ry="10" transform="rotate(20 147 25)" />
+                <ellipse cx="101" cy="32" rx="5" ry="8" transform="rotate(-35 101 32)" />
+                <ellipse cx="159" cy="32" rx="5" ry="8" transform="rotate(35 159 32)" />
+            </g>
+
+            <!-- OLHOS fechados em meia-lua de riso -->
+            <path d="M105 52 C110 44, 124 44, 127 52" fill="#0a0a0a" stroke="#ffffff"
+                stroke-width="2" stroke-linecap="round" />
+            <path d="M133 52 C136 44, 150 44, 155 52" fill="#0a0a0a" stroke="#ffffff"
+                stroke-width="2" stroke-linecap="round" />
+
+            <!-- BICO aberto de gargalhada -->
+            <path
+                d="M108 64 C108 56, 121 53, 130 53 C139 53, 152 56, 152 64 C152 74, 141 80, 130 80 C119 80, 108 74, 108 64 Z"
+                fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+            <!-- interior da boca aberta -->
+            <path d="M114 68 C118 80, 142 80, 146 68" fill="#c8310a" />
+
+            <!-- Estrelinhas/brilhos de alegria -->
+            <g opacity="0">
+                <animate attributeName="opacity" values="0; 1; 0" dur="0.45s"
+                    repeatCount="indefinite" />
+                <line x1="92" y1="32" x2="86" y2="24" stroke="#f2c400" stroke-width="2"
+                    stroke-linecap="round" />
+                <line x1="168" y1="32" x2="174" y2="24" stroke="#f2c400" stroke-width="2"
+                    stroke-linecap="round" />
+                <line x1="88" y1="28" x2="94" y2="22" stroke="#f2c400" stroke-width="1.5"
+                    stroke-linecap="round" />
+                <line x1="172" y1="28" x2="166" y2="22" stroke="#f2c400" stroke-width="1.5"
+                    stroke-linecap="round" />
+            </g>
+
+        </g>
+    </g>
+</svg>

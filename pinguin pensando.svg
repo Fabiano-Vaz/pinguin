@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- PÉS -->
+    <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+        <path
+            d="M78 222 C58 228, 52 240, 68 246 C86 252, 110 244, 116 236 C121 229, 105 221, 78 222 Z" />
+        <path
+            d="M182 222 C202 228, 208 240, 192 246 C174 252, 150 244, 144 236 C139 229, 155 221, 182 222 Z" />
+    </g>
+
+    <!-- CORPO -->
+    <path
+        d="M130 100 C85 100, 60 135, 60 165 C60 190, 85 220, 130 240 C175 220, 200 190, 200 165 C200 135, 175 100, 130 100 Z"
+        fill="#0a0a0a" />
+    <path
+        d="M130 110 C105 110, 85 135, 85 175 C85 205, 105 225, 130 230 C155 225, 175 205, 175 175 C175 135, 155 110, 130 110 Z"
+        fill="#ffffff" />
+
+    <!-- ASA esquerda estática -->
+    <path d="M70 140 C45 165, 60 200, 90 210 C95 200, 95 160, 70 140 Z" fill="#0a0a0a" />
+
+    <!-- ASA direita levantada tocando o bico (pensativo) -->
+    <g>
+        <animateTransform attributeName="transform" type="rotate"
+            values="95 190 140; 90 190 140; 95 190 140" dur="2.5s" repeatCount="indefinite" />
+        <path d="M190 140 C215 165, 200 200, 170 210 C165 200, 165 160, 190 140 Z" fill="#0a0a0a" />
+    </g>
+
+    <!-- PESCOÇO + CABEÇA inclinando ao pensar -->
+    <g>
+        <animateTransform attributeName="transform" type="rotate"
+            values="-8 130 95; -12 130 95; -8 130 95" dur="2.5s" repeatCount="indefinite" />
+
+        <!-- PESCOÇO -->
+        <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
+
+        <!-- CABEÇA -->
+        <ellipse cx="130" cy="55" rx="45" ry="35" fill="#0a0a0a" />
+
+        <!-- CABELO FOFO -->
+        <g fill="#0a0a0a">
+            <ellipse cx="130" cy="20" rx="7" ry="12" transform="rotate(-5 130 20)" />
+            <ellipse cx="113" cy="25" rx="6" ry="10" transform="rotate(-20 113 25)" />
+            <ellipse cx="147" cy="25" rx="6" ry="10" transform="rotate(20 147 25)" />
+            <ellipse cx="101" cy="32" rx="5" ry="8" transform="rotate(-35 101 32)" />
+            <ellipse cx="159" cy="32" rx="5" ry="8" transform="rotate(35 159 32)" />
+        </g>
+
+        <!-- OLHOS olhando pra cima-esquerda (pensativo) -->
+        <circle cx="116" cy="50" r="12" fill="#ffffff" />
+        <circle cx="144" cy="50" r="12" fill="#ffffff" />
+        <circle cx="113" cy="47" r="5" fill="#000000" />
+        <circle cx="141" cy="47" r="5" fill="#000000" />
+
+        <!-- BICO -->
+        <path
+            d="M108 64 C108 58, 121 55, 130 55 C139 55, 152 58, 152 64 C152 72, 141 78, 130 78 C119 78, 108 72, 108 64 Z"
+            fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+
+        <!-- BOLHAS de pensamento -->
+        <circle cx="165" cy="28" r="3" fill="#ffffff" opacity="0">
+            <animate attributeName="opacity" values="0; 0; 0.7; 0.7; 0"
+                keyTimes="0; 0.3; 0.5; 0.8; 1" dur="2.5s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="175" cy="17" r="5" fill="#ffffff" opacity="0">
+            <animate attributeName="opacity" values="0; 0; 0.7; 0.7; 0"
+                keyTimes="0; 0.35; 0.55; 0.8; 1" dur="2.5s" repeatCount="indefinite" />
+        </circle>
+        <!-- Balão de pensamento -->
+        <rect x="175" y="-5" width="55" height="30" rx="10" ry="10" fill="#ffffff" opacity="0">
+            <animate attributeName="opacity" values="0; 0; 0.9; 0.9; 0"
+                keyTimes="0; 0.4; 0.6; 0.8; 1" dur="2.5s" repeatCount="indefinite" />
+        </rect>
+        <text x="178" y="14" font-size="18" fill="#555" font-family="sans-serif" opacity="0">
+            <animate attributeName="opacity" values="0; 0; 0.9; 0.9; 0"
+                keyTimes="0; 0.4; 0.6; 0.8; 1" dur="2.5s" repeatCount="indefinite" /> ... </text>
+
+    </g>
+</svg>

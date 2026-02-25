@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- PÉS -->
+    <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+        <path
+            d="M78 222 C58 228, 52 240, 68 246 C86 252, 110 244, 116 236 C121 229, 105 221, 78 222 Z" />
+        <path
+            d="M182 222 C202 228, 208 240, 192 246 C174 252, 150 244, 144 236 C139 229, 155 221, 182 222 Z" />
+    </g>
+
+    <!-- CORPO curvado pra dentro envergonhado -->
+    <path
+        d="M130 102 C86 102, 62 136, 62 166 C62 191, 86 221, 130 240 C174 221, 198 191, 198 166 C198 136, 174 102, 130 102 Z"
+        fill="#0a0a0a" />
+    <path
+        d="M130 112 C107 112, 87 136, 87 175 C87 205, 106 224, 130 229 C154 224, 173 205, 173 175 C173 136, 153 112, 130 112 Z"
+        fill="#ffffff" />
+
+    <!-- ASA direita cruzada POR BAIXO (desenhada primeiro) -->
+    <g>
+        <animateTransform attributeName="transform" type="rotate"
+            values="68 176 164; 65 176 164; 68 176 164" dur="2s" repeatCount="indefinite" />
+        <path d="M190 148 C214 172, 198 206, 169 213 C164 201, 166 166, 190 148 Z" fill="#0a0a0a" />
+    </g>
+
+    <!-- ASA esquerda cruzada POR CIMA -->
+    <g>
+        <animateTransform attributeName="transform" type="rotate"
+            values="-68 84 164; -65 84 164; -68 84 164" dur="2s" repeatCount="indefinite" />
+        <path d="M87 140 C45 165, 60 200, 90 210 C95 200, 95 160, 80 150" fill="#0a0a0a" />
+    </g>
+
+    <!-- PESCOÇO + CABEÇA inclinada pra baixo envergonhado -->
+    <g>
+        <animateTransform attributeName="transform" type="rotate"
+            values="12 130 95; 15 130 95; 12 130 95" dur="2s" repeatCount="indefinite" />
+
+        <!-- PESCOÇO -->
+        <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
+
+        <!-- CABEÇA -->
+        <ellipse cx="130" cy="55" rx="45" ry="35" fill="#0a0a0a" />
+
+        <!-- CABELO FOFO -->
+        <g fill="#0a0a0a">
+            <ellipse cx="130" cy="20" rx="7" ry="12" transform="rotate(-5 130 20)" />
+            <ellipse cx="113" cy="25" rx="6" ry="10" transform="rotate(-20 113 25)" />
+            <ellipse cx="147" cy="25" rx="6" ry="10" transform="rotate(20 147 25)" />
+            <ellipse cx="101" cy="32" rx="5" ry="8" transform="rotate(-35 101 32)" />
+            <ellipse cx="159" cy="32" rx="5" ry="8" transform="rotate(35 159 32)" />
+        </g>
+
+        <!-- OLHOS desviando o olhar (pra baixo) -->
+        <circle cx="116" cy="50" r="12" fill="#ffffff" />
+        <circle cx="144" cy="50" r="12" fill="#ffffff" />
+        <circle cx="114" cy="54" r="5" fill="#000000" />
+        <circle cx="142" cy="54" r="5" fill="#000000" />
+
+        <!-- BOCHECHA corada (esquerda e direita) -->
+        <ellipse cx="100" cy="70" rx="10" ry="6" fill="#ff8090" opacity="0.55">
+            <animate attributeName="opacity" values="0.55; 0.75; 0.55" dur="2s"
+                repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="160" cy="70" rx="10" ry="6" fill="#ff8090" opacity="0.55">
+            <animate attributeName="opacity" values="0.55; 0.75; 0.55" dur="2s"
+                repeatCount="indefinite" />
+        </ellipse>
+
+        <!-- BICO -->
+        <path
+            d="M108 64 C108 58, 121 55, 130 55 C139 55, 152 58, 152 64 C152 72, 141 78, 130 78 C119 78, 108 72, 108 64 Z"
+            fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+
+        <!-- BOCA tipo "ehhh" tímida -->
+        <path d="M120 74 C124 71, 136 71, 140 74" fill="none" stroke="#c8960a" stroke-width="2"
+            stroke-linecap="round" />
+
+        <!-- Linhas de vergonha (- -) nos olhos -->
+        <line x1="109" y1="39" x2="123" y2="39" stroke="#ffffff" stroke-width="1.5"
+            stroke-linecap="round" opacity="0.6" />
+        <line x1="137" y1="39" x2="151" y2="39" stroke="#ffffff" stroke-width="1.5"
+            stroke-linecap="round" opacity="0.6" />
+
+    </g>
+</svg>

@@ -19,6 +19,10 @@ body {
     background-position: center bottom;
     background-repeat: no-repeat;
     font-family: 'Comic Sans MS', cursive, sans-serif;
+    cursor: auto;
+}
+
+body.fish-cursor-enabled {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="20" font-size="20">🐟</text></svg>'), auto;
 }
 
@@ -231,6 +235,20 @@ body {
     pointer-events: none;
     animation: ripple 0.6s ease-out;
     z-index: 5;
+}
+
+.food-fish-drop {
+    position: absolute;
+    pointer-events: none;
+    z-index: 6;
+    font-size: 22px;
+    transform: translate(-50%, -50%);
+    transition: left 0.55s ease-out, top 0.55s ease-in, opacity 0.25s ease, transform 0.25s ease;
+}
+
+.food-fish-drop.eaten {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
 }
 
 @keyframes ripple {

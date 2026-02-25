@@ -58,7 +58,19 @@ function getWebviewContent(webview, extensionUri) {
   const cssUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "css", "style.css"),
   );
-  const jsUri = webview.asWebviewUri(
+  const configJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-config.js"),
+  );
+  const contentJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-content.js"),
+  );
+  const effectsJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-effects.js"),
+  );
+  const penguinJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin.js"),
+  );
+  const bootstrapJsUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "js", "script.js"),
   );
   const backgroundUri = webview.asWebviewUri(
@@ -80,6 +92,7 @@ function getWebviewContent(webview, extensionUri) {
     peeking: "pinguin espiando curioso.svg",
     laughing: "pinguin gargalhando.svg",
     thinking: "pinguin-apaixonado.svg",
+    eating: "pinguin comendo peixe.svg",
     flying: "pinguin voando.svg",
   };
 
@@ -91,9 +104,7 @@ function getWebviewContent(webview, extensionUri) {
         ? vscode.Uri.joinPath(extensionUri, ...segments)
         : vscode.Uri.joinPath(extensionUri, "assets", filePath);
 
-    webviewAssets[state] = webview
-      .asWebviewUri(assetUri)
-      .toString();
+    webviewAssets[state] = webview.asWebviewUri(assetUri).toString();
   }
 
   const nonce = createNonce();
@@ -111,12 +122,16 @@ function getWebviewContent(webview, extensionUri) {
   <script nonce="${nonce}">
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
     window.PENGUIN_CONFIG = {
-      size: 40,
+      size: 86,
       groundRatio: 0.86,
       backgroundImage: "${backgroundUri}",
     };
   </script>
-  <script nonce="${nonce}" src="${jsUri}"></script>
+  <script nonce="${nonce}" src="${configJsUri}"></script>
+  <script nonce="${nonce}" src="${contentJsUri}"></script>
+  <script nonce="${nonce}" src="${effectsJsUri}"></script>
+  <script nonce="${nonce}" src="${penguinJsUri}"></script>
+  <script nonce="${nonce}" src="${bootstrapJsUri}"></script>
 </body>
 </html>`;
 }

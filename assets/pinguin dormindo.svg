@@ -59,32 +59,32 @@
 
     <!-- ZZZ flutuando — 3 letras com offsets -->
     <!-- Z1 -->
-    <text font-size="16" font-weight="bold" font-family="sans-serif" fill="#aaaaaa" opacity="0"
+    <text font-size="28" font-weight="bold" font-family="sans-serif" fill="#aaaaaa" opacity="0"
         x="175" y="80"> Z <animate attributeName="y" values="80; 40" dur="2.5s"
             repeatCount="indefinite" />
     <animate attributeName="opacity" values="0; 1; 0"
             keyTimes="0; 0.5; 1" dur="2.5s" repeatCount="indefinite" />
     <animate
-            attributeName="font-size" values="14; 20" dur="2.5s" repeatCount="indefinite" />
+            attributeName="font-size" values="28; 40" dur="2.5s" repeatCount="indefinite" />
     </text>
     <!-- Z2 -->
-    <text font-size="13" font-weight="bold" font-family="sans-serif" fill="#aaaaaa" opacity="0"
+    <text font-size="22" font-weight="bold" font-family="sans-serif" fill="#aaaaaa" opacity="0"
         x="190" y="65"> Z <animate attributeName="y" values="65; 25" dur="2.5s" begin="0.8s"
             repeatCount="indefinite" />
     <animate attributeName="opacity" values="0; 1; 0"
             keyTimes="0; 0.5; 1" dur="2.5s" begin="0.8s" repeatCount="indefinite" />
     <animate
-            attributeName="font-size" values="13; 19" dur="2.5s" begin="0.8s"
+            attributeName="font-size" values="22; 34" dur="2.5s" begin="0.8s"
             repeatCount="indefinite" />
     </text>
     <!-- Z3 -->
-    <text font-size="11" font-weight="bold" font-family="sans-serif" fill="#aaaaaa" opacity="0"
+    <text font-size="16" font-weight="bold" font-family="sans-serif" fill="#aaaaaa" opacity="0"
         x="205" y="50"> Z <animate attributeName="y" values="50; 10" dur="2.5s" begin="1.6s"
             repeatCount="indefinite" />
     <animate attributeName="opacity" values="0; 1; 0"
             keyTimes="0; 0.5; 1" dur="2.5s" begin="1.6s" repeatCount="indefinite" />
     <animate
-            attributeName="font-size" values="11; 17" dur="2.5s" begin="1.6s"
+            attributeName="font-size" values="16; 28" dur="2.5s" begin="1.6s"
             repeatCount="indefinite" />
     </text>
 

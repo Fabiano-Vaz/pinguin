@@ -42,6 +42,7 @@ class PenguinSidebarProvider {
       enableScripts: true,
       localResourceRoots: [
         vscode.Uri.joinPath(this.extensionUri, "assets"),
+        vscode.Uri.joinPath(this.extensionUri, "image"),
         vscode.Uri.joinPath(this.extensionUri, "css"),
         vscode.Uri.joinPath(this.extensionUri, "js"),
       ],
@@ -75,17 +76,23 @@ function getWebviewContent(webview, extensionUri) {
     angry: "pinguin com raiva.svg",
     scratching: "pinguin coçando a cabecinha.svg",
     waving: "pinguin dando tchau.svg",
-    shy: "pinguin envergonhado.svg",
+    shy: "pinguin-apaixonado.svg",
     peeking: "pinguin espiando curioso.svg",
     laughing: "pinguin gargalhando.svg",
-    thinking: "pinguin pensando.svg",
+    thinking: "pinguin-apaixonado.svg",
     flying: "pinguin voando.svg",
   };
 
   const webviewAssets = {};
-  for (const [state, fileName] of Object.entries(assets)) {
+  for (const [state, filePath] of Object.entries(assets)) {
+    const segments = filePath.split("/");
+    const assetUri =
+      segments.length > 1
+        ? vscode.Uri.joinPath(extensionUri, ...segments)
+        : vscode.Uri.joinPath(extensionUri, "assets", filePath);
+
     webviewAssets[state] = webview
-      .asWebviewUri(vscode.Uri.joinPath(extensionUri, "assets", fileName))
+      .asWebviewUri(assetUri)
       .toString();
   }
 

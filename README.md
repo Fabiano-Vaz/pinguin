@@ -1,80 +1,42 @@
 # 🐧 Pinguim Pet
 
-> Um companheirinho animado direto na sua barra lateral — porque codar sozinho é triste demais.
-
-O **Pinguim Pet** é uma extensão fofa para o VS Code que coloca um pinguim animado no seu painel do Explorer. Ele anda, dança, dorme, espía, fica com raiva... e tudo isso enquanto você trabalha. ❄️
-
----
+Um pinguim animado no painel **Explorer** do VS Code, com comportamento autônomo e interações visuais.
 
 ## ✨ Funcionalidades
 
-| Recurso                     | Descrição                                             |
-| --------------------------- | ----------------------------------------------------- |
-| 🎭 14 estados emocionais    | Cada ação tem sua própria animação SVG                |
-| 💬 Balões de fala           | Frases engraçadas em português para cada estado       |
-| ❄️ Neve animada             | Partículas de neve caindo ao fundo                    |
-| 🖱️ Interatividade           | O pinguim reage ao mouse e ao clique                  |
-| 🤖 Comportamento autônomo   | Ele age por conta própria — anda, para, dança, espia  |
-| ✨ Efeitos de partículas    | Explosão de partículas ao clicar nele                 |
-| ⚡ Leve e zero configuração | Funciona assim que instalado, sem nenhuma dependência |
-
----
+| Recurso | Descrição |
+| --- | --- |
+| 🎭 Estados emocionais | Vários estados com SVG dedicado (correndo, dançando, dormindo, assustado, etc.) |
+| 💘 Visual apaixonado frequente | `pinguin-apaixonado.svg` usado em estados recorrentes (`shy` e `thinking`) |
+| 🤖 Movimento contínuo | O pinguim se move de forma mais ativa, com menos tempo parado |
+| 🦘 Pulos mais realistas | Saltos mais curtos, sutis e naturais |
+| 😄 Risada em sequência | Ao rir: ri, volta ao normal, e ri novamente |
+| ⏱️ Emoções mais longas | Estados emocionais permanecem mais tempo na tela |
+| 💬 Balões ocasionais | Mensagens aparecem apenas de vez em quando (aprox. 5 min entre oportunidades) |
+| 🖱️ Interações | Reage ao mouse, clique e arrasto |
+| ❄️ Neve e partículas | Neve no fundo e efeito de partículas ao clicar |
 
 ## 🚀 Como usar
 
-1. Instale a extensão pelo Marketplace.
-2. O pinguim aparece automaticamente no painel **Explorer** ao abrir o VS Code.
-3. Prefere abrir manualmente? Use o comando:
-
-   > `Ctrl+Shift+P` → **Pinguim: Mostrar no Explorador**
-
----
+1. Instale a extensão.
+2. Abra o VS Code: o painel do pinguim pode abrir automaticamente no **Explorer**.
+3. Para abrir manualmente: `Ctrl+Shift+P` → `Pinguim: Mostrar no Explorador`.
 
 ## ⚙️ Configuração
 
-| Propriedade                 | Tipo      | Padrão | Descrição                                                     |
-| --------------------------- | --------- | ------ | ------------------------------------------------------------- |
-| `pinguin.autoOpenOnStartup` | `boolean` | `true` | Abre o painel do pinguim automaticamente ao iniciar o VS Code |
+| Propriedade | Tipo | Padrão | Descrição |
+| --- | --- | --- | --- |
+| `pinguin.autoOpenOnStartup` | `boolean` | `true` | Abre automaticamente o painel do pinguim ao iniciar o VS Code |
 
-Para alterar, vá em **Arquivo → Preferências → Configurações** e busque por `pinguin`.
+## 🎮 Interações disponíveis
 
----
-
-## 🎮 Interações
-
-- **Mova o mouse** sobre o painel — o pinguim percebe sua presença.
-- **Clique nele** para disparar reações aleatórias.
-- **Só observe** — ele tem vida própria e muda de estado sozinho.
-
----
-
-## 🐧 Os 14 estados do pinguim
-
-| Estado           | Humor                 |
-| ---------------- | --------------------- |
-| Parado           | Idle tranquilo        |
-| Correndo         | Em movimento          |
-| Pulando          | Animado e feliz       |
-| Dançando         | Com energia total     |
-| Dormindo         | Descansando           |
-| Assustado        | Levou um susto        |
-| Chorando         | Tá triste             |
-| Com raiva        | Não mexa              |
-| Coçando a cabeça | Pensativo             |
-| Dando tchau      | Até logo!             |
-| Envergonhado     | Que situação...       |
-| Espiando         | Curioso demais        |
-| Gargalhando      | Achou muito engraçado |
-| Pensando         | Concentrado           |
-
----
+- Mover o mouse perto do pinguim.
+- Clicar no pinguim para reação aleatória.
+- Arrastar e soltar o pinguim no painel.
+- Deixar ele agir sozinho no modo autônomo.
 
 ## 🛠️ Tecnologias
 
-- HTML5 + CSS3 (animações, Flexbox)
-- JavaScript Vanilla (ES6+)
-- SVG customizado para cada estado
-
----
-
-Feito com carinho, café e muita nevasca. 🐧❄️
+- JavaScript (Vanilla)
+- HTML + CSS
+- SVGs para estados do personagem

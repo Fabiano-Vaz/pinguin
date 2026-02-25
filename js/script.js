@@ -10,10 +10,10 @@ const defaultActionStates = {
   angry: "assets/pinguin com raiva.svg",
   scratching: "assets/pinguin coçando a cabecinha.svg",
   waving: "assets/pinguin dando tchau.svg",
-  shy: "assets/pinguin envergonhado.svg",
+  shy: "assets/pinguin-apaixonado.svg",
   peeking: "assets/pinguin espiando curioso.svg",
   laughing: "assets/pinguin gargalhando.svg",
-  thinking: "assets/pinguin pensando.svg",
+  thinking: "assets/pinguin-apaixonado.svg",
   flying: "assets/pinguin voando.svg",
 };
 
@@ -33,11 +33,17 @@ const penguinSize =
     ? window.PENGUIN_CONFIG.size
     : defaultPenguinSize;
 const halfPenguinSize = penguinSize / 2;
-const SPEECH_COOLDOWN_MS = 12000;
-const BEHAVIOR_DELAY_MIN_MS = 5000;
-const BEHAVIOR_DELAY_VARIATION_MS = 3000;
-const SPEED_WALK = 1.2;
-const SPEED_WALK_FAST = 1.8;
+const BUBBLE_BASE_INTERVAL_MS = 300000;
+const BUBBLE_INTERVAL_JITTER_MS = 120000;
+const BUBBLE_SHOW_CHANCE = 0.6;
+const EMOTION_DURATION_MULTIPLIER = 1.35;
+const PRELUDE_EMOTIONS = ["crying", "shy", "angry"];
+const PRELUDE_EMOTION_DURATION_MS = 2200;
+const PRELUDE_IDLE_DURATION_MS = 900;
+const BEHAVIOR_DELAY_MIN_MS = 600;
+const BEHAVIOR_DELAY_VARIATION_MS = 1000;
+const SPEED_WALK = 1.5;
+const SPEED_WALK_FAST = 2.2;
 const SPEED_CHASE = 2.2;
 const SPEED_FLEE = 2.8;
 const defaultSnowTopRatio = 0.86;
@@ -192,7 +198,7 @@ const behaviors = [
   ],
   () => [
     { type: "walk" },
-    { type: "act", state: "sleeping", duration: 15000 },
+    { type: "act", state: "sleeping", duration: 20000 },
     { type: "walk" },
   ],
   () => [
@@ -219,7 +225,7 @@ const behaviors = [
   () => [
     { type: "walk" },
     { type: "act", state: "crying", duration: 2500 },
-    { type: "act", state: "laughing", duration: 2000 },
+    { type: "act", state: "shy", duration: 2000 },
     { type: "walk" },
   ],
   () => [
@@ -270,7 +276,7 @@ class Penguin {
 
     this.bubble = null;
     this.bubbleTimeout = null;
-    this.lastSpeechAt = 0;
+    this.nextBubbleAt = Date.now() + this.getNextBubbleDelay();
 
     // Controle da IA
     this.aiLocked = false;
@@ -315,7 +321,15 @@ class Penguin {
     );
     const clampedY = this.clampY(targetY);
     const horizontalDistance = Math.abs(clampedX - this.x);
-    const apex = Math.max(28, Math.min(100, 36 + horizontalDistance * 0.18));
+    const realisticDistance = Math.min(70, horizontalDistance);
+    const apex = Math.max(
+      10,
+      Math.min(28, 12 + realisticDistance * 0.12),
+    );
+    const duration = Math.max(
+      380,
+      Math.min(620, 420 + realisticDistance * 2.1),
+    );
 
     this.customMotion = {
       type: "jumpArc",
@@ -323,7 +337,7 @@ class Penguin {
       startY: this.y,
       targetX: clampedX,
       targetY: clampedY,
-      duration: 900,
+      duration,
       elapsed: 0,
       apex,
     };
@@ -391,9 +405,51 @@ class Penguin {
 
   // ── Fala ──────────────────────────────────────────────────────────────────
 
+  getNextBubbleDelay() {
+    return BUBBLE_BASE_INTERVAL_MS + Math.random() * BUBBLE_INTERVAL_JITTER_MS;
+  }
+
+  scheduleNextBubble() {
+    this.nextBubbleAt = Date.now() + this.getNextBubbleDelay();
+  }
+
+  scaleEmotionDuration(durationMs) {
+    return Math.max(300, Math.round(durationMs * EMOTION_DURATION_MULTIPLIER));
+  }
+
+  playLaughThenIdleThenLaugh(totalDuration, onDone) {
+    const duration = Math.max(
+      900,
+      this.scaleEmotionDuration(totalDuration || 2000),
+    );
+    const firstLaugh = Math.round(duration * 0.4);
+    const neutral = Math.round(duration * 0.2);
+    const secondLaugh = duration - firstLaugh - neutral;
+
+    this.element.style.animation = "";
+    this.setState("laughing");
+    this.speak();
+
+    setTimeout(() => {
+      if (!this.isMoving) this.setState("idle");
+      setTimeout(() => {
+        this.setState("laughing");
+        setTimeout(() => {
+          this.element.style.animation = "";
+          if (!this.isMoving) this.setState("idle");
+          if (typeof onDone === "function") onDone();
+        }, secondLaugh);
+      }, neutral);
+    }, firstLaugh);
+  }
+
   speak() {
     const now = Date.now();
-    if (now - this.lastSpeechAt < SPEECH_COOLDOWN_MS) return;
+    if (now < this.nextBubbleAt) return;
+    if (Math.random() > BUBBLE_SHOW_CHANCE) {
+      this.scheduleNextBubble();
+      return;
+    }
 
     if (this.bubble) this.bubble.remove();
     if (this.bubbleTimeout) clearTimeout(this.bubbleTimeout);
@@ -401,8 +457,10 @@ class Penguin {
     const list = phrases[this.currentState];
     const text = list[Math.floor(Math.random() * list.length)];
 
-    if (!text) return;
-    this.lastSpeechAt = now;
+    if (!text) {
+      this.scheduleNextBubble();
+      return;
+    }
 
     this.bubble = document.createElement("div");
     this.bubble.className = "speech-bubble";
@@ -433,6 +491,7 @@ class Penguin {
         this.bubble = null;
       }
     }, 3000);
+    this.scheduleNextBubble();
   }
 
   updateBubblePosition() {
@@ -578,8 +637,18 @@ class Penguin {
 
   startNextBehavior() {
     if (this.aiLocked) return;
+    const preludeEmotion =
+      PRELUDE_EMOTIONS[Math.floor(Math.random() * PRELUDE_EMOTIONS.length)];
     const seq = behaviors[Math.floor(Math.random() * behaviors.length)]();
-    this.stepQueue = [...seq];
+    this.stepQueue = [
+      {
+        type: "act",
+        state: preludeEmotion,
+        duration: PRELUDE_EMOTION_DURATION_MS,
+      },
+      { type: "act", state: "idle", duration: PRELUDE_IDLE_DURATION_MS },
+      ...seq,
+    ];
     this.runNextStep();
   }
 
@@ -609,11 +678,16 @@ class Penguin {
         if (!this.isMoving) {
           clearInterval(waitArrival);
           this.speed = SPEED_WALK;
-          setTimeout(() => this.runNextStep(), 1000);
+          setTimeout(() => this.runNextStep(), 250);
         }
       }, 100);
     } else if (step.type === "jumpMove") {
-      const target = this.randomTarget(false);
+      const jumpDirection = Math.random() < 0.5 ? -1 : 1;
+      const jumpDistance = 30 + Math.random() * 40;
+      const target = {
+        x: this.x + jumpDirection * jumpDistance,
+        y: this.randomWalkY(),
+      };
       this.speed = SPEED_WALK_FAST;
       this.speak();
       this.element.style.animation = "";
@@ -661,6 +735,15 @@ class Penguin {
         }
       }, 100);
     } else if (step.type === "act") {
+      const actDuration = this.scaleEmotionDuration(step.duration || 1200);
+
+      if (step.state === "laughing") {
+        this.playLaughThenIdleThenLaugh(actDuration, () => {
+          this.runNextStep();
+        });
+        return;
+      }
+
       this.element.style.animation = "";
       this.setState(step.state);
       this.speak();
@@ -670,7 +753,7 @@ class Penguin {
         this.element.style.animation = "";
         if (!this.isMoving) this.setState("idle");
         this.runNextStep();
-      }, step.duration);
+      }, actDuration);
     }
   }
 
@@ -769,7 +852,7 @@ class Penguin {
       if (!this.isMoving) this.setState("idle");
       this.aiLocked = false;
       this.scheduleNextBehavior();
-    }, 2500);
+    }, this.scaleEmotionDuration(2500));
   }
 
   triggerMouseGoodbye() {
@@ -782,7 +865,7 @@ class Penguin {
       if (!this.isMoving) this.setState("idle");
       this.aiLocked = false;
       this.scheduleNextBehavior();
-    }, 2000);
+    }, this.scaleEmotionDuration(2000));
   }
 
   // ── Interação manual ──────────────────────────────────────────────────────
@@ -876,7 +959,7 @@ class Penguin {
         clearInterval(waitLanding);
         this.speed = SPEED_WALK;
         this.setState("angry");
-        this.lastSpeechAt = 0;
+        this.nextBubbleAt = 0;
         this.speak();
         setTimeout(() => {
           if (!this.isMoving) this.setState("idle");
@@ -891,23 +974,28 @@ class Penguin {
     this.isChasing = false;
     this.aiLocked = true;
     this.stepQueue = [];
+    const isCryingNow = this.currentState === "crying";
 
-    const reactions = [
-      "laughing",
-      "jumping",
-      "dancing",
-      "shy",
-      "waving",
-      "scared",
-    ];
+    const reactions = isCryingNow
+      ? ["jumping", "dancing", "shy", "waving", "scared"]
+      : ["laughing", "jumping", "dancing", "shy", "waving", "scared"];
     const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+
+    if (reaction === "laughing") {
+      createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
+      this.playLaughThenIdleThenLaugh(2200, () => {
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      });
+      return;
+    }
 
     this.setState(reaction);
     this.speak();
     createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
 
     const anims = {
-      jumping: "bounce 0.8s ease",
+      jumping: "hop 0.45s ease-out 2",
       dancing: "dance 0.7s ease-in-out infinite",
       shy: "shake 0.6s ease",
       scared: "shake 0.4s ease",
@@ -919,7 +1007,7 @@ class Penguin {
       if (!this.isMoving) this.setState("idle");
       this.aiLocked = false;
       this.scheduleNextBehavior();
-    }, 2000);
+    }, this.scaleEmotionDuration(2000));
   }
 
   // ── Loop de animação ──────────────────────────────────────────────────────

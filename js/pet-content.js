@@ -136,7 +136,12 @@
         duration: 3000,
         anim: "dance 0.7s ease-in-out infinite",
       },
-      { type: "act", state: "turningBack", duration: 2500, anim: "waddle 0.4s ease-in-out infinite" },
+      {
+        type: "act",
+        state: "turningBack",
+        duration: 2500,
+        anim: "waddle 0.4s ease-in-out infinite",
+      },
       { type: "act", state: "waving", duration: 2000 },
       {
         type: "act",

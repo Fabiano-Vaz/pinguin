@@ -201,6 +201,7 @@ body.fish-cursor-enabled {
 }
 
 @keyframes waddle {
+
     0%,
     100% {
         transform: rotate(-6deg) translateY(0);

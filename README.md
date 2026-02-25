@@ -1,6 +1,6 @@
-# 🐧 Pinguim Brincalhão
+# 🐧 Pinguim Pet para VS Code
 
-Um jogo interativo e divertido com um pinguim animado que responde aos seus comandos!
+Extensão do VS Code com um pinguim animado que anda continuamente enquanto o editor estiver aberto.
 
 ## 📁 Estrutura do Projeto
 
@@ -15,16 +15,16 @@ pinguim-game/
     └── *.svg          # Imagens do pinguim (14 estados diferentes)
 ```
 
-## 🎮 Como Jogar
+## 🚀 Como usar no VS Code
 
-### Controles
+1. Abra esta pasta no VS Code.
+2. Pressione `F5` para iniciar a janela de desenvolvimento da extensão.
+3. O painel `Pinguim Pet` abre automaticamente (configurável).
+4. Se quiser abrir manualmente, execute o comando `Pinguim: Abrir Pet`.
 
-- **Mouse**: Clique em qualquer lugar da tela para o pinguim se mover até lá
-- **Clique no Pinguim**: Interage e mostra reações aleatórias
-- **Setas do Teclado** (← → ↑ ↓): Move o pinguim nas direções
-- **Barra de Espaço**: Faz o pinguim pular
+### Configuração
 
-### Estados do Pinguim
+- `pinguin.autoOpenOnStartup`: define se o painel abre sozinho ao iniciar o VS Code (`true` por padrão).
 
 O pinguim possui 14 estados diferentes, cada um com sua própria imagem SVG:
 
@@ -53,20 +53,11 @@ O pinguim possui 14 estados diferentes, cada um com sua própria imagem SVG:
 - 🎭 14 estados emocionais diferentes
 - 🎮 Ações aleatórias automáticas
 
-## 🚀 Como Executar
+## 🎮 Interações no painel
 
-1. Abra o arquivo `index.html` no seu navegador preferido
-2. Ou use um servidor local:
-
-   ```bash
-   # Com Python 3
-   python -m http.server 8000
-
-   # Com Node.js (http-server)
-   npx http-server
-   ```
-
-3. Divirta-se interagindo com o pinguim! 🐧
+- **Mouse**: o pinguim reage à proximidade do cursor
+- **Clique no pinguim**: dispara reações aleatórias
+- **Comportamento autônomo**: ele anda, para, dança e muda de estado sozinho
 
 ## 💻 Tecnologias
 
@@ -92,4 +83,4 @@ O pinguim possui 14 estados diferentes, cada um com sua própria imagem SVG:
 
 ---
 
-Feito com ❤️ e 🐧
+Feito com JavaScript, HTML, CSS e SVG.

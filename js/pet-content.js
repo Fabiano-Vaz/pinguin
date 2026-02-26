@@ -131,29 +131,29 @@
     () => [
       { type: "walk" },
       {
-        type: "act",
-        state: "dancing",
-        duration: 3000,
-        anim: "dance 0.7s ease-in-out infinite",
-      },
-      {
-        type: "act",
-        state: "turningBack",
-        duration: 2500,
-        anim: "waddle 0.4s ease-in-out infinite",
-      },
-      { type: "act", state: "waving", duration: 2000 },
-      {
-        type: "act",
-        state: "flying",
-        duration: 2500,
-        anim: "bounce 1s ease-in-out infinite",
-      },
-      {
-        type: "act",
-        state: "dancing",
-        duration: 3000,
-        anim: "dance 0.7s ease-in-out infinite",
+        type: "sequence",
+        steps: [
+          {
+            state: "dancing",
+            duration: 1400,
+            anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
+            speak: true,
+          },
+          { state: "default", duration: 650 },
+          { state: "peeking", facing: "right", duration: 900 },
+          { state: "peeking", facing: "left", duration: 900 },
+          {
+            state: "dancing",
+            duration: 1400,
+            anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
+          },
+          {
+            state: "flying",
+            duration: 1200,
+            anim: "bounce 1s ease-in-out infinite",
+          },
+          { state: "default", duration: 800 },
+        ],
       },
     ],
     () => [
@@ -178,7 +178,7 @@
       { type: "walk" },
     ],
     () => [
-      { type: "jumpMove", duration: 1300 },
+      { type: "walkShort" },
       { type: "act", state: "waving", duration: 2000 },
       { type: "walk" },
     ],
@@ -195,7 +195,7 @@
         type: "act",
         state: "dancing",
         duration: 3000,
-        anim: "dance 0.7s ease-in-out infinite",
+        anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
       },
     ],
     () => [
@@ -205,7 +205,7 @@
     ],
     () => [
       { type: "flyMove", duration: 1800 },
-      { type: "jumpMove", duration: 1000 },
+      { type: "walkShort" },
       { type: "walk" },
     ],
     () => [

@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <!-- Fundo transparente para manter somente o personagem visível -->
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- Sombra no chão para dar noção de apoio/profundidade -->
+    <ellipse cx="130" cy="236" rx="76" ry="13" fill="#000000" opacity="0.16">
+        <animate
+            attributeName="opacity"
+            values="0.16;0.12;0.16"
+            dur="1.2s"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keySplines="0.42 0 0.58 1;0.42 0 0.58 1"
+            keyTimes="0;0.5;1" />
+    </ellipse>
+
+    <g>
+        <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="0 0;0 -2;0 0"
+            dur="1.2s"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keySplines="0.42 0 0.58 1;0.42 0 0.58 1"
+            keyTimes="0;0.5;1" />
+
+        <!-- Corpo principal (silhueta preta) -->
+        <path
+            d="M130 118
+           C92 118, 66 142, 66 173
+           C66 202, 90 223, 130 231
+           C170 223, 194 202, 194 173
+           C194 142, 168 118, 130 118 Z"
+            fill="#0a0a0a" />
+
+        <!-- Barriga branca -->
+        <path
+            d="M130 128
+           C108 128, 92 147, 92 178
+           C92 204, 108 220, 130 224
+           C152 220, 168 204, 168 178
+           C168 147, 152 128, 130 128 Z"
+            fill="#ffffff" />
+
+        <!-- Asa esquerda levemente rotacionada para dentro -->
+        <path
+            d="M82 156
+           C64 170, 70 198, 94 205
+           C97 192, 156 170, 82 156 Z"
+            transform="rotate(12 94 176)"
+            fill="#0a0a0a" />
+
+        <!-- Asa direita levemente rotacionada para dentro -->
+        <path
+            d="M178 156
+           C196 170, 190 198, 166 205
+           C163 192, 104 170, 178 156 Z"
+            transform="rotate(-12 166 176)"
+            fill="#0a0a0a" />
+
+        <!-- Grupo da cabeça (deslocado para encaixar no corpo) -->
+        <g transform="translate(0, 16)">
+            <!-- Pescoço e cabeça -->
+            <ellipse cx="130" cy="78" rx="18" ry="23" fill="#0a0a0a" />
+            <ellipse cx="130" cy="67" rx="43" ry="33" fill="#0a0a0a" />
+
+            <!-- Penachos do topo da cabeça -->
+            <g fill="#0a0a0a">
+                <ellipse cx="130" cy="34" rx="7" ry="11" transform="rotate(-5 130 34)" />
+                <ellipse cx="114" cy="39" rx="6" ry="9" transform="rotate(-20 114 39)" />
+                <ellipse cx="146" cy="39" rx="6" ry="9" transform="rotate(20 146 39)" />
+            </g>
+
+            <!-- Olhos e pupilas -->
+            <circle cx="116" cy="64" r="12" fill="#ffffff" />
+            <circle cx="144" cy="64" r="12" fill="#ffffff" />
+            <circle cx="120" cy="66" r="5" fill="#000000" />
+            <circle cx="148" cy="66" r="5" fill="#000000" />
+
+            <!-- Bico -->
+            <path
+                d="M108 79
+               C108 72, 120 68, 130 68
+               C140 68, 152 72, 152 79
+               C152 86, 140 92, 130 92
+               C120 92, 108 86, 108 79 Z"
+                fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+        </g>
+    </g>
+
+    <!-- Patinhas -->
+    <g transform="translate(73,162) scale(0.9)">
+        <g transform="translate(32,15)">
+            <g>
+                <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    values="-5 8 67;5 8 67;-5 8 67"
+                    dur="0.6s"
+                    repeatCount="indefinite" />
+                <path
+                    d="M0 0 C1.9375 0.1875 1.9375 0.1875 4 1 C5 2.8125 5 2.8125 6 5 C6.61875 5.598125 7.2375 6.19625 7.875 6.8125 C10.6028971 9.62062936 12.14575782 12.55640738 14 16 C16.89932357 13.60490662 17.50168276 11.68754757 18 8 C21.80797391 9.45336318 22.96067277 11.17908118 24.6875 14.8125 C25.10386719 15.66457031 25.52023438 16.51664063 25.94921875 17.39453125 C28.58811569 23.93781847 28.2188093 30.6772715 28.25 37.625 C28.270625 38.75035156 28.29125 39.87570313 28.3125 41.03515625 C28.35213316 49.60582695 27.77531043 57.95597623 22.8125 65.1875 C19.85513852 67.09335518 17.71570013 67.85999626 14.16796875 67.59375 C2.90940876 64.51032456 -4.21835484 51.10864137 -9.875 41.875 C-13.77022651 34.97023654 -16.63628611 28.05962407 -16 20 C-13.13275314 20.57344937 -12.1385485 20.8614515 -10 23 C-6.95817107 23.25005386 -6.95817107 23.25005386 -4 23 C-2.3960906 21.3960906 -2.68447556 19.562398 -2.5 17.34375 C-2.4175 16.40402344 -2.335 15.46429688 -2.25 14.49609375 C-2.1675 13.50738281 -2.085 12.51867187 -2 11.5 C-1.83743307 9.5517369 -1.67097771 7.603793 -1.5 5.65625 C-1.4278125 4.78806641 -1.355625 3.91988281 -1.28125 3.02539062 C-1 1 -1 1 0 0 Z"
+                    fill="#F0C300" />
+            </g>
+        </g>
+        <g transform="translate(95,15)">
+            <g>
+                <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    values="5 -11 67;-5 -11 67;5 -11 67"
+                    dur="0.6s"
+                    repeatCount="indefinite" />
+                <path
+                    d="M0 0 C0.99 0 1.98 0 3 0 C3.68271293 8.35104207 4.15392039 16.61988971 4 25 C9.3086849 24.41825155 9.3086849 24.41825155 14 22 C14.99 22 15.98 22 17 22 C15.55602572 38.60570418 3.89821233 51.85073216 -7.91015625 62.765625 C-12.19913278 66.16554261 -15.65444778 67.08621858 -21 67 C-24.1391664 65.53505568 -25.44359988 64.13074863 -26.96875 61.03125 C-31.84116516 47.49676346 -29.88964342 29.21716955 -24.14453125 16.19921875 C-22.38227536 12.81304105 -20.43469578 9.94726331 -18 7 C-17.34 7 -16.68 7 -16 7 C-15.34 9.64 -14.68 12.28 -14 15 C-10.03204224 13.67734741 -8.44909377 11.09813251 -6.24609375 7.75390625 C-4.97338728 5.96254197 -3.55479322 4.54654498 -2 3 C-1.34 2.01 -0.68 1.02 0 0 Z"
+                    fill="#F0C300" />
+            </g>
+        </g>
+    </g>
+
+</svg>

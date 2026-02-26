@@ -1,0 +1,535 @@
+(() => {
+  const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
+
+  modules.interactions = ({
+    runtime,
+    createClickEffect,
+    SPEED_WALK,
+    SPEED_CHASE,
+    SPEED_FLEE,
+    halfPenguinSize,
+    penguinSize,
+  }) => ({
+    onMouseMove(mouseX, mouseY) {
+      if (!Number.isFinite(mouseX) || !Number.isFinite(mouseY)) return;
+      if (this.isWalkingAway || this.isDragging || this.isRanting) return;
+      if (
+        typeof this.hasPendingFoodTargets === "function" &&
+        this.hasPendingFoodTargets()
+      ) {
+        return;
+      }
+
+      const now = Date.now();
+      const penguinCenterX = this.x + halfPenguinSize;
+      const penguinCenterY = this.y + halfPenguinSize;
+      const mdx = mouseX - penguinCenterX;
+      const mdy = mouseY - penguinCenterY;
+      const dist = Math.sqrt(mdx * mdx + mdy * mdy);
+      const sinceLastSample = Math.max(16, now - (this.lastMouseSampleAt || now));
+      const lastX =
+        typeof this.lastMouseSampleX === "number" ? this.lastMouseSampleX : mouseX;
+      const lastY =
+        typeof this.lastMouseSampleY === "number" ? this.lastMouseSampleY : mouseY;
+      const mouseSpeed =
+        (Math.hypot(mouseX - lastX, mouseY - lastY) / sinceLastSample) * 1000;
+
+      this.lastMouseSampleX = mouseX;
+      this.lastMouseSampleY = mouseY;
+      this.lastMouseSampleAt = now;
+
+      if (!this.isMoving && !this.customMotion && Math.abs(mdx) > 18) {
+        const shouldFaceRight = mdx > 0;
+        if (shouldFaceRight !== this.facingRight) {
+          this.facingRight = shouldFaceRight;
+          this.applyTransform();
+        }
+      }
+
+      const isCursorAbovePenguin = mouseY < this.y - 18;
+      const isCursorTooHighToReach = mouseY < this.getFlyMinY() - 8;
+      const isNearHorizontally = Math.abs(mdx) <= 180;
+      if (
+        isCursorAbovePenguin &&
+        isCursorTooHighToReach &&
+        isNearHorizontally &&
+        !this.aiLocked &&
+        now >= (this.unreachableMouseReactCooldownUntil || 0)
+      ) {
+        this.unreachableMouseReactCooldownUntil = now + 3200;
+        this.aiLocked = true;
+        this.stepQueue = [];
+        this.isChasing = false;
+        this.element.style.animation = "";
+
+        const shouldFaceRight = mdx >= 0;
+        if (shouldFaceRight !== this.facingRight) {
+          this.facingRight = shouldFaceRight;
+          this.applyTransform();
+        }
+
+        if (Math.random() < 0.55) {
+          this.setState("peeking");
+          if (Math.random() < 0.45) this.speak();
+
+          setTimeout(() => {
+            if (
+              typeof this.enforceFoodPriority === "function" &&
+              this.enforceFoodPriority()
+            ) {
+              return;
+            }
+            if (!this.isMoving) this.setState("idle");
+            this.aiLocked = false;
+            this.scheduleNextBehavior();
+          }, this.scaleEmotionDuration(1000));
+          return;
+        }
+
+        this.setState("flying");
+        this.startWingFlap();
+        this.speed = SPEED_CHASE;
+        this.moveToPosition(
+          mouseX,
+          this.getFlyMinY() + halfPenguinSize,
+          SPEED_CHASE,
+          true,
+        );
+
+        setTimeout(() => {
+          if (
+            typeof this.enforceFoodPriority === "function" &&
+            this.enforceFoodPriority()
+          ) {
+            return;
+          }
+          this.stopWingFlap();
+          this.speed = SPEED_WALK;
+          this.moveToPosition(
+            this.x + halfPenguinSize,
+            this.randomWalkY() + halfPenguinSize,
+            SPEED_WALK,
+          );
+
+          const waitLanding = setInterval(() => {
+            if (!this.isMoving) {
+              clearInterval(waitLanding);
+              if (!this.isMoving) this.setState("idle");
+              this.aiLocked = false;
+              this.scheduleNextBehavior();
+            }
+          }, 100);
+        }, 850);
+        return;
+      }
+
+      if (
+        dist < 80 &&
+        !this.aiLocked &&
+        now >= (this.hoverReactionCooldownUntil || 0)
+      ) {
+        this.hoverReactionCooldownUntil = now + 2600;
+        this.aiLocked = true;
+        this.stepQueue = [];
+
+        const hoverReactions = ["peeking", "waving", "shy"];
+        const reaction =
+          hoverReactions[Math.floor(Math.random() * hoverReactions.length)];
+        this.element.style.animation = "";
+        this.setState(reaction);
+        this.speak();
+
+        setTimeout(() => {
+          if (
+            typeof this.enforceFoodPriority === "function" &&
+            this.enforceFoodPriority()
+          ) {
+            return;
+          }
+          if (!this.isMoving) this.setState("idle");
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        }, this.scaleEmotionDuration(1200));
+        return;
+      }
+
+      if (
+        dist >= 120 &&
+        dist <= 320 &&
+        mouseSpeed > 900 &&
+        !this.aiLocked &&
+        !this.isMoving &&
+        now >= (this.playfulFollowCooldownUntil || 0)
+      ) {
+        this.playfulFollowCooldownUntil = now + 5000;
+        this.aiLocked = true;
+        this.stepQueue = [];
+        this.isChasing = true;
+        this.speed = SPEED_CHASE;
+        this.setState("running");
+
+        setTimeout(() => {
+          if (
+            typeof this.enforceFoodPriority === "function" &&
+            this.enforceFoodPriority()
+          ) {
+            return;
+          }
+          this.isChasing = false;
+          this.speed = SPEED_WALK;
+          if (!this.isMoving) this.setState("idle");
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        }, 1400);
+      }
+    },
+
+    handleMouseProximity() {
+      if (this.isWalkingAway) return;
+      if (!runtime.isMouseInsideViewport) return;
+      if (
+        typeof this.hasPendingFoodTargets === "function" &&
+        this.hasPendingFoodTargets()
+      ) {
+        return;
+      }
+      if (this.isDragging || this.currentFoodTarget || this.isEatingFood) return;
+      if (this.isCursorTouchingPenguin()) return;
+
+      const mdx = runtime.mouseX - (this.x + halfPenguinSize);
+      const mdy = runtime.mouseY - (this.y + halfPenguinSize);
+      const dist = Math.sqrt(mdx * mdx + mdy * mdy);
+
+      if (this.mouseReactionCooldown > 0) {
+        this.mouseReactionCooldown -= 16;
+        return;
+      }
+
+      if (dist < 90 && this.lastMouseZone !== "close") {
+        this.lastMouseZone = "close";
+        this.mouseReactionCooldown = 3000;
+        this.isChasing = false;
+        this.triggerMouseFlee();
+      } else if (dist >= 90 && dist < 220 && this.lastMouseZone === "far") {
+        this.lastMouseZone = "near";
+        if (Math.random() < 100) {
+          this.mouseReactionCooldown = 5000;
+          this.triggerMouseChase();
+        } else {
+          this.mouseReactionCooldown = 4000;
+          this.triggerMouseCurious();
+        }
+      } else if (dist >= 220 && this.lastMouseZone === "near") {
+        this.lastMouseZone = "far";
+        this.mouseReactionCooldown = 1500;
+        this.triggerMouseGoodbye();
+      } else if (dist >= 90 && this.lastMouseZone === "close") {
+        this.lastMouseZone = dist < 220 ? "near" : "far";
+      }
+    },
+
+    triggerMouseChase() {
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.isChasing = true;
+      this.speed = SPEED_CHASE;
+      this.setState("running");
+      this.speak();
+
+      setTimeout(() => {
+        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        this.isChasing = false;
+        this.speed = SPEED_WALK;
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, 4000);
+    },
+
+    triggerMouseFlee() {
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.setState("scared");
+      this.speak();
+
+      const angle = Math.atan2(
+        this.y + halfPenguinSize - runtime.mouseY,
+        this.x + halfPenguinSize - runtime.mouseX,
+      );
+      const fleeX = this.x + halfPenguinSize + Math.cos(angle) * 280;
+      const fleeY = this.y + halfPenguinSize + Math.sin(angle) * 280;
+      this.speed = SPEED_FLEE;
+      this.moveToPosition(
+        Math.max(
+          halfPenguinSize,
+          Math.min(fleeX, window.innerWidth - halfPenguinSize),
+        ),
+        Math.max(
+          halfPenguinSize,
+          Math.min(fleeY, this.getWalkMaxY() + halfPenguinSize),
+        ),
+      );
+
+      setTimeout(() => {
+        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        this.speed = SPEED_WALK;
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, 2500);
+    },
+
+    triggerMouseCurious() {
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.setState("peeking");
+      this.speak();
+
+      setTimeout(() => {
+        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, this.scaleEmotionDuration(2500));
+    },
+
+    triggerMouseGoodbye() {
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.setState("waving");
+      this.speak();
+
+      setTimeout(() => {
+        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, this.scaleEmotionDuration(2000));
+    },
+
+    setupEventListeners() {
+      this.element.addEventListener("pointerdown", (e) => {
+        this.onDragStart(e);
+      });
+
+      window.addEventListener("pointermove", (e) => {
+        this.onDragMove(e);
+      });
+
+      window.addEventListener("pointerup", () => {
+        this.onDragEnd();
+      });
+      window.addEventListener("pointercancel", () => {
+        this.onDragEnd();
+      });
+      document.addEventListener("mouseleave", () => {
+        this.onDragEnd();
+      });
+
+      this.element.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (Date.now() < this.suppressClickUntil) return;
+        this.onClickPenguin();
+      });
+    },
+
+    onDragStart(e) {
+      if (this.isWalkingAway) return;
+      if (
+        typeof this.hasPendingFoodTargets === "function" &&
+        this.hasPendingFoodTargets()
+      ) {
+        return;
+      }
+      e.preventDefault();
+      this.isDragging = true;
+      this.isCursorTouchEating = false;
+      this.currentFoodTarget = null;
+      this.isEatingFood = false;
+      this.dragMoved = false;
+      this.dragOffsetX = e.clientX - this.x;
+      this.dragOffsetY = e.clientY - this.y;
+      this.isChasing = false;
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.isMoving = false;
+      this.customMotion = null;
+      this.allowAirMovement = true;
+      this.element.style.animation = "";
+      this.setState("flying");
+      this.startWingFlap();
+    },
+
+    onDragMove(e) {
+      if (!this.isDragging) return;
+
+      if (
+        e.clientX < 0 ||
+        e.clientX > window.innerWidth ||
+        e.clientY < 0 ||
+        e.clientY > window.innerHeight
+      ) {
+        this.onDragEnd();
+        return;
+      }
+
+      e.preventDefault();
+
+      this.dragMoved = true;
+      this.x = Math.max(
+        0,
+        Math.min(e.clientX - this.dragOffsetX, window.innerWidth - penguinSize),
+      );
+      this.y = Math.max(
+        0,
+        Math.min(e.clientY - this.dragOffsetY, window.innerHeight - penguinSize),
+      );
+      this.targetX = this.x;
+      this.targetY = this.y;
+
+      this.element.style.left = this.x + "px";
+      this.element.style.top = this.y + "px";
+      this.updateBubblePosition();
+    },
+
+    onDragEnd() {
+      if (!this.isDragging) return;
+      this.isDragging = false;
+      this.stopWingFlap();
+
+      if (!this.dragMoved) {
+        this.allowAirMovement = false;
+        this.setState("idle");
+        this.aiLocked = false;
+        this.tryStartFoodHunt();
+        return;
+      }
+
+      this.suppressClickUntil = Date.now() + 250;
+      const now = Date.now();
+      const streakWindowMs = 1800;
+      this.dropReleaseStreak =
+        now - this.lastDropReleaseAt <= streakWindowMs
+          ? this.dropReleaseStreak + 1
+          : 1;
+      this.lastDropReleaseAt = now;
+
+      if (this.dropReleaseStreak >= 2) {
+        this.startWalkAwayAfterDrops();
+        return;
+      }
+
+      this.dropWithFlap();
+    },
+
+    startWalkAwayAfterDrops() {
+      this.aiLocked = true;
+      this.isChasing = false;
+      this.stepQueue = [];
+      this.currentFoodTarget = null;
+      this.isEatingFood = false;
+      this.foodTargets = [];
+      this.customMotion = null;
+      this.allowAirMovement = false;
+      this.isWalkingAway = true;
+      this.isMoving = true;
+      this.speed = SPEED_WALK;
+      this.element.style.animation = "";
+      this.setState("turningBack");
+      this.startWaddleSteps();
+      this.walkAwayReturnX = Math.max(
+        0,
+        Math.min(this.x, window.innerWidth - penguinSize),
+      );
+      this.walkAwayReturnY = this.clampY(this.y, false);
+
+      const midX = this.x + halfPenguinSize;
+      const goRight = midX >= window.innerWidth / 2;
+      const exitPadding = penguinSize + 12;
+      const targetX = goRight ? window.innerWidth + exitPadding : -exitPadding;
+      this.customMotion = {
+        type: "walkAwayExit",
+        startX: this.x,
+        startY: this.getGroundTopY(),
+        targetX,
+        elapsed: 0,
+        duration: 2600,
+      };
+    },
+
+    dropWithFlap() {
+      this.aiLocked = true;
+      this.isChasing = false;
+      this.stepQueue = [];
+      this.speed = SPEED_WALK;
+      this.startDropFall();
+
+      const waitLanding = setInterval(() => {
+        if (!this.isMoving) {
+          clearInterval(waitLanding);
+          this.speed = SPEED_WALK;
+          this.setState("angry");
+          this.nextBubbleAt = 0;
+          this.speak();
+          setTimeout(() => {
+            if (!this.isMoving) this.setState("idle");
+            this.aiLocked = false;
+            if (this.foodTargets.length > 0) {
+              this.tryStartFoodHunt();
+            } else {
+              this.scheduleNextBehavior();
+            }
+          }, 1800);
+        }
+      }, 100);
+    },
+
+    onClickPenguin() {
+      if (this.isWalkingAway) return;
+      if (
+        typeof this.hasPendingFoodTargets === "function" &&
+        this.hasPendingFoodTargets()
+      ) {
+        return;
+      }
+      this.isChasing = false;
+      this.aiLocked = true;
+      this.stepQueue = [];
+      const isCryingNow = this.currentState === "crying";
+
+      const reactions = isCryingNow
+        ? ["dancing", "shy", "waving", "scared"]
+        : ["laughing", "dancing", "shy", "waving", "scared"];
+      if (Math.random() < 0.12) reactions.push("jumping");
+      const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+
+      if (reaction === "laughing") {
+        createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
+        this.playLaughThenIdleThenLaugh(2200, () => {
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        });
+        return;
+      }
+
+      this.setState(reaction);
+      this.speak();
+      createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
+
+      const anims = {
+        jumping: "hop 0.52s ease-out 2",
+        dancing: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
+        shy: "shake 0.6s ease",
+        scared: "shake 0.4s ease",
+      };
+      if (anims[reaction]) this.element.style.animation = anims[reaction];
+
+      setTimeout(() => {
+        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        this.element.style.animation = "";
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, this.scaleEmotionDuration(2000));
+    },
+  });
+})();

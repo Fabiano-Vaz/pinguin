@@ -1,4 +1,5 @@
 const vscode = require("vscode");
+const penguinShared = require("./js/pet-shared");
 
 const SIDEBAR_VIEW_ID = "pinguinPet.sidebar";
 
@@ -58,6 +59,9 @@ function getWebviewContent(webview, extensionUri) {
   const cssUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "css", "style.css"),
   );
+  const sharedJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-shared.js"),
+  );
   const configJsUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "js", "pet-config.js"),
   );
@@ -66,6 +70,21 @@ function getWebviewContent(webview, extensionUri) {
   );
   const effectsJsUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "js", "pet-effects.js"),
+  );
+  const penguinStateJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-state.js"),
+  );
+  const penguinSpeechJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-speech.js"),
+  );
+  const penguinMotionJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-motion.js"),
+  );
+  const penguinAiJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-ai.js"),
+  );
+  const penguinInteractionsJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-interactions.js"),
   );
   const penguinJsUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "js", "pet-penguin.js"),
@@ -77,36 +96,17 @@ function getWebviewContent(webview, extensionUri) {
     vscode.Uri.joinPath(extensionUri, "assets", "backgroung-dark.png"),
   );
 
-  const assets = {
-    idle: "pinguin.svg",
-    running: "pinguin correndo.svg",
-    jumping: "pinguin pulando feliz.svg",
-    dancing: "pinguin dançando.svg",
-    sleeping: "pinguin dormindo.svg",
-    scared: "pinguin assustado.svg",
-    crying: "pinguin chorando.svg",
-    angry: "pinguin com raiva.svg",
-    scratching: "pinguin coçando a cabecinha.svg",
-    waving: "pinguin dando tchau.svg",
-    shy: "pinguin-apaixonado.svg",
-    peeking: "pinguin espiando curioso.svg",
-    laughing: "pinguin gargalhando.svg",
-    thinking: "pinguin-apaixonado.svg",
-    eating: "pinguin comendo peixe.svg",
-    flying: "pinguin voando.svg",
-    turningBack: "pinguin de costas.svg",
-  };
+  const webviewAssets = penguinShared.buildAssetPaths((fileName) =>
+    webview
+      .asWebviewUri(vscode.Uri.joinPath(extensionUri, "assets", fileName))
+      .toString(),
+  );
 
-  const webviewAssets = {};
-  for (const [state, filePath] of Object.entries(assets)) {
-    const segments = filePath.split("/");
-    const assetUri =
-      segments.length > 1
-        ? vscode.Uri.joinPath(extensionUri, ...segments)
-        : vscode.Uri.joinPath(extensionUri, "assets", filePath);
-
-    webviewAssets[state] = webview.asWebviewUri(assetUri).toString();
-  }
+  const webviewConfig = penguinShared.getMergedConfig({
+    size: 86,
+    groundRatio: 0.86,
+    backgroundImage: backgroundUri.toString(),
+  });
 
   const nonce = createNonce();
 
@@ -122,15 +122,17 @@ function getWebviewContent(webview, extensionUri) {
 <body>
   <script nonce="${nonce}">
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
-    window.PENGUIN_CONFIG = {
-      size: 86,
-      groundRatio: 0.86,
-      backgroundImage: "${backgroundUri}",
-    };
+    window.PENGUIN_CONFIG = ${JSON.stringify(webviewConfig)};
   </script>
+  <script nonce="${nonce}" src="${sharedJsUri}"></script>
   <script nonce="${nonce}" src="${configJsUri}"></script>
   <script nonce="${nonce}" src="${contentJsUri}"></script>
   <script nonce="${nonce}" src="${effectsJsUri}"></script>
+  <script nonce="${nonce}" src="${penguinStateJsUri}"></script>
+  <script nonce="${nonce}" src="${penguinSpeechJsUri}"></script>
+  <script nonce="${nonce}" src="${penguinMotionJsUri}"></script>
+  <script nonce="${nonce}" src="${penguinAiJsUri}"></script>
+  <script nonce="${nonce}" src="${penguinInteractionsJsUri}"></script>
   <script nonce="${nonce}" src="${penguinJsUri}"></script>
   <script nonce="${nonce}" src="${bootstrapJsUri}"></script>
 </body>

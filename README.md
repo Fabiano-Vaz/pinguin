@@ -40,3 +40,11 @@ Um pinguim animado no painel **Explorer** do VS Code, com comportamento autônom
 - JavaScript (Vanilla)
 - HTML + CSS
 - SVGs para estados do personagem
+
+## 🧱 Estrutura de código
+
+- `js/pet-shared.js`: fonte única de verdade para assets e config padrão.
+- `js/pet-config.js`: aplica overrides de ambiente (navegador/VS Code) sem duplicar regras.
+- `js/pet-penguin.js`: núcleo da classe `Penguin` + loop de atualização.
+- `js/pet-penguin-*.js`: módulos por responsabilidade (`state`, `speech`, `motion`, `ai`, `interactions`).
+- `extension.js` e `index.html`: apenas injetam contexto do ambiente (URLs/config) e reutilizam o mesmo núcleo.

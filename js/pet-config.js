@@ -1,57 +1,49 @@
 (() => {
-  const defaultActionStates = {
-    idle: "assets/pinguin.svg",
-    running: "assets/pinguin correndo.svg",
-    jumping: "assets/pinguin pulando feliz.svg",
-    dancing: "assets/pinguin dançando.svg",
-    sleeping: "assets/pinguin dormindo.svg",
-    scared: "assets/pinguin assustado.svg",
-    crying: "assets/pinguin chorando.svg",
-    angry: "assets/pinguin com raiva.svg",
-    scratching: "assets/pinguin coçando a cabecinha.svg",
-    waving: "assets/pinguin dando tchau.svg",
-    shy: "assets/pinguin-apaixonado.svg",
-    peeking: "assets/pinguin espiando curioso.svg",
-    laughing: "assets/pinguin gargalhando.svg",
-    thinking: "assets/pinguin-apaixonado.svg",
-    eating: "assets/pinguin comendo peixe.svg",
-    flying: "assets/pinguin voando.svg",
-    turningBack: "assets/pinguin de costas.svg",
-  };
+  const shared =
+    typeof window !== "undefined" && window.PenguinPetShared
+      ? window.PenguinPetShared
+      : null;
 
   const actionStates =
-    typeof window !== "undefined" &&
-    window.PENGUIN_ASSETS &&
-    typeof window.PENGUIN_ASSETS === "object"
-      ? window.PENGUIN_ASSETS
-      : defaultActionStates;
+    shared && typeof shared.getActionStates === "function"
+      ? shared.getActionStates(window.PENGUIN_ASSETS || {}, (fileName) =>
+          `assets/${fileName}`,
+        )
+      : shared && typeof shared.buildAssetPaths === "function"
+        ? {
+            ...shared.buildAssetPaths((fileName) => `assets/${fileName}`),
+            ...(window.PENGUIN_ASSETS || {}),
+          }
+        : window.PENGUIN_ASSETS || {};
 
-  const defaultPenguinSize = 120;
-  const penguinSize =
-    typeof window !== "undefined" &&
-    window.PENGUIN_CONFIG &&
-    Number.isFinite(window.PENGUIN_CONFIG.size) &&
-    window.PENGUIN_CONFIG.size > 0
-      ? window.PENGUIN_CONFIG.size
-      : defaultPenguinSize;
+  const mergedConfig =
+    shared && typeof shared.getMergedConfig === "function"
+      ? shared.getMergedConfig(window.PENGUIN_CONFIG || {})
+      : {
+          size:
+            window.PENGUIN_CONFIG &&
+            Number.isFinite(window.PENGUIN_CONFIG.size) &&
+            window.PENGUIN_CONFIG.size > 0
+              ? window.PENGUIN_CONFIG.size
+              : 120,
+          groundRatio:
+            window.PENGUIN_CONFIG &&
+            Number.isFinite(window.PENGUIN_CONFIG.groundRatio) &&
+            window.PENGUIN_CONFIG.groundRatio > 0 &&
+            window.PENGUIN_CONFIG.groundRatio <= 1
+              ? window.PENGUIN_CONFIG.groundRatio
+              : 0.86,
+          backgroundImage:
+            window.PENGUIN_CONFIG &&
+            typeof window.PENGUIN_CONFIG.backgroundImage === "string" &&
+            window.PENGUIN_CONFIG.backgroundImage.length > 0
+              ? window.PENGUIN_CONFIG.backgroundImage
+              : "assets/backgroung-dark.png",
+        };
 
-  const defaultSnowTopRatio = 0.86;
-  const snowTopRatio =
-    typeof window !== "undefined" &&
-    window.PENGUIN_CONFIG &&
-    Number.isFinite(window.PENGUIN_CONFIG.groundRatio) &&
-    window.PENGUIN_CONFIG.groundRatio > 0 &&
-    window.PENGUIN_CONFIG.groundRatio <= 1
-      ? window.PENGUIN_CONFIG.groundRatio
-      : defaultSnowTopRatio;
-
-  const backgroundImage =
-    typeof window !== "undefined" &&
-    window.PENGUIN_CONFIG &&
-    typeof window.PENGUIN_CONFIG.backgroundImage === "string" &&
-    window.PENGUIN_CONFIG.backgroundImage.length > 0
-      ? window.PENGUIN_CONFIG.backgroundImage
-      : "assets/backgroung-dark.png";
+  const penguinSize = mergedConfig.size;
+  const snowTopRatio = mergedConfig.groundRatio;
+  const backgroundImage = mergedConfig.backgroundImage;
 
   window.PenguinPet = {
     ...(window.PenguinPet || {}),

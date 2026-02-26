@@ -52,6 +52,9 @@
     runtime.isMouseInsideViewport = true;
     runtime.mouseX = e.clientX;
     runtime.mouseY = e.clientY;
+    if (typeof penguin.onMouseMove === "function") {
+      penguin.onMouseMove(e.clientX, e.clientY);
+    }
   });
 
   document.addEventListener("mouseenter", (e) => {

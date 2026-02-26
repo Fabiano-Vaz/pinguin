@@ -255,12 +255,13 @@
       const depthScale =
         typeof this.getDepthScale === "function" ? this.getDepthScale() : 1;
       const umbrellaSize = penguinSize * 0.85 * depthScale;
-      // Desloca para o lado que o pinguim está olhando (~25% do tamanho)
-      const sideOffset = umbrellaSize * 0.25 * (this.facingRight ? 1 : -1);
+      // Mantém o lado esquerdo um pouco mais próximo do pinguim.
+      const sideOffsetRatio = this.facingRight ? 0.25 : 0.16;
+      const sideOffset = umbrellaSize * sideOffsetRatio * (this.facingRight ? 1 : -1);
       const left = this.x + halfPenguinSize - umbrellaSize / 2 + sideOffset;
       // Align so the pole base (56% from top of SVG) sits at the penguin's upper body
       const liftOffset = this.umbrellaLiftOffset || 0;
-      const top = this.y - umbrellaSize * 0.38 - liftOffset;
+      const top = this.y - umbrellaSize * 0.30 - liftOffset;
       this.umbrellaEl.style.left = left + "px";
       this.umbrellaEl.style.top = top + "px";
       this.umbrellaEl.style.zIndex = String(

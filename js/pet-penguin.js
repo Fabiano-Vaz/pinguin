@@ -24,6 +24,8 @@
     SPEED_WALK_FAST,
     SPEED_CHASE,
     SPEED_FLEE,
+    MOUSE_IDLE_TRIGGER_MS,
+    MOUSE_IDLE_REACTION_COOLDOWN_MS,
   } = constants;
 
   const actionStates = pet.actionStates || {};
@@ -88,6 +90,11 @@
       this.lastMouseSampleX = runtime.mouseX;
       this.lastMouseSampleY = runtime.mouseY;
       this.lastMouseSampleAt = Date.now();
+      this.lastMouseMovementAt = Date.now();
+      this.lastMouseMovementX = runtime.mouseX;
+      this.lastMouseMovementY = runtime.mouseY;
+      this.mouseIdleApproachTriggered = false;
+      this.mouseIdleApproachCooldownUntil = 0;
       this.isChasing = false;
       this.isDragging = false;
       this.dragMoved = false;
@@ -102,6 +109,7 @@
       this.lastScreenClickAt = 0;
       this.penguinClickStreak = 0;
       this.lastPenguinClickAt = 0;
+      this.pendingPenguinClickTimeoutId = null;
       this.isRanting = false;
       this.rantCooldownUntil = 0;
       this.dropReleaseStreak = 0;
@@ -297,6 +305,8 @@
     SPEED_WALK_FAST,
     SPEED_CHASE,
     SPEED_FLEE,
+    MOUSE_IDLE_TRIGGER_MS,
+    MOUSE_IDLE_REACTION_COOLDOWN_MS,
   };
 
   Object.assign(

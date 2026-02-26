@@ -1,5 +1,7 @@
 (() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
+  const PENGUIN_DOUBLE_CLICK_MS = 450;
+  const MOUSE_IDLE_MOVEMENT_THRESHOLD_PX = 10;
 
   modules.interactions = ({
     runtime,
@@ -7,6 +9,8 @@
     SPEED_WALK,
     SPEED_CHASE,
     SPEED_FLEE,
+    MOUSE_IDLE_TRIGGER_MS,
+    MOUSE_IDLE_REACTION_COOLDOWN_MS,
     halfPenguinSize,
     penguinSize,
   }) => ({
@@ -44,6 +48,24 @@
       this.lastMouseSampleX = mouseX;
       this.lastMouseSampleY = mouseY;
       this.lastMouseSampleAt = now;
+      const lastMovementX =
+        typeof this.lastMouseMovementX === "number"
+          ? this.lastMouseMovementX
+          : mouseX;
+      const lastMovementY =
+        typeof this.lastMouseMovementY === "number"
+          ? this.lastMouseMovementY
+          : mouseY;
+      const movementDist = Math.hypot(
+        mouseX - lastMovementX,
+        mouseY - lastMovementY,
+      );
+      if (movementDist >= MOUSE_IDLE_MOVEMENT_THRESHOLD_PX) {
+        this.lastMouseMovementAt = now;
+        this.lastMouseMovementX = mouseX;
+        this.lastMouseMovementY = mouseY;
+        this.mouseIdleApproachTriggered = false;
+      }
 
       if (!this.isMoving && !this.customMotion && Math.abs(mdx) > 18) {
         const shouldFaceRight = mdx > 0;
@@ -195,6 +217,7 @@
     handleMouseProximity() {
       if (this.isWalkingAway) return;
       if (!runtime.isMouseInsideViewport) return;
+      if (this.aiLocked) return;
       if (
         typeof this.hasPendingFoodTargets === "function" &&
         this.hasPendingFoodTargets()
@@ -208,6 +231,24 @@
       const mdx = runtime.mouseX - (this.x + halfPenguinSize);
       const mdy = runtime.mouseY - (this.y + halfPenguinSize);
       const dist = Math.sqrt(mdx * mdx + mdy * mdy);
+      const now = Date.now();
+      const lastMovementAt =
+        typeof this.lastMouseMovementAt === "number"
+          ? this.lastMouseMovementAt
+          : now;
+
+      if (
+        !this.customMotion &&
+        !this.mouseIdleApproachTriggered &&
+        now - lastMovementAt >= MOUSE_IDLE_TRIGGER_MS &&
+        now >= (this.mouseIdleApproachCooldownUntil || 0)
+      ) {
+        this.mouseIdleApproachTriggered = true;
+        this.mouseIdleApproachCooldownUntil =
+          now + MOUSE_IDLE_REACTION_COOLDOWN_MS;
+        this.triggerMouseIdleApproach();
+        return;
+      }
 
       if (this.mouseReactionCooldown > 0) {
         this.mouseReactionCooldown -= 16;
@@ -314,6 +355,65 @@
       }, this.scaleEmotionDuration(2500));
     },
 
+    triggerMouseIdleApproach() {
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.isChasing = false;
+      this.element.style.animation = "";
+
+      const approachSpeed = Math.max(0.9, SPEED_WALK * 0.72);
+      const currentCenterX = this.x + halfPenguinSize;
+      const dir = runtime.mouseX >= currentCenterX ? 1 : -1;
+      const stopDist = 70;
+      const rawTargetCenterX = runtime.mouseX - dir * stopDist;
+      // Garante que o alvo sempre fique na direção do mouse, nunca do lado oposto
+      const clampedByDir =
+        dir > 0
+          ? Math.max(currentCenterX, rawTargetCenterX)
+          : Math.min(currentCenterX, rawTargetCenterX);
+      const targetCenterX = Math.max(
+        halfPenguinSize,
+        Math.min(clampedByDir, window.innerWidth - halfPenguinSize),
+      );
+      const targetTopY = this.clampY(runtime.mouseY - halfPenguinSize);
+
+      this.speed = approachSpeed;
+      this.setState("running");
+      this.moveToPosition(
+        targetCenterX,
+        targetTopY + halfPenguinSize,
+        approachSpeed,
+      );
+
+      const waitArrival = setInterval(() => {
+        if (this.isMoving) return;
+        clearInterval(waitArrival);
+
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        ) {
+          return;
+        }
+
+        this.speed = SPEED_WALK;
+        this.setState("peeking");
+        this.speak();
+
+        setTimeout(() => {
+          if (
+            typeof this.enforceFoodPriority === "function" &&
+            this.enforceFoodPriority()
+          ) {
+            return;
+          }
+          if (!this.isMoving) this.setState("idle");
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        }, this.scaleEmotionDuration(1600));
+      }, 100);
+    },
+
     triggerMouseGoodbye() {
       this.aiLocked = true;
       this.stepQueue = [];
@@ -354,7 +454,22 @@
       this.element.addEventListener("click", (e) => {
         e.stopPropagation();
         if (Date.now() < this.suppressClickUntil) return;
-        this.onClickPenguin();
+        if (this.pendingPenguinClickTimeoutId) return;
+        this.pendingPenguinClickTimeoutId = setTimeout(() => {
+          this.pendingPenguinClickTimeoutId = null;
+          this.onClickPenguin();
+        }, PENGUIN_DOUBLE_CLICK_MS);
+      });
+
+      this.element.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (Date.now() < this.suppressClickUntil) return;
+        if (this.pendingPenguinClickTimeoutId) {
+          clearTimeout(this.pendingPenguinClickTimeoutId);
+          this.pendingPenguinClickTimeoutId = null;
+        }
+        this.onDoubleClickPenguin();
       });
     },
 
@@ -580,6 +695,32 @@
         this.aiLocked = false;
         this.scheduleNextBehavior();
       }, this.scaleEmotionDuration(2000));
+    },
+
+    onDoubleClickPenguin() {
+      if (this.isWalkingAway || this.isDragging) return;
+
+      if (this.pendingPenguinClickTimeoutId) {
+        clearTimeout(this.pendingPenguinClickTimeoutId);
+        this.pendingPenguinClickTimeoutId = null;
+      }
+      this.suppressClickUntil = Date.now() + PENGUIN_DOUBLE_CLICK_MS;
+      this.penguinClickStreak = 0;
+      this.lastPenguinClickAt = 0;
+
+      if (typeof this.triggerLoveMoment === "function") {
+        this.triggerLoveMoment();
+      } else {
+        this.aiLocked = true;
+        this.stepQueue = [];
+        this.setState("thinking");
+        this.showSpeech("♥");
+        setTimeout(() => {
+          if (!this.isMoving) this.setState("idle");
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        }, this.scaleEmotionDuration(2200));
+      }
     },
   });
 })();

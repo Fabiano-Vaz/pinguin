@@ -27,9 +27,15 @@
     "runnerBackground",
     "assets/backgroung.png",
   );
-  const helicopterSprites = [
-    resolveSprite("helicopterA", "assets/helicopterA.gif"),
-    resolveSprite("helicopterB", "assets/helicopterB.gif"),
+  const helicopterVariants = [
+    {
+      src: resolveSprite("helicopterA", "assets/helicopterA.gif"),
+      scale: 5,
+    },
+    {
+      src: resolveSprite("helicopterB", "assets/helicopterB.gif"),
+      scale: 8,
+    },
   ];
 
   const STORAGE_KEY_BEST_SCORE = "pinguinRunnerBestScore";
@@ -406,19 +412,19 @@
       el.style.justifyContent = "center";
       el.style.filter = "drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28))";
       const heliImg = document.createElement("img");
-      const firstIndex = game.nextHelicopterIndex % helicopterSprites.length;
+      const firstIndex = game.nextHelicopterIndex % helicopterVariants.length;
       game.nextHelicopterIndex =
-        (game.nextHelicopterIndex + 1) % helicopterSprites.length;
-      const heliSrc = helicopterSprites[firstIndex];
-      const fallbackSrc =
-        helicopterSprites[(firstIndex + 1) % helicopterSprites.length];
-      heliImg.src = heliSrc;
+        (game.nextHelicopterIndex + 1) % helicopterVariants.length;
+      const selectedVariant = helicopterVariants[firstIndex];
+      const fallbackVariant =
+        helicopterVariants[(firstIndex + 1) % helicopterVariants.length];
+      heliImg.src = selectedVariant.src;
       heliImg.alt = "helicopter";
       heliImg.draggable = false;
       heliImg.style.width = "100%";
       heliImg.style.height = "100%";
       heliImg.style.objectFit = "contain";
-      heliImg.style.transform = "scale(2)";
+      heliImg.style.transform = `scale(${selectedVariant.scale})`;
       heliImg.style.transformOrigin = "center";
       heliImg.style.pointerEvents = "none";
       heliImg.addEventListener(
@@ -429,7 +435,8 @@
             return;
           }
           heliImg.dataset.fallbackTried = "1";
-          heliImg.src = fallbackSrc;
+          heliImg.src = fallbackVariant.src;
+          heliImg.style.transform = `scale(${fallbackVariant.scale})`;
         },
       );
       el.appendChild(heliImg);

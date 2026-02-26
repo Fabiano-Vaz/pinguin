@@ -1,127 +1,144 @@
 (() => {
   window.PenguinPet = window.PenguinPet || {};
 
-  window.PenguinPet.phrases = {
-    idle: [
-      "Oi! Tudo bem?",
-      "Alguém me chamou?",
-      "Tô aqui... só sendo fofo.",
-      "Hm... e agora?",
-      "Tô esperando o Wi-Fi carregar a vida.",
-      "Bom dia! Ou boa tarde. Tanto faz.",
-    ],
-    running: [
-      "WHEEE! Não me para!",
-      "Correr é minha terapia!",
-      "Alguém soltou o pinguim!!",
-    ],
-    jumping: [
-      "YAAAY!",
-      "Eu consigo voar... quase.",
-      "Olha eu aqui em cima!",
-      "Pulo, logo existo!",
-      "Mais alto! MAIS ALTO!",
-      "Oba oba oba!",
-    ],
-    dancing: [
-      "Isso é vida, minha gente!",
-      "Ninguém me para na pista!",
-      "La la laaaa! 🎵",
-      "Dança, pinguim, dança!",
-    ],
-    sleeping: [
-      "Zzz...",
-      "Tô só descansando os olhos...",
-      "Sonhando com peixe fresco...",
-      "Zzz... mais cinco minutinhos...",
-    ],
-    scared: [
-      "AHHH! QUE FOI ISSO?!",
-      "Minha alma saiu pelo bico!!",
-      "Eu vi alguma coisa! Juro!",
-      "Socorroooo!",
-      "Faz isso não!!",
-    ],
-    crying: [
-      "Buááá!",
-      "Tô bem... tô bem... não tô.",
-      "Snif snif... que vida dura...",
-      "Alguém me dá um abraço?",
-      "Tô chorando, mas com estilo.",
-      "Isso não foi legal não... 😢",
-    ],
-    angry: [
-      "GRRRR!",
-      "Tô com a cabeça fumegando aqui!",
-      "Quem fez isso?! QUEM FOI?!",
-      "Não, não e NÃO!",
-      "Caramba! Que tombo foi esse?!",
-      "Ei! Mais cuidado comigo, pô!",
-      "Que queda desnecessária... droga!",
-    ],
-    scratching: [
-      "Coça coça coça...",
-      "Hmm... tô pensando ou coçando?",
-      "Esse lugar coça todo dia...",
-      "Não olha assim pra mim.",
-      "Operação coça-cabeça em andamento.",
-    ],
-    waving: [
-      "Tchau tchau! 👋",
-      "Até a próxima aventura!",
-      "Volte sempre! Tenho saudade fácil.",
-      "Vai com Deus! E com peixe.",
-      "Flau flau! (é tchau em pinguinês)",
-      "Até logo, amiguinho!",
-    ],
-    shy: [
-      "Ui... que situação...",
-      "Eu? Não... não sou eu não...",
-      "Que vergonhinha...",
-      "Tô vermelho embaixo da pena.",
-      "Fica de boas... eu fico de corado.",
-      "Não olha pra mim assim!",
-    ],
-    peeking: [
-      "Psiu... tá seguro?",
-      "O que é isso ali?!",
-      "Espreitando com discrição total.",
-      "Eu vi alguma coisa suspeita...",
-      "Curioso? Eu? Jamais. (mentira)",
-      "Quem é esse ser misterioso?",
-    ],
-    laughing: [
-      "HAHAHAHAHA!",
-      "Para! Para que eu vou morrer!",
-      "Isso foi hilário demais!!",
-      "Tô morrendo de rir aqui!",
-      "Minha barriga tá doendo de rir!",
-      "KEK KEK KEK!",
-    ],
-    thinking: ["Te amo!", "Acho que apaixonei!", "Vc é um xuxuzinho!"],
-    eating: [
-      "Hmmm... peixinho!",
-      "Nhac nhac nhac!",
-      "Isso sim e vida!",
-      "Mais peixe, por favor!",
-    ],
-    flying: [
-      "Vou conseguir! Só mais um pouquinho!",
-      "Os pinguins PODEM voar. Hoje é o dia!",
-      "Bate! Bate! BATE as asas!",
-      "Eu juro que tô saindo do chão...",
-      "A gravidade é fake news!",
-      "Weeeeee!! (quase)",
-    ],
-    turningBack: [
-      "Psst... tô de costas, não tô te ignorando.",
-      "Hm? Tinha alguém aí?",
-      "Só virando pra ver o outro lado...",
-      "Nada a ver aqui. Pode passar.",
-      "Olha o que achei por aqui...",
-      "Relaxa, volto já!",
-    ],
-  };
+  window.PenguinPet = window.PenguinPet || {};
+
+window.PenguinPet.phrases = {
+  idle: [
+    "Tá pensando ou tá debugando mentalmente?",
+    "Esse olhar é de quem esqueceu um ;",
+    "Compilando ideias... ⏳",
+    "Se olhar fixamente pro código ele se resolve sozinho?",
+    "Hmm… isso tem cara de bug escondido.",
+    "Respira. Não é culpa sua. (provavelmente)",
+    "Você parece inteligente digitando assim.",
+    "Eu confio em você, dev.",
+  ],
+
+  running: [
+    "Deploy em produção!!! CORRE!",
+    "É hotfix! É HOTFIX!",
+    "Foge do bug!!",
+    "Pipeline passou? NÃO?!",
+    "Rollback! Rollback!",
+  ],
+
+  jumping: [
+    "Funcionou de primeira?! 😮",
+    "SEM ERRO NO CONSOLE!!",
+    "Testes verdes!! 🟢🟢🟢",
+    "Era só limpar o cache! EU SABIA!",
+    "Deploy sem erro? Milagre!",
+  ],
+
+  dancing: [
+    "Build passou!!! 🎉",
+    "Sem conflito de merge!",
+    "PR aprovado!!",
+    "Cliente disse 'perfeito'!!!",
+    "Hoje é dia de commitar feliz.",
+  ],
+
+  sleeping: [
+    "npm install tá rodando... zzz",
+    "Docker build demora mesmo...",
+    "Enquanto compila eu descanso...",
+    "CI/CD trabalhando por nós...",
+  ],
+
+  scared: [
+    "VOCÊ RODOU EM PRODUÇÃO?!",
+    "Cadê o backup?!",
+    "Apagou a tabela errada?!",
+    "Isso não era pra acontecer...",
+    "Quem mexeu na ENV?!",
+  ],
+
+  crying: [
+    "Mas ontem tava funcionando...",
+    "Eu não toquei nessa parte 😭",
+    "Quem fez esse código?",
+    "Stack trace infinito...",
+    "Erro 500… de novo não…",
+  ],
+
+  angry: [
+    "Quem fez esse if aninhado?!",
+    "Isso aqui precisava MESMO ser assim?",
+    "Comentário: 'arrumar depois'… sério?",
+    "Variável chamada x1FinalFinalMesmo?",
+    "Isso não é gambiarra… é arte moderna.",
+  ],
+
+  scratching: [
+    "Hmm... isso tem cara de escopo errado...",
+    "Será que é cache?",
+    "Deixa eu pensar mais um pouco...",
+    "Tem algo estranho aqui...",
+    "Operação debug silencioso.",
+  ],
+
+  waving: [
+    "Até amanhã, dev!",
+    "Não esquece de dar git push!",
+    "Salva antes de sair!",
+    "Commit pequeno é commit feliz!",
+    "Vai descansar, o bug espera.",
+  ],
+
+  shy: [
+    "Eu vi você errando… mas finjo que não.",
+    "Todo mundo erra um ponto e vírgula.",
+    "Relaxa… eu também não sei voar.",
+    "Foi só um errinho bobo...",
+  ],
+
+  peeking: [
+    "Você tá no StackOverflow, né?",
+    "Isso aí é chatGPT aberto?",
+    "Copiou e colou… confessa.",
+    "Testando direto em produção? 👀",
+  ],
+
+  laughing: [
+    "HAHAHAHAHA!",
+    "Era só um ; mesmo!",
+    "Você passou 40 minutos nisso?",
+    "Bug resolvido com restart 😂",
+    "KEK KEK KEK!",
+  ],
+
+  thinking: [
+    "Será que é problema de escopo?",
+    "Tá faltando await aqui...",
+    "Isso tem cara de race condition...",
+    "Cache ou banco?",
+    "Tá no front… certeza.",
+  ],
+
+  eating: [
+    "Hmmm… peixinho e café ☕",
+    "Dev vive de café e esperança.",
+    "Sem café não tem deploy.",
+    "Alimentando o cérebro pra debugar.",
+  ],
+
+  flying: [
+    "Hoje eu viro tech lead!",
+    "Escalabilidade infinita!!",
+    "Microserviços, baby!",
+    "Cloud resolve tudo… né?",
+    "Bate as asas da arquitetura!",
+  ],
+
+  turningBack: [
+    "Psst... tô revisando seu commit.",
+    "Hm? Tinha console.log aqui?",
+    "Só conferindo se não quebrou nada...",
+    "Nada a ver aqui. Pode passar.",
+    "Olha o que achei nesse diff...",
+  ],
+};
 
   window.PenguinPet.behaviors = [
     () => [

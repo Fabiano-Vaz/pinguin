@@ -152,7 +152,6 @@
       this.targetY = this.y;
       this.element.style.animation = "";
       this.setState("eating");
-      this.nextBubbleAt = 0;
       this.speak();
 
       if (target.element && target.element.isConnected) {

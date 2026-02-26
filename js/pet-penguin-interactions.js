@@ -212,7 +212,8 @@
         this.triggerMouseFlee();
       } else if (dist >= 90 && dist < 220 && this.lastMouseZone === "far") {
         this.lastMouseZone = "near";
-        if (Math.random() < 100) {
+        // Keep chase as an occasional reaction; always-chase traps movement near the cursor.
+        if (Math.random() < 0.4) {
           this.mouseReactionCooldown = 5000;
           this.triggerMouseChase();
         } else {
@@ -468,7 +469,6 @@
           clearInterval(waitLanding);
           this.speed = SPEED_WALK;
           this.setState("angry");
-          this.nextBubbleAt = 0;
           this.speak();
           setTimeout(() => {
             if (!this.isMoving) this.setState("idle");

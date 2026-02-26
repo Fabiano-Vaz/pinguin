@@ -4,6 +4,12 @@
   const runtime = pet.runtime || {};
   const Penguin = pet.Penguin;
   const effects = pet.effects || {};
+  const FISH_THROW_STREAK_LIMIT = 7;
+  const FISH_THROW_STREAK_GAP_MS = 900;
+  const FISH_THROW_COOLDOWN_MS = 3 * 60 * 1000;
+  let fishThrowStreak = 0;
+  let lastFishThrowClickAt = 0;
+  let fishThrowBlockedUntil = 0;
 
   const applyFishCursorState = () => {
     if (!document.body) return;
@@ -74,9 +80,24 @@
 
     if (typeof effects.createFoodDrops !== "function") return;
     if (typeof penguin.enqueueFoodTargets !== "function") return;
+    const now = Date.now();
+    if (now < fishThrowBlockedUntil) return;
+
+    if (now - lastFishThrowClickAt <= FISH_THROW_STREAK_GAP_MS) {
+      fishThrowStreak += 1;
+    } else {
+      fishThrowStreak = 1;
+    }
+    lastFishThrowClickAt = now;
 
     const targets = effects.createFoodDrops(e.clientX, e.clientY, 2);
     penguin.enqueueFoodTargets(targets);
+
+    if (fishThrowStreak >= FISH_THROW_STREAK_LIMIT) {
+      fishThrowBlockedUntil = now + FISH_THROW_COOLDOWN_MS;
+      fishThrowStreak = 0;
+      lastFishThrowClickAt = 0;
+    }
   });
 
   if (typeof effects.startSnowCycle === "function") {

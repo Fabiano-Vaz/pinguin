@@ -96,6 +96,7 @@
   }
 
   let snowSpawnIntervalId = null;
+  let snowCooldownTimeoutId = null;
 
   function createRainDrop() {
     const drop = document.createElement("div");
@@ -112,9 +113,19 @@
   }
 
   let rainSpawnIntervalId = null;
+  let rainCooldownTimeoutId = null;
+  const WEATHER_RETRY_DELAY_MS = 5000;
 
   function startRainCycle() {
     if (rainSpawnIntervalId !== null) return;
+    if (snowSpawnIntervalId !== null) {
+      if (rainCooldownTimeoutId !== null) clearTimeout(rainCooldownTimeoutId);
+      rainCooldownTimeoutId = setTimeout(
+        startRainCycle,
+        WEATHER_RETRY_DELAY_MS,
+      );
+      return;
+    }
 
     const penguin = window.PenguinPet && window.PenguinPet.penguin;
     if (penguin && typeof penguin.showUmbrella === "function") {
@@ -135,12 +146,24 @@
       if (p && typeof p.hideUmbrella === "function") {
         p.hideUmbrella();
       }
-      setTimeout(startRainCycle, constants.RAIN_COOLDOWN_DURATION_MS);
+      if (rainCooldownTimeoutId !== null) clearTimeout(rainCooldownTimeoutId);
+      rainCooldownTimeoutId = setTimeout(
+        startRainCycle,
+        constants.RAIN_COOLDOWN_DURATION_MS,
+      );
     }, constants.RAIN_ACTIVE_DURATION_MS);
   }
 
   function startSnowCycle() {
     if (snowSpawnIntervalId !== null) return;
+    if (rainSpawnIntervalId !== null) {
+      if (snowCooldownTimeoutId !== null) clearTimeout(snowCooldownTimeoutId);
+      snowCooldownTimeoutId = setTimeout(
+        startSnowCycle,
+        WEATHER_RETRY_DELAY_MS,
+      );
+      return;
+    }
 
     snowSpawnIntervalId = setInterval(
       createBackgroundParticles,
@@ -153,7 +176,11 @@
         snowSpawnIntervalId = null;
       }
 
-      setTimeout(startSnowCycle, constants.SNOW_COOLDOWN_DURATION_MS);
+      if (snowCooldownTimeoutId !== null) clearTimeout(snowCooldownTimeoutId);
+      snowCooldownTimeoutId = setTimeout(
+        startSnowCycle,
+        constants.SNOW_COOLDOWN_DURATION_MS,
+      );
     }, constants.SNOW_ACTIVE_DURATION_MS);
   }
 

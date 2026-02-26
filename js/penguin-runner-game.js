@@ -17,26 +17,64 @@
     jumping: resolveSprite("trace", "assets/trace.svg"),
     front: resolveSprite("default", "assets/pinguin.svg"),
     crying: resolveSprite("crying", "assets/pinguin chorando.svg"),
+    angry: resolveSprite("angry", "assets/pinguin com raiva.svg"),
+    flying: resolveSprite("flying", "assets/pinguin voando.svg"),
+    caveirinha: resolveSprite("caveirinha", "assets/pinguin caveirinha.svg"),
   };
   const configuredBackgroundImage =
     window.PENGUIN_CONFIG &&
     typeof window.PENGUIN_CONFIG.backgroundImage === "string"
       ? window.PENGUIN_CONFIG.backgroundImage
       : "";
-  const runnerBackgroundImage = resolveSprite(
+  const runnerBackgroundLightImage = resolveSprite(
     "runnerBackground",
     "assets/backgroung.png",
   );
+  const runnerBackgroundDarkImage = (() => {
+    if (configuredBackgroundImage && configuredBackgroundImage.length > 0) {
+      if (configuredBackgroundImage.indexOf("backgroung.png") !== -1) {
+        return configuredBackgroundImage.replace(
+          "backgroung.png",
+          "backgroung-dark.png",
+        );
+      }
+      return configuredBackgroundImage;
+    }
+
+    if (runnerBackgroundLightImage.indexOf("backgroung.png") !== -1) {
+      return runnerBackgroundLightImage.replace(
+        "backgroung.png",
+        "backgroung-dark.png",
+      );
+    }
+
+    return "assets/backgroung-dark.png";
+  })();
   const helicopterVariants = [
     {
+      key: "A",
       src: resolveSprite("helicopterA", "assets/helicopterA.gif"),
       scale: 5,
+      hitboxInsetRatios: {
+        left: 0.28,
+        right: 0.5,
+        top: 0.22,
+        bottom: 0.26,
+      },
     },
     {
+      key: "B",
       src: resolveSprite("helicopterB", "assets/helicopterB.gif"),
       scale: 8,
+      hitboxInsetRatios: {
+        left: 0.39,
+        right: 0.61,
+        top: 0.31,
+        bottom: 0.37,
+      },
     },
   ];
+  const RUNNER_PENGUIN_VISUAL_OFFSET_Y = 10;
 
   const STORAGE_KEY_BEST_SCORE = "pinguinRunnerBestScore";
 
@@ -86,6 +124,7 @@
     fishRain: [],
     nextHelicopterIndex: 0,
     nextFishDropScore: 100,
+    currentRunnerBackground: "",
     fishCursorWasEnabledClass: false,
     fishCursorWasEnabledRuntime: null,
     penguin: {
@@ -120,6 +159,7 @@
   penguinEl.className = "runner-penguin";
   penguinEl.src = sprites.running;
   penguinEl.draggable = false;
+  let currentPenguinSpriteState = "running";
 
   const ground = document.createElement("div");
   ground.className = "runner-ground";
@@ -158,11 +198,14 @@
   const getGroundY = () =>
     Math.max(0, getPlayfieldHeight() - game.penguin.standingHeight + 8);
   const getGroundLineY = () => getGroundY() + game.penguin.standingHeight;
+  const LOSS_REACTION_STATES = ["crying", "angry", "flying", "caveirinha"];
 
   const setPenguinSprite = (state) => {
-    const source = sprites[state] || sprites.running;
-    if (penguinEl.src.endsWith(source)) return;
+    const nextState = sprites[state] ? state : "running";
+    if (currentPenguinSpriteState === nextState) return;
+    const source = sprites[nextState];
     penguinEl.src = source;
+    currentPenguinSpriteState = nextState;
   };
 
   const getPenguinHeight = () =>
@@ -172,7 +215,11 @@
 
   const getPenguinTopY = () => {
     const currentHeight = getPenguinHeight();
-    return game.penguin.y + (game.penguin.standingHeight - currentHeight);
+    return (
+      game.penguin.y +
+      (game.penguin.standingHeight - currentHeight) +
+      RUNNER_PENGUIN_VISUAL_OFFSET_Y
+    );
   };
 
   const applyPenguinPosition = () => {
@@ -266,19 +313,24 @@
     game.groundDecor = [];
   };
 
+  const updateRunnerBackgroundByScore = (force = false) => {
+    const scoreBand = Math.floor(game.score / 500);
+    const useLightBackground = scoreBand % 2 === 1;
+    const nextBackground = useLightBackground
+      ? runnerBackgroundLightImage
+      : runnerBackgroundDarkImage;
+
+    if (!force && game.currentRunnerBackground === nextBackground) return;
+
+    stage.style.backgroundImage = `url("${nextBackground}")`;
+    game.currentRunnerBackground = nextBackground;
+  };
+
   const updateGroundPresentation = () => {
     const groundLineY = getGroundLineY();
     ground.style.top = `${groundLineY}px`;
 
-    const webviewRunnerBackground =
-      configuredBackgroundImage.indexOf("backgroung-dark.png") !== -1
-        ? configuredBackgroundImage.replace(
-            "backgroung-dark.png",
-            "backgroung.png",
-          )
-        : runnerBackgroundImage;
-
-    stage.style.backgroundImage = `url("${webviewRunnerBackground}")`;
+    updateRunnerBackgroundByScore(true);
     stage.style.backgroundColor = "#1c2b56";
     stage.style.backgroundSize = "cover";
     stage.style.backgroundPosition = "center bottom";
@@ -404,13 +456,10 @@
     el.style.overflow = "hidden";
 
     if (template.id === "airplane") {
+      el.classList.add("runner-obstacle--airplane");
       el.style.background = "transparent";
       el.style.boxShadow = "none";
       el.style.overflow = "visible";
-      el.style.display = "flex";
-      el.style.alignItems = "center";
-      el.style.justifyContent = "center";
-      el.style.filter = "drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28))";
       const heliImg = document.createElement("img");
       const firstIndex = game.nextHelicopterIndex % helicopterVariants.length;
       game.nextHelicopterIndex =
@@ -418,15 +467,20 @@
       const selectedVariant = helicopterVariants[firstIndex];
       const fallbackVariant =
         helicopterVariants[(firstIndex + 1) % helicopterVariants.length];
+      el.dataset.heliVariantKey = selectedVariant.key;
+      el.dataset.heliHitboxLeft = String(selectedVariant.hitboxInsetRatios.left);
+      el.dataset.heliHitboxRight = String(
+        selectedVariant.hitboxInsetRatios.right,
+      );
+      el.dataset.heliHitboxTop = String(selectedVariant.hitboxInsetRatios.top);
+      el.dataset.heliHitboxBottom = String(
+        selectedVariant.hitboxInsetRatios.bottom,
+      );
       heliImg.src = selectedVariant.src;
+      heliImg.className = "runner-helicopter";
       heliImg.alt = "helicopter";
       heliImg.draggable = false;
-      heliImg.style.width = "100%";
-      heliImg.style.height = "100%";
-      heliImg.style.objectFit = "contain";
-      heliImg.style.transform = `scale(${selectedVariant.scale})`;
-      heliImg.style.transformOrigin = "center";
-      heliImg.style.pointerEvents = "none";
+      heliImg.style.setProperty("--heli-scale", selectedVariant.scale);
       heliImg.addEventListener(
         "error",
         () => {
@@ -435,8 +489,17 @@
             return;
           }
           heliImg.dataset.fallbackTried = "1";
+          el.dataset.heliVariantKey = fallbackVariant.key;
+          el.dataset.heliHitboxLeft = String(fallbackVariant.hitboxInsetRatios.left);
+          el.dataset.heliHitboxRight = String(
+            fallbackVariant.hitboxInsetRatios.right,
+          );
+          el.dataset.heliHitboxTop = String(fallbackVariant.hitboxInsetRatios.top);
+          el.dataset.heliHitboxBottom = String(
+            fallbackVariant.hitboxInsetRatios.bottom,
+          );
           heliImg.src = fallbackVariant.src;
-          heliImg.style.transform = `scale(${fallbackVariant.scale})`;
+          heliImg.style.setProperty("--heli-scale", fallbackVariant.scale);
         },
       );
       el.appendChild(heliImg);
@@ -543,6 +606,28 @@
   };
 
   const getObstacleHitbox = (obstacle) => {
+    const isHelicopter = obstacle.id === "airplane";
+    if (isHelicopter) {
+      const helicopterEl = obstacle.el.querySelector(".runner-helicopter");
+      if (helicopterEl) {
+        const rect = helicopterEl.getBoundingClientRect();
+        const leftRatio = Number(obstacle.el.dataset.heliHitboxLeft) || 0.28;
+        const rightRatio = Number(obstacle.el.dataset.heliHitboxRight) || 0.5;
+        const topRatio = Number(obstacle.el.dataset.heliHitboxTop) || 0.22;
+        const bottomRatio = Number(obstacle.el.dataset.heliHitboxBottom) || 0.26;
+        const insetLeft = Math.round(rect.width * leftRatio);
+        const insetRight = Math.round(rect.width * rightRatio);
+        const insetTop = Math.round(rect.height * topRatio);
+        const insetBottom = Math.round(rect.height * bottomRatio);
+        return {
+          x: rect.left + insetLeft,
+          y: rect.top + insetTop,
+          width: Math.max(8, rect.width - insetLeft - insetRight),
+          height: Math.max(8, rect.height - insetTop - insetBottom),
+        };
+      }
+    }
+
     const horizontalInsetRatio = obstacle.requiresCrouch ? 0.16 : 0.12;
     const verticalInsetRatio = obstacle.requiresCrouch ? 0.12 : 0.08;
 
@@ -614,7 +699,11 @@
 
     setTimeout(() => {
       if (!game.isGameOver) return;
-      setPenguinSprite("crying");
+      const randomReaction =
+        LOSS_REACTION_STATES[
+          Math.floor(Math.random() * LOSS_REACTION_STATES.length)
+        ];
+      setPenguinSprite(randomReaction);
     }, 260);
 
     message.textContent = `Fim de jogo | Pontos ${scoreInt} | Recorde ${game.bestScore} | Space para reiniciar`;
@@ -736,6 +825,7 @@
   const updateDifficultyAndSpawns = (deltaMs) => {
     game.worldTimeMs += deltaMs;
     game.score += (deltaMs / 1000) * 10;
+    updateRunnerBackgroundByScore();
     while (game.score >= game.nextFishDropScore) {
       spawnScoreFishDrop();
       game.nextFishDropScore += 100;
@@ -797,6 +887,7 @@
     game.worldTimeMs = 0;
     game.nextFishDropScore = 100;
     game.nextHelicopterIndex = 0;
+    game.currentRunnerBackground = "";
 
     game.penguin.velocityY = 0;
     game.penguin.isJumping = false;

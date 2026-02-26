@@ -162,6 +162,11 @@
       { type: "walk" },
     ],
     () => [
+      { type: "walkShort" },
+      { type: "act", state: "sleeping", duration: 14000 },
+      { type: "walk" },
+    ],
+    () => [
       { type: "walkEdge" },
       { type: "act", state: "peeking", duration: 3000 },
       { type: "walk" },
@@ -216,8 +221,13 @@
     () => [
       { type: "walkFast" },
       { type: "act", state: "turningBack", duration: 3500 },
-      { type: "act", state: "idle", duration: 1000 },
+      { type: "act", state: "sleeping", duration: 8000 },
       { type: "walk" },
+    ],
+    () => [
+      { type: "walkEdge" },
+      { type: "act", state: "sleeping", duration: 12000 },
+      { type: "walkShort" },
     ],
   ];
 })();

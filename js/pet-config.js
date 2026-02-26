@@ -6,8 +6,9 @@
 
   const actionStates =
     shared && typeof shared.getActionStates === "function"
-      ? shared.getActionStates(window.PENGUIN_ASSETS || {}, (fileName) =>
-          `assets/${fileName}`,
+      ? shared.getActionStates(
+          window.PENGUIN_ASSETS || {},
+          (fileName) => `assets/${fileName}`,
         )
       : shared && typeof shared.buildAssetPaths === "function"
         ? {
@@ -53,25 +54,28 @@
       halfPenguinSize: penguinSize / 2,
       snowTopRatio,
       backgroundImage,
-      BUBBLE_BASE_INTERVAL_MS: 15000,
-      BUBBLE_INTERVAL_JITTER_MS: 6000,
-      BUBBLE_SHOW_CHANCE: 0.85,
-      EMOTION_DURATION_MULTIPLIER: 1.35,
-      PRELUDE_EMOTIONS: ["crying", "shy", "angry"],
-      PRELUDE_EMOTION_DURATION_MS: 2200,
-      PRELUDE_IDLE_DURATION_MS: 450,
-      PRELUDE_CHANCE: 0.2,
-      BEHAVIOR_DELAY_MIN_MS: 2400,
-      BEHAVIOR_DELAY_VARIATION_MS: 2600,
-      STEP_TRANSITION_DELAY_MS: 700,
-      STEP_TRANSITION_DELAY_VARIATION_MS: 450,
+      BUBBLE_BASE_INTERVAL_MS: 30000,
+      BUBBLE_INTERVAL_JITTER_MS: 15000,
+      BUBBLE_SHOW_CHANCE: 0.45,
+      EMOTION_DURATION_MULTIPLIER: 1.0,
+      PRELUDE_EMOTIONS: ["shy"],
+      PRELUDE_EMOTION_DURATION_MS: 1600,
+      PRELUDE_IDLE_DURATION_MS: 350,
+      PRELUDE_CHANCE: 0.06,
+      BEHAVIOR_DELAY_MIN_MS: 5000,
+      BEHAVIOR_DELAY_VARIATION_MS: 7000,
+      STEP_TRANSITION_DELAY_MS: 600,
+      STEP_TRANSITION_DELAY_VARIATION_MS: 600,
       SPEED_WALK: 1.5,
       SPEED_WALK_FAST: 2.2,
       SPEED_CHASE: 2.2,
       SPEED_FLEE: 2.8,
       SNOW_ACTIVE_DURATION_MS: 15000,
-      SNOW_COOLDOWN_DURATION_MS: 3600000,
+      SNOW_COOLDOWN_DURATION_MS: 1800000,
       SNOW_SPAWN_INTERVAL_MS: 400,
+      RAIN_ACTIVE_DURATION_MS: 40000,
+      RAIN_COOLDOWN_DURATION_MS: 600000,
+      RAIN_SPAWN_INTERVAL_MS: 60,
     },
     runtime: {
       mouseX: window.innerWidth / 2,

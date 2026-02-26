@@ -1,7 +1,12 @@
 (() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
-  modules.motion = ({ penguinSize, halfPenguinSize, snowTopRatio }) => ({
+  modules.motion = ({
+    penguinSize,
+    halfPenguinSize,
+    snowTopRatio,
+    phrases,
+  }) => ({
     startJumpArc(targetX, targetY) {
       const clampedX = Math.max(
         0,
@@ -161,7 +166,13 @@
           this.stopWaddleSteps();
           this.setVisualState("default");
           this.applyTransform();
-          this.showSpeech("Se me jogar novamente eu não volto", 3200);
+          const droppedList = (phrases && phrases.dropped) || [
+            "Se me jogar novamente eu não volto",
+          ];
+          this.showSpeech(
+            droppedList[Math.floor(Math.random() * droppedList.length)],
+            3200,
+          );
 
           setTimeout(() => {
             this.aiLocked = false;
@@ -194,7 +205,7 @@
     },
 
     getWalkMaxY() {
-      return this.getWalkMinY() + 10;
+      return this.getWalkMinY() + Math.round(window.innerHeight * 0.13);
     },
 
     getFlyMinY() {

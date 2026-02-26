@@ -26,11 +26,18 @@
       const mdx = mouseX - penguinCenterX;
       const mdy = mouseY - penguinCenterY;
       const dist = Math.sqrt(mdx * mdx + mdy * mdy);
-      const sinceLastSample = Math.max(16, now - (this.lastMouseSampleAt || now));
+      const sinceLastSample = Math.max(
+        16,
+        now - (this.lastMouseSampleAt || now),
+      );
       const lastX =
-        typeof this.lastMouseSampleX === "number" ? this.lastMouseSampleX : mouseX;
+        typeof this.lastMouseSampleX === "number"
+          ? this.lastMouseSampleX
+          : mouseX;
       const lastY =
-        typeof this.lastMouseSampleY === "number" ? this.lastMouseSampleY : mouseY;
+        typeof this.lastMouseSampleY === "number"
+          ? this.lastMouseSampleY
+          : mouseY;
       const mouseSpeed =
         (Math.hypot(mouseX - lastX, mouseY - lastY) / sinceLastSample) * 1000;
 
@@ -56,7 +63,7 @@
         !this.aiLocked &&
         now >= (this.unreachableMouseReactCooldownUntil || 0)
       ) {
-        this.unreachableMouseReactCooldownUntil = now + 3200;
+        this.unreachableMouseReactCooldownUntil = now + 6000;
         this.aiLocked = true;
         this.stepQueue = [];
         this.isChasing = false;
@@ -124,11 +131,12 @@
       }
 
       if (
-        dist < 80 &&
+        dist < 55 &&
         !this.aiLocked &&
-        now >= (this.hoverReactionCooldownUntil || 0)
+        now >= (this.hoverReactionCooldownUntil || 0) &&
+        Math.random() < 0.55
       ) {
-        this.hoverReactionCooldownUntil = now + 2600;
+        this.hoverReactionCooldownUntil = now + 6000;
         this.aiLocked = true;
         this.stepQueue = [];
 
@@ -154,14 +162,14 @@
       }
 
       if (
-        dist >= 120 &&
-        dist <= 320 &&
-        mouseSpeed > 900 &&
+        dist >= 150 &&
+        dist <= 280 &&
+        mouseSpeed > 1500 &&
         !this.aiLocked &&
         !this.isMoving &&
         now >= (this.playfulFollowCooldownUntil || 0)
       ) {
-        this.playfulFollowCooldownUntil = now + 5000;
+        this.playfulFollowCooldownUntil = now + 10000;
         this.aiLocked = true;
         this.stepQueue = [];
         this.isChasing = true;
@@ -193,7 +201,8 @@
       ) {
         return;
       }
-      if (this.isDragging || this.currentFoodTarget || this.isEatingFood) return;
+      if (this.isDragging || this.currentFoodTarget || this.isEatingFood)
+        return;
       if (this.isCursorTouchingPenguin()) return;
 
       const mdx = runtime.mouseX - (this.x + halfPenguinSize);
@@ -213,16 +222,16 @@
       } else if (dist >= 90 && dist < 220 && this.lastMouseZone === "far") {
         this.lastMouseZone = "near";
         // Keep chase as an occasional reaction; always-chase traps movement near the cursor.
-        if (Math.random() < 0.4) {
-          this.mouseReactionCooldown = 5000;
+        if (Math.random() < 0.2) {
+          this.mouseReactionCooldown = 9000;
           this.triggerMouseChase();
         } else {
-          this.mouseReactionCooldown = 4000;
+          this.mouseReactionCooldown = 7000;
           this.triggerMouseCurious();
         }
       } else if (dist >= 220 && this.lastMouseZone === "near") {
         this.lastMouseZone = "far";
-        this.mouseReactionCooldown = 1500;
+        this.mouseReactionCooldown = 3000;
         this.triggerMouseGoodbye();
       } else if (dist >= 90 && this.lastMouseZone === "close") {
         this.lastMouseZone = dist < 220 ? "near" : "far";
@@ -238,13 +247,17 @@
       this.speak();
 
       setTimeout(() => {
-        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        )
+          return;
         this.isChasing = false;
         this.speed = SPEED_WALK;
         if (!this.isMoving) this.setState("idle");
         this.aiLocked = false;
         this.scheduleNextBehavior();
-      }, 4000);
+      }, 2500);
     },
 
     triggerMouseFlee() {
@@ -272,7 +285,11 @@
       );
 
       setTimeout(() => {
-        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        )
+          return;
         this.speed = SPEED_WALK;
         this.aiLocked = false;
         this.scheduleNextBehavior();
@@ -286,7 +303,11 @@
       this.speak();
 
       setTimeout(() => {
-        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        )
+          return;
         if (!this.isMoving) this.setState("idle");
         this.aiLocked = false;
         this.scheduleNextBehavior();
@@ -300,7 +321,11 @@
       this.speak();
 
       setTimeout(() => {
-        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        )
+          return;
         if (!this.isMoving) this.setState("idle");
         this.aiLocked = false;
         this.scheduleNextBehavior();
@@ -382,7 +407,10 @@
       );
       this.y = Math.max(
         0,
-        Math.min(e.clientY - this.dragOffsetY, window.innerHeight - penguinSize),
+        Math.min(
+          e.clientY - this.dragOffsetY,
+          window.innerHeight - penguinSize,
+        ),
       );
       this.targetX = this.x;
       this.targetY = this.y;
@@ -491,6 +519,24 @@
       ) {
         return;
       }
+
+      const now = Date.now();
+      if (!this.isRanting && now >= (this.rantCooldownUntil || 0)) {
+        const penguinClickGapMs = 800;
+        if (now - this.lastPenguinClickAt <= penguinClickGapMs) {
+          this.penguinClickStreak += 1;
+        } else {
+          this.penguinClickStreak = 1;
+        }
+        this.lastPenguinClickAt = now;
+
+        if (this.penguinClickStreak >= 4) {
+          this.penguinClickStreak = 0;
+          this.startRantMode();
+          return;
+        }
+      }
+
       this.isChasing = false;
       this.aiLocked = true;
       this.stepQueue = [];
@@ -524,7 +570,11 @@
       if (anims[reaction]) this.element.style.animation = anims[reaction];
 
       setTimeout(() => {
-        if (typeof this.enforceFoodPriority === "function" && this.enforceFoodPriority()) return;
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        )
+          return;
         this.element.style.animation = "";
         if (!this.isMoving) this.setState("idle");
         this.aiLocked = false;

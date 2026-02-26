@@ -11,7 +11,9 @@
     halfPenguinSize,
   }) => ({
     getNextBubbleDelay() {
-      return BUBBLE_BASE_INTERVAL_MS + Math.random() * BUBBLE_INTERVAL_JITTER_MS;
+      return (
+        BUBBLE_BASE_INTERVAL_MS + Math.random() * BUBBLE_INTERVAL_JITTER_MS
+      );
     },
 
     scheduleNextBubble() {
@@ -19,7 +21,10 @@
     },
 
     scaleEmotionDuration(durationMs) {
-      return Math.max(300, Math.round(durationMs * EMOTION_DURATION_MULTIPLIER));
+      return Math.max(
+        300,
+        Math.round(durationMs * EMOTION_DURATION_MULTIPLIER),
+      );
     },
 
     playLaughThenIdleThenLaugh(totalDuration, onDone) {
@@ -62,7 +67,14 @@
 
       const content = document.createElement("div");
       content.className = "bubble-content";
-      content.textContent = text;
+      const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      content.innerHTML = escaped.replace(
+        /\*([^*]+)\*/g,
+        "<strong>$1</strong>",
+      );
       this.bubble.appendChild(content);
 
       const dot1 = document.createElement("span");

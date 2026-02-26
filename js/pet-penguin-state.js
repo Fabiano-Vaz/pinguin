@@ -105,7 +105,22 @@
           : this.facingRight
             ? 1
             : -1;
-      this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale})`;
+      const depth = this.getDepthScale();
+      this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale * depth})`;
+      // Ajusta z-index: mais ao fundo = menor z-index (atrás), mais à frente = maior
+      const zBase = 10;
+      const zRange = 8;
+      this.element.style.zIndex = String(
+        Math.round(zBase + ((depth - 0.65) / 0.35) * zRange),
+      );
+    },
+
+    getDepthScale() {
+      // y = 0 (topo da tela) → escala 0.65 (fundo/longe)
+      // y = getWalkMaxY() (chão) → escala 1.0 (frente/perto)
+      const groundY = this.getWalkMaxY();
+      const ratio = Math.max(0, Math.min(1, this.y / Math.max(1, groundY)));
+      return 0.65 + ratio * 0.35;
     },
   });
 })();

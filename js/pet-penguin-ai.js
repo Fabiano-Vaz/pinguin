@@ -16,6 +16,7 @@
     SPEED_WALK,
     SPEED_WALK_FAST,
     halfPenguinSize,
+    phrases,
   }) => ({
     pruneFoodTargets() {
       if (!Array.isArray(this.foodTargets) || this.foodTargets.length === 0) {
@@ -181,7 +182,8 @@
       this.isChasing = false;
       this.element.style.animation = "";
       this.setState("thinking");
-      this.showSpeech("Te amo!");
+      const loveList = (phrases && phrases.love) || ["Te amo!"];
+      this.showSpeech(loveList[Math.floor(Math.random() * loveList.length)]);
 
       setTimeout(() => {
         if (!this.isMoving && !this.isDragging) this.setState("idle");
@@ -303,7 +305,7 @@
       this.element.style.animation = "shake 0.4s ease";
       this.setState("angry");
 
-      const rantLines = [
+      const rantLines = (phrases && phrases.rant) || [
         "PARA P#!@ !!!!",
         "PARAAA!!!",
         "NÃO QUERO MAAAAIISS",
@@ -317,13 +319,16 @@
         }, index * rantStepMs);
       });
 
-      setTimeout(() => {
-        this.element.style.animation = "";
-        if (!this.isMoving) this.setState("idle");
-        this.isRanting = false;
-        this.aiLocked = false;
-        this.scheduleNextBehavior();
-      }, rantLines.length * rantStepMs + 300);
+      setTimeout(
+        () => {
+          this.element.style.animation = "";
+          if (!this.isMoving) this.setState("idle");
+          this.isRanting = false;
+          this.aiLocked = false;
+          this.scheduleNextBehavior();
+        },
+        rantLines.length * rantStepMs + 300,
+      );
     },
 
     insertWalkBetweenEmotionSteps(currentStep) {
@@ -497,6 +502,5 @@
         }, actDuration);
       }
     },
-
   });
 })();

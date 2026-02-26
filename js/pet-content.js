@@ -3,247 +3,143 @@
 
   window.PenguinPet = window.PenguinPet || {};
 
-window.PenguinPet.phrases = {
-  idle: [
-    "Tá pensando ou tá debugando mentalmente?",
-    "Esse olhar é de quem esqueceu um ;",
-    "Compilando ideias... ⏳",
-    "Se olhar fixamente pro código ele se resolve sozinho?",
-    "Hmm… isso tem cara de bug escondido.",
-    "Respira. Não é culpa sua. (provavelmente)",
-    "Você parece inteligente digitando assim.",
-    "Eu confio em você, dev.",
-  ],
+  window.PenguinPet.phrases = {
+    idle: ["...", "hmm.", "*olha ao redor*", "tô por aqui."],
 
-  running: [
-    "Deploy em produção!!! CORRE!",
-    "É hotfix! É HOTFIX!",
-    "Foge do bug!!",
-    "Pipeline passou? NÃO?!",
-    "Rollback! Rollback!",
-  ],
+    running: ["*trotando*", "...", "*corre um pouco*"],
 
-  jumping: [
-    "Funcionou de primeira?! 😮",
-    "SEM ERRO NO CONSOLE!!",
-    "Testes verdes!! 🟢🟢🟢",
-    "Era só limpar o cache! EU SABIA!",
-    "Deploy sem erro? Milagre!",
-  ],
+    jumping: ["*hop*", "...", "*saltinho*"],
 
-  dancing: [
-    "Build passou!!! 🎉",
-    "Sem conflito de merge!",
-    "PR aprovado!!",
-    "Cliente disse 'perfeito'!!!",
-    "Hoje é dia de commitar feliz.",
-  ],
+    dancing: ["*balança levemente*", "♪ ♩ ♪", "..."],
 
-  sleeping: [
-    "npm install tá rodando... zzz",
-    "Docker build demora mesmo...",
-    "Enquanto compila eu descanso...",
-    "CI/CD trabalhando por nós...",
-  ],
+    sleeping: ["zzz...", "zz...", "...zzz"],
 
-  scared: [
-    "VOCÊ RODOU EM PRODUÇÃO?!",
-    "Cadê o backup?!",
-    "Apagou a tabela errada?!",
-    "Isso não era pra acontecer...",
-    "Quem mexeu na ENV?!",
-  ],
+    scared: ["!"],
 
-  crying: [
-    "Mas ontem tava funcionando...",
-    "Eu não toquei nessa parte 😭",
-    "Quem fez esse código?",
-    "Stack trace infinito...",
-    "Erro 500… de novo não…",
-  ],
+    crying: ["...", "*soluço*", "sniff."],
 
-  angry: [
-    "Quem fez esse if aninhado?!",
-    "Isso aqui precisava MESMO ser assim?",
-    "Comentário: 'arrumar depois'… sério?",
-    "Variável chamada x1FinalFinalMesmo?",
-    "Isso não é gambiarra… é arte moderna.",
-  ],
+    angry: ["humph.", "*resmunga baixinho*", "..."],
 
-  scratching: [
-    "Hmm... isso tem cara de escopo errado...",
-    "Será que é cache?",
-    "Deixa eu pensar mais um pouco...",
-    "Tem algo estranho aqui...",
-    "Operação debug silencioso.",
-  ],
+    scratching: ["*coça a cabeça*", "hmm...", "...", "*pensativo*"],
 
-  waving: [
-    "Até amanhã, dev!",
-    "Não esquece de dar git push!",
-    "Salva antes de sair!",
-    "Commit pequeno é commit feliz!",
-    "Vai descansar, o bug espera.",
-  ],
+    waving: ["*acena*", "o/", "..."],
 
-  shy: [
-    "Eu vi você errando… mas finjo que não.",
-    "Todo mundo erra um ponto e vírgula.",
-    "Relaxa… eu também não sei voar.",
-    "Foi só um errinho bobo...",
-  ],
+    shy: ["*esconde o rosto*", "...", "*tímido*"],
 
-  peeking: [
-    "Você tá no StackOverflow, né?",
-    "Isso aí é chatGPT aberto?",
-    "Copiou e colou… confessa.",
-    "Testando direto em produção? 👀",
-  ],
+    peeking: ["*espia*", "...", "*curioso*"],
 
-  laughing: [
-    "HAHAHAHAHA!",
-    "Era só um ; mesmo!",
-    "Você passou 40 minutos nisso?",
-    "Bug resolvido com restart 😂",
-    "KEK KEK KEK!",
-  ],
+    laughing: ["heh.", "*risinho*", "heh heh."],
 
-  thinking: [
-    "Será que é problema de escopo?",
-    "Tá faltando await aqui...",
-    "Isso tem cara de race condition...",
-    "Cache ou banco?",
-    "Tá no front… certeza.",
-  ],
+    thinking: ["...", "*pensa*", "hmm..."],
 
-  eating: [
-    "Hmmm… peixinho e café ☕",
-    "Dev vive de café e esperança.",
-    "Sem café não tem deploy.",
-    "Alimentando o cérebro pra debugar.",
-  ],
+    eating: ["*nom nom*", "*come*", "mmm."],
 
-  flying: [
-    "Hoje eu viro tech lead!",
-    "Escalabilidade infinita!!",
-    "Microserviços, baby!",
-    "Cloud resolve tudo… né?",
-    "Bate as asas da arquitetura!",
-  ],
+    flying: ["*bate as asinhas*", "...", "*flap flap*"],
 
-  turningBack: [
-    "Psst... tô revisando seu commit.",
-    "Hm? Tinha console.log aqui?",
-    "Só conferindo se não quebrou nada...",
-    "Nada a ver aqui. Pode passar.",
-    "Olha o que achei nesse diff...",
-  ],
-};
+    turningBack: ["*olha pra trás*", "...", "*espreita*"],
+
+    // Frases especiais (eventos específicos)
+    dropped: [
+      "Se me jogar novamente eu não volto",
+      "Isso doeu...",
+      "*olhar de julgamento*",
+    ],
+
+    love: [
+      "Te amo!",
+      "♥",
+      "*cora*",
+    ],
+
+    rant: [
+      "PARA P#!@ !!!!",
+      "PARAAA!!!",
+      "NÃO QUERO MAAAAIISS",
+      "PARA DE CLICAR NESSA M#$%@!",
+    ],
+  };
 
   window.PenguinPet.behaviors = [
+    // Apenas fica parado por um bom tempo
+    () => [{ type: "act", state: "idle", duration: 6000 }],
+    // Parado, depois olha pra trás discretamente
     () => [
-      { type: "walk" },
-      { type: "act", state: "thinking", duration: 3000 },
+      { type: "act", state: "idle", duration: 4000 },
+      { type: "act", state: "turningBack", duration: 1800 },
     ],
+    // Caminha um pouco e para
+    () => [{ type: "walkShort" }],
+    // Caminha, pensa e fica parado
     () => [
       { type: "walk" },
+      { type: "act", state: "thinking", duration: 2500 },
+    ],
+    // Soneca curta
+    () => [
+      { type: "walkShort" },
+      { type: "act", state: "sleeping", duration: 25000 },
+    ],
+    // Soneca longa
+    () => [
+      { type: "walk" },
+      { type: "act", state: "sleeping", duration: 50000 },
+      { type: "walkShort" },
+    ],
+    // Soneca muito longa (comportamento mais comum de dia)
+    () => [
+      { type: "walkShort" },
+      { type: "act", state: "sleeping", duration: 75000 },
+    ],
+    // Coça a cabeça e continua
+    () => [
+      { type: "walk" },
+      { type: "act", state: "scratching", duration: 2000 },
+      { type: "walkShort" },
+    ],
+    // Vai até a borda e espreita
+    () => [
+      { type: "walkEdge" },
+      { type: "act", state: "peeking", duration: 2200 },
+    ],
+    // Dança de leve e para
+    () => [
+      { type: "walkShort" },
       {
         type: "sequence",
         steps: [
           {
             state: "dancing",
-            duration: 1400,
-            anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
-            speak: true,
-          },
-          { state: "default", duration: 650 },
-          { state: "peeking", facing: "right", duration: 900 },
-          { state: "peeking", facing: "left", duration: 900 },
-          {
-            state: "dancing",
-            duration: 1400,
-            anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
-          },
-          {
-            state: "flying",
             duration: 1200,
-            anim: "bounce 1s ease-in-out infinite",
+            anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
           },
-          { state: "default", duration: 800 },
+          { state: "default", duration: 500 },
         ],
       },
     ],
-    () => [
-      { type: "walk" },
-      { type: "act", state: "sleeping", duration: 20000 },
-      { type: "walk" },
-    ],
+    // Acena discretamente
     () => [
       { type: "walkShort" },
-      { type: "act", state: "sleeping", duration: 14000 },
-      { type: "walk" },
+      { type: "act", state: "waving", duration: 1600 },
     ],
+    // Caminha rápido, para e olha em volta
+    () => [
+      { type: "walkFast" },
+      { type: "act", state: "peeking", duration: 2000 },
+    ],
+    // Voo curto e volta
+    () => [{ type: "flyMove", duration: 1600 }, { type: "walkShort" }],
+    // Olha pra trás e dorme
+    () => [
+      { type: "walkFast" },
+      { type: "act", state: "turningBack", duration: 2000 },
+      { type: "act", state: "sleeping", duration: 35000 },
+    ],
+    // Apenas fica parado por muito tempo
+    () => [{ type: "act", state: "idle", duration: 10000 }],
+    // Vai até a borda e dorme lá
     () => [
       { type: "walkEdge" },
-      { type: "act", state: "peeking", duration: 3000 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walk" },
-      { type: "act", state: "scratching", duration: 2500 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walkFast" },
-      { type: "act", state: "scared", duration: 1500, anim: "shake 0.6s ease" },
-      { type: "act", state: "shy", duration: 2000 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walkShort" },
-      { type: "act", state: "waving", duration: 2000 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walk" },
-      { type: "act", state: "crying", duration: 2500 },
-      { type: "act", state: "shy", duration: 2000 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walk" },
-      { type: "act", state: "angry", duration: 2000, anim: "shake 0.5s ease" },
-      {
-        type: "act",
-        state: "dancing",
-        duration: 3000,
-        anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
-      },
-    ],
-    () => [
-      { type: "walkFast" },
-      { type: "walk" },
-      { type: "act", state: "waving", duration: 2000 },
-    ],
-    () => [
-      { type: "flyMove", duration: 1800 },
-      { type: "walkShort" },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walk" },
-      { type: "act", state: "turningBack", duration: 2500 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walkFast" },
-      { type: "act", state: "turningBack", duration: 3500 },
-      { type: "act", state: "sleeping", duration: 8000 },
-      { type: "walk" },
-    ],
-    () => [
-      { type: "walkEdge" },
-      { type: "act", state: "sleeping", duration: 12000 },
+      { type: "act", state: "sleeping", duration: 45000 },
       { type: "walkShort" },
     ],
   ];

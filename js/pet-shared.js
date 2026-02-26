@@ -18,6 +18,7 @@
     eating: "pinguin comendo peixe.svg",
     flying: "pinguin voando.svg",
     turningBack: "pinguin de costas.svg",
+    umbrella: "umbrella.svg",
   };
 
   const DEFAULT_CONFIG = {

@@ -47,6 +47,16 @@
       this.img = document.createElement("img");
       this.img.draggable = false;
       this.element.appendChild(this.img);
+
+      this.umbrellaEl = document.createElement("img");
+      this.umbrellaEl.className = "penguin-umbrella";
+      this.umbrellaEl.draggable = false;
+      this.umbrellaEl.src =
+        window.PENGUIN_ASSETS && window.PENGUIN_ASSETS.umbrella
+          ? window.PENGUIN_ASSETS.umbrella
+          : "assets/umbrella.svg";
+      document.body.appendChild(this.umbrellaEl);
+
       document.body.appendChild(this.element);
 
       this.x = window.innerWidth / 2 - halfPenguinSize;
@@ -90,6 +100,8 @@
       this.fishCursorResumeTimeout = null;
       this.screenClickStreak = 0;
       this.lastScreenClickAt = 0;
+      this.penguinClickStreak = 0;
+      this.lastPenguinClickAt = 0;
       this.isRanting = false;
       this.rantCooldownUntil = 0;
       this.dropReleaseStreak = 0;
@@ -126,12 +138,16 @@
         if (this.customMotion && this.customMotion.type === "walkAwayExit") {
           this.y = this.clampY(this.y, false);
         } else {
-          this.x = Math.max(0, Math.min(this.x, window.innerWidth - penguinSize));
+          this.x = Math.max(
+            0,
+            Math.min(this.x, window.innerWidth - penguinSize),
+          );
           this.y = Math.max(0, Math.min(this.y, this.getWalkMaxY()));
         }
         this.element.style.left = this.x + "px";
         this.element.style.top = this.y + "px";
         this.updateBubblePosition();
+        this.updateUmbrellaPosition();
         this.handleMouseProximity();
         requestAnimationFrame((ts) => this.update(ts));
         return;
@@ -193,10 +209,59 @@
       this.element.style.top = this.y + "px";
       this.applyTransform(this.isWalkingAway ? 1 : undefined);
       this.updateBubblePosition();
+      this.updateUmbrellaPosition();
       this.applyCursorEatingState();
       this.handleMouseProximity();
 
       requestAnimationFrame((ts) => this.update(ts));
+    }
+
+    showUmbrella() {
+      if (this.umbrellaEl.classList.contains("open")) return;
+      this.updateUmbrellaPosition();
+      this.umbrellaEl.classList.remove("closing");
+      void this.umbrellaEl.offsetWidth;
+      this.umbrellaEl.classList.add("open");
+    }
+
+    hideUmbrella() {
+      if (!this.umbrellaEl.classList.contains("open")) return;
+      this.umbrellaEl.classList.remove("open");
+      this.umbrellaEl.classList.add("closing");
+      const el = this.umbrellaEl;
+      el.addEventListener(
+        "animationend",
+        () => el.classList.remove("closing"),
+        { once: true },
+      );
+    }
+
+    updateUmbrellaPosition() {
+      if (!this.umbrellaEl) return;
+      const depthScale =
+        typeof this.getDepthScale === "function" ? this.getDepthScale() : 1;
+      const umbrellaSize = penguinSize * 0.85 * depthScale;
+      // Desloca para o lado que o pinguim está olhando (~25% do tamanho)
+      const sideOffset = umbrellaSize * 0.25 * (this.facingRight ? 1 : -1);
+      const left = this.x + halfPenguinSize - umbrellaSize / 2 + sideOffset;
+      // Align so the pole base (56% from top of SVG) sits at the penguin's upper body
+      const top = this.y - umbrellaSize * 0.38;
+      this.umbrellaEl.style.left = left + "px";
+      this.umbrellaEl.style.top = top + "px";
+      this.umbrellaEl.style.zIndex = String(
+        parseInt(this.element.style.zIndex || "10", 10) + 1,
+      );
+
+      // Inclinação sutil baseada na posição horizontal do mouse
+      const centerX = window.innerWidth / 2;
+      const tiltMax = 10;
+      const rawTilt =
+        ((runtime.mouseX - centerX) / Math.max(1, centerX)) * tiltMax;
+      const tilt = Math.max(-tiltMax, Math.min(tiltMax, rawTilt));
+      this.umbrellaEl.style.setProperty(
+        "--umbrella-tilt",
+        tilt.toFixed(2) + "deg",
+      );
     }
   }
 

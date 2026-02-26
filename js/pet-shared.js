@@ -19,6 +19,7 @@
     flying: "pinguin voando.svg",
     turningBack: "pinguin de costas.svg",
     umbrella: "umbrella.svg",
+    caveirinha: "pinguin caveirinha.svg",
   };
 
   const DEFAULT_CONFIG = {

@@ -1,8 +1,6 @@
 (() => {
   window.PenguinPet = window.PenguinPet || {};
 
-  window.PenguinPet = window.PenguinPet || {};
-
   window.PenguinPet.phrases = {
     idle: ["...", "hmm.", "*olha ao redor*", "tô por aqui."],
 

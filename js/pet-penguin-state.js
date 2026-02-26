@@ -3,6 +3,7 @@
 
   modules.state = ({ actionStates }) => ({
     setState(state) {
+      if (Date.now() < (this.visualLockUntil || 0)) return;
       if (
         this.isWalkingAway &&
         this.customMotion &&
@@ -13,11 +14,14 @@
       }
       if (this.isDragging && state !== "flying") return;
       if (this.currentState === state) return;
+      const stateAsset = actionStates[state] || actionStates.default || actionStates.idle;
+      if (!stateAsset) return;
       this.currentState = state;
-      this.img.src = actionStates[state];
+      this.img.src = stateAsset;
     },
 
     setVisualState(state) {
+      if (Date.now() < (this.visualLockUntil || 0)) return;
       const requestedState = typeof state === "string" ? state : "idle";
       const normalizedState =
         requestedState === "default" ? "idle" : requestedState;
@@ -27,6 +31,17 @@
       if (requestedState === "default" && actionStates.default) {
         this.img.src = actionStates.default;
       }
+    },
+
+    lockVisualSprite(src, durationMs = 0) {
+      if (typeof src !== "string" || src.trim().length === 0) return;
+      const duration = Number.isFinite(durationMs) ? Math.max(0, durationMs) : 0;
+      this.visualLockUntil = Date.now() + duration;
+      this.img.src = src;
+    },
+
+    unlockVisualSprite() {
+      this.visualLockUntil = 0;
     },
 
     playStateSequence(sequence, onDone) {
@@ -106,7 +121,8 @@
             ? 1
             : -1;
       const depth = this.getDepthScale();
-      this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale * depth})`;
+      const windTilt = Number.isFinite(this.windTilt) ? this.windTilt : 0;
+      this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale * depth}) rotate(${windTilt}deg)`;
       // Ajusta z-index: mais ao fundo = menor z-index (atrás), mais à frente = maior
       const zBase = 10;
       const zRange = 8;

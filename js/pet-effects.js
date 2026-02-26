@@ -191,13 +191,78 @@
     });
   }
 
-  // Raio visual que cai da posição X clicada
+  // Raio visual que cai da posição X clicada (SVG zigzag animado)
   function createLightningBolt(x) {
-    const bolt = document.createElement("div");
-    bolt.className = "lightning-bolt";
-    bolt.style.left = x - 2 + "px";
-    document.body.appendChild(bolt);
-    bolt.addEventListener("animationend", () => bolt.remove(), { once: true });
+    const uid = "bg" + Date.now();
+    const svgNS = "http://www.w3.org/2000/svg";
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 60 400");
+    svg.style.cssText =
+      "position:fixed;top:0;left:" +
+      (x - 30) +
+      "px;width:60px;height:90vh;" +
+      "pointer-events:none;z-index:9998;overflow:visible;" +
+      "filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 14px #ffeb3b) drop-shadow(0 0 28px #ff9800);";
+
+    // Gradiente do topo (branco) até a base (laranja)
+    const defs = document.createElementNS(svgNS, "defs");
+    const grad = document.createElementNS(svgNS, "linearGradient");
+    grad.setAttribute("id", uid);
+    grad.setAttribute("x1", "0");
+    grad.setAttribute("y1", "0");
+    grad.setAttribute("x2", "0");
+    grad.setAttribute("y2", "1");
+    [
+      ["0%", "#ffffff"],
+      ["30%", "#fff176"],
+      ["70%", "#ffeb3b"],
+      ["100%", "#ff6f00"],
+    ].forEach(function (s) {
+      const stop = document.createElementNS(svgNS, "stop");
+      stop.setAttribute("offset", s[0]);
+      stop.setAttribute("stop-color", s[1]);
+      grad.appendChild(stop);
+    });
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    // Polyline em zigzag clássico: topo-centro → baixo-direita → recuo-esquerda → ponta-direita
+    // (0 0 60 400 viewport) — dois segmentos com "retorno" no meio
+    const POINTS = "30,0 52,165 34,165 58,400";
+    const PATH_LEN = 520; // comprimento estimado da polyline
+
+    // Halo externo (mais espesso, semitransparente)
+    const halo = document.createElementNS(svgNS, "polyline");
+    halo.setAttribute("points", POINTS);
+    halo.setAttribute("fill", "none");
+    halo.setAttribute("stroke", "url(#" + uid + ")");
+    halo.setAttribute("stroke-width", "9");
+    halo.setAttribute("stroke-linecap", "round");
+    halo.setAttribute("stroke-linejoin", "round");
+    halo.setAttribute("stroke-opacity", "0.45");
+    halo.style.strokeDasharray = PATH_LEN;
+    halo.style.strokeDashoffset = PATH_LEN;
+    halo.classList.add("bolt-path");
+    svg.appendChild(halo);
+
+    // Núcleo (fino e brilhante)
+    const core = document.createElementNS(svgNS, "polyline");
+    core.setAttribute("points", POINTS);
+    core.setAttribute("fill", "none");
+    core.setAttribute("stroke", "url(#" + uid + ")");
+    core.setAttribute("stroke-width", "3.5");
+    core.setAttribute("stroke-linecap", "round");
+    core.setAttribute("stroke-linejoin", "round");
+    core.style.strokeDasharray = PATH_LEN;
+    core.style.strokeDashoffset = PATH_LEN;
+    core.classList.add("bolt-path");
+    svg.appendChild(core);
+
+    document.body.appendChild(svg);
+    setTimeout(function () {
+      svg.remove();
+    }, 700);
   }
 
   // Rajada de vento: streaks horizontais + balanço no pinguim
@@ -233,12 +298,16 @@
     // Balança e empurra o pinguim
     const p = window.PenguinPet && window.PenguinPet.penguin;
     if (p && p.element) {
-      // Inclinação visual
-      p.element.style.setProperty("--wind-dir", String(dir));
-      p.element.classList.remove("wind-blown");
-      void p.element.offsetWidth;
-      p.element.classList.add("wind-blown");
-      setTimeout(() => p.element.classList.remove("wind-blown"), 700);
+      // Inclinação visual sem conflitar com o transform principal do pinguim
+      if (p.windTiltPhaseATimeoutId) clearTimeout(p.windTiltPhaseATimeoutId);
+      if (p.windTiltPhaseBTimeoutId) clearTimeout(p.windTiltPhaseBTimeoutId);
+      p.windTilt = dir * 8;
+      p.windTiltPhaseATimeoutId = setTimeout(() => {
+        p.windTilt = dir * -4;
+      }, 220);
+      p.windTiltPhaseBTimeoutId = setTimeout(() => {
+        p.windTilt = 0;
+      }, 560);
 
       // Desloca fisicamente o pinguim na direção do vento
       const push = (Math.random() * 40 + 30) * dir;

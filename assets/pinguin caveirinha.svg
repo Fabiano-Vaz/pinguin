@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- PÉS (ossos) -->
+    <g fill="#d4cfc7" stroke="#a09890" stroke-width="1.5">
+        <path d="M70 215 C50 220,45 235,62 240 C80 245,105 238,112 230 C118 223,100 215,70 215 Z" />
+        <!-- Dedos osso pé esquerdo -->
+        <line x1="62" y1="238" x2="52" y2="248" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="75" y1="242" x2="70" y2="253" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="90" y1="242" x2="90" y2="253" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="104" y1="238" x2="112" y2="247" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+
+        <path
+            d="M190 215 C210 220,215 235,198 240 C180 245,155 238,148 230 C142 223,160 215,190 215 Z" />
+        <line x1="198" y1="238" x2="208" y2="248" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="185" y1="242" x2="190" y2="253" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="170" y1="242" x2="170" y2="253" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="156" y1="238" x2="148" y2="247" stroke="#a09890" stroke-width="3"
+            stroke-linecap="round" />
+    </g>
+
+    <!-- CORPO (osso escuro) -->
+    <path
+        d="M130 100 C85 100,60 135,60 165 C60 190,85 220,130 240 C175 220,200 190,200 165 C200 135,175 100,130 100 Z"
+        fill="#1a1a1a" />
+
+    <!-- BARRIGA OSSO (branca/cinza com costelas) -->
+    <path
+        d="M130 110 C105 110,85 135,85 175 C85 205,105 225,130 230 C155 225,175 205,175 175 C175 135,155 110,130 110 Z"
+        fill="#e8e2d8" />
+
+    <!-- COSTELAS -->
+    <g stroke="#b8b0a4" stroke-width="1.8" stroke-linecap="round" fill="none" opacity="0.7">
+        <path d="M108 138 Q100 142 97 150" />
+        <path d="M108 149 Q99 153 96 162" />
+        <path d="M108 160 Q99 164 97 173" />
+        <path d="M108 171 Q100 175 99 184" />
+        <path d="M152 138 Q160 142 163 150" />
+        <path d="M152 149 Q161 153 164 162" />
+        <path d="M152 160 Q161 164 163 173" />
+        <path d="M152 171 Q160 175 161 184" />
+        <!-- Esterno central -->
+        <line x1="130" y1="130" x2="130" y2="210" stroke="#c8c0b4" stroke-width="2.5" />
+        <!-- Linha de junção costelas -->
+        <path d="M108 138 Q120 134 130 134 Q140 134 152 138" stroke="#c8c0b4" stroke-width="1.5" />
+    </g>
+
+    <!-- PESCOÇO -->
+    <g transform="translate(0,10)">
+        <ellipse cx="130" cy="65" rx="20" ry="28" fill="#1a1a1a" />
+
+        <!-- CRÂNIO (cabeça) -->
+        <ellipse cx="130" cy="52" rx="46" ry="36" fill="#e8e2d8" stroke="#c0b8b0" stroke-width="1.5" />
+
+        <!-- Suturas do crânio -->
+        <path d="M130 16 Q140 28 136 38 Q130 42 124 38 Q120 28 130 16" fill="none" stroke="#c0b8b0"
+            stroke-width="1.2" opacity="0.6" />
+        <path d="M84 52 Q94 45 104 50 Q108 58 104 64 Q94 68 84 62" fill="none" stroke="#c0b8b0"
+            stroke-width="1.2" opacity="0.5" />
+        <path d="M176 52 Q166 45 156 50 Q152 58 156 64 Q166 68 176 62" fill="none" stroke="#c0b8b0"
+            stroke-width="1.2" opacity="0.5" />
+
+        <!-- CABELO FOFO (em osso) -->
+        <g fill="#d4cfc7" stroke="#b0a898" stroke-width="0.8">
+            <ellipse cx="130" cy="18" rx="7" ry="11" transform="rotate(-5 130 18)" />
+            <ellipse cx="113" cy="23" rx="6" ry="9" transform="rotate(-20 113 23)" />
+            <ellipse cx="147" cy="23" rx="6" ry="9" transform="rotate(20 147 23)" />
+            <ellipse cx="101" cy="30" rx="5" ry="7" transform="rotate(-35 101 30)" />
+            <ellipse cx="159" cy="30" rx="5" ry="7" transform="rotate(35 159 30)" />
+        </g>
+
+        <!-- ÓRBITAS (olhos caveira — grandes e ovais) -->
+        <ellipse cx="113" cy="52" rx="16" ry="14" fill="#0a0a0a" />
+        <ellipse cx="147" cy="52" rx="16" ry="14" fill="#0a0a0a" />
+        <!-- Brilho sinistro nos olhos -->
+        <ellipse cx="108" cy="47" rx="4" ry="3" fill="#1a1a2e" opacity="0.7" />
+        <ellipse cx="142" cy="47" rx="4" ry="3" fill="#1a1a2e" opacity="0.7" />
+        <!-- Brilhinho de luz nos olhos -->
+        <circle cx="107" cy="46" r="2.5" fill="white" opacity="0.25" />
+        <circle cx="141" cy="46" r="2.5" fill="white" opacity="0.25" />
+
+        <!-- NARIZ (buraco triangular) -->
+        <path d="M127 65 L130 60 L133 65 Z" fill="#1a1a1a" />
+
+        <!-- BICO / MANDÍBULA com dentes -->
+        <!-- Maxilar superior -->
+        <path d="M108 68 Q120 62 130 62 Q140 62 152 68 Q148 76 130 77 Q112 76 108 68 Z"
+            fill="#c8a800" stroke="#a08800" stroke-width="1.2" />
+        <!-- Dentes superiores -->
+        <g fill="#e8e2d8" stroke="#b8b0a4" stroke-width="0.8">
+            <rect x="116" y="68" width="6" height="7" rx="1" />
+            <rect x="124" y="68" width="6" height="7" rx="1" />
+            <rect x="132" y="68" width="6" height="7" rx="1" />
+            <rect x="140" y="68" width="6" height="7" rx="1" />
+        </g>
+        <!-- Mandíbula inferior -->
+        <path d="M110 75 Q120 80 130 80 Q140 80 150 75 Q148 84 130 86 Q112 84 110 75 Z"
+            fill="#c8a800" stroke="#a08800" stroke-width="1.2" />
+        <!-- Dentes inferiores -->
+        <g fill="#e8e2d8" stroke="#b8b0a4" stroke-width="0.8">
+            <rect x="118" y="76" width="5" height="6" rx="1" />
+            <rect x="125" y="77" width="5" height="6" rx="1" />
+            <rect x="132" y="77" width="5" height="6" rx="1" />
+            <rect x="139" y="76" width="5" height="6" rx="1" />
+        </g>
+    </g>
+
+    <!-- ASAS (ossos) -->
+    <!-- Asa esquerda: úmero + rádio/ulna -->
+    <g fill="#1a1a1a" stroke="#333" stroke-width="0.5">
+        <path d="M70 140 C45 165,60 200,90 210 C95 200,95 160,70 140 Z" />
+    </g>
+    <!-- Detalhes de junta na asa esquerda -->
+    <circle cx="74" cy="148" r="5" fill="#2e2e2e" stroke="#444" stroke-width="1" />
+    <circle cx="80" cy="200" r="4" fill="#2e2e2e" stroke="#444" stroke-width="1" />
+    <line x1="74" y1="153" x2="80" y2="196" stroke="#555" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Asa direita -->
+    <g fill="#1a1a1a" stroke="#333" stroke-width="0.5">
+        <path d="M190 140 C215 165,200 200,170 210 C165 200,165 160,190 140 Z" />
+    </g>
+    <circle cx="186" cy="148" r="5" fill="#2e2e2e" stroke="#444" stroke-width="1" />
+    <circle cx="180" cy="200" r="4" fill="#2e2e2e" stroke="#444" stroke-width="1" />
+    <line x1="186" y1="153" x2="180" y2="196" stroke="#555" stroke-width="2" stroke-linecap="round" />
+
+</svg>

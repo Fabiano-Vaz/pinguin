@@ -110,7 +110,15 @@
         return;
       }
 
-      const list = phrases[this.currentState];
+      const list = Array.isArray(phrases[this.currentState])
+        ? phrases[this.currentState]
+        : Array.isArray(phrases.idle)
+          ? phrases.idle
+          : ["..."];
+      if (list.length === 0) {
+        this.scheduleNextBubble();
+        return;
+      }
       const text = list[Math.floor(Math.random() * list.length)];
       this.showSpeech(text);
     },

@@ -8,6 +8,8 @@ html,
 body {
     width: 100%;
     height: 100%;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 body {
@@ -344,39 +346,29 @@ body.fish-cursor-enabled {
     }
 }
 
-/* Raio – traço que cai do céu */
-.lightning-bolt {
-    position: fixed;
-    top: 0;
-    width: 4px;
-    pointer-events: none;
-    z-index: 9998;
-    transform-origin: top center;
-    animation: boltFall 0.45s ease-in forwards;
-    border-radius: 2px;
-    background: linear-gradient(to bottom, #fffde7, #ffeb3b, #ff6f00);
-    filter: drop-shadow(0 0 8px #ffeb3b) drop-shadow(0 0 20px #ff9800);
+/* Raio – SVG zigzag animado */
+.bolt-path {
+    animation: boltDraw 0.55s ease-out forwards;
 }
 
-@keyframes boltFall {
+@keyframes boltDraw {
     0% {
-        height: 0;
-        opacity: 1;
-        top: 0;
-    }
-
-    60% {
-        height: 90vh;
+        stroke-dashoffset: 520;
         opacity: 1;
     }
 
-    80% {
-        height: 90vh;
-        opacity: 0.8;
+    45% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+
+    70% {
+        stroke-dashoffset: 0;
+        opacity: 0.85;
     }
 
     100% {
-        height: 90vh;
+        stroke-dashoffset: 0;
         opacity: 0;
     }
 }
@@ -410,29 +402,6 @@ body.fish-cursor-enabled {
     100% {
         transform: translateX(var(--wind-travel));
         opacity: 0;
-    }
-}
-
-/* Inclinação do pinguim no vento */
-.penguin.wind-blown {
-    animation: windBlow 0.6s ease-in-out;
-}
-
-@keyframes windBlow {
-    0% {
-        transform: rotate(0deg) scaleX(var(--flip, 1));
-    }
-
-    30% {
-        transform: rotate(calc(var(--wind-dir, 1) * 8deg)) scaleX(var(--flip, 1));
-    }
-
-    65% {
-        transform: rotate(calc(var(--wind-dir, 1) * -4deg)) scaleX(var(--flip, 1));
-    }
-
-    100% {
-        transform: rotate(0deg) scaleX(var(--flip, 1));
     }
 }
 

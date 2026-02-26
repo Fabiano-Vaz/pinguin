@@ -345,9 +345,14 @@
     },
 
     scheduleNextBehavior() {
+      if (this.nextBehaviorTimeoutId) {
+        clearTimeout(this.nextBehaviorTimeoutId);
+        this.nextBehaviorTimeoutId = null;
+      }
       const delay =
         BEHAVIOR_DELAY_MIN_MS + Math.random() * BEHAVIOR_DELAY_VARIATION_MS;
-      setTimeout(() => {
+      this.nextBehaviorTimeoutId = setTimeout(() => {
+        this.nextBehaviorTimeoutId = null;
         if (this.enforceFoodPriority()) return;
         this.startNextBehavior();
       }, delay);
@@ -361,6 +366,10 @@
     },
 
     startNextBehavior() {
+      if (this.nextBehaviorTimeoutId) {
+        clearTimeout(this.nextBehaviorTimeoutId);
+        this.nextBehaviorTimeoutId = null;
+      }
       if (this.enforceFoodPriority()) return;
       if (this.aiLocked) return;
       const seq = behaviors[Math.floor(Math.random() * behaviors.length)]();

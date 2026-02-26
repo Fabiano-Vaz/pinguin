@@ -54,6 +54,10 @@
     penguin,
   };
 
+  document.addEventListener("dblclick", (e) => {
+    e.preventDefault();
+  });
+
   document.addEventListener("mousemove", (e) => {
     runtime.isMouseInsideViewport = true;
     runtime.mouseX = e.clientX;
@@ -138,17 +142,52 @@
         effects.createLightningFlash();
       }
 
+      // Relâmpago simples → pinguim se assusta
+      const pFlash = window.PenguinPet && window.PenguinPet.penguin;
+      if (pFlash && typeof pFlash.setState === "function") {
+        pFlash.setState("scared");
+        setTimeout(() => {
+          if (typeof pFlash.setState === "function") pFlash.setState("idle");
+        }, 900);
+      }
+
       if (isDoubleClick) {
-        // Raio cai + pinguim se assusta
-        if (typeof effects.createLightningBolt === "function") {
-          effects.createLightningBolt(e.clientX);
-        }
+        // Raio cai + pinguim vira caveirinha
         const p = window.PenguinPet && window.PenguinPet.penguin;
-        if (p && typeof p.setState === "function") {
-          p.setState("scared");
+        const penguinCenterX =
+          p && Number.isFinite(p.x) && Number.isFinite(constants.halfPenguinSize)
+            ? p.x + constants.halfPenguinSize
+            : e.clientX;
+        if (typeof effects.createLightningBolt === "function") {
+          effects.createLightningBolt(penguinCenterX);
+        }
+        // Levantar o guarda-chuva durante o susto
+        if (p) {
+          p.umbrellaLiftOffset = 38;
           setTimeout(() => {
+            p.umbrellaLiftOffset = 0;
+          }, 4000);
+        }
+        if (p && p.img) {
+          // Trocar imagem para caveirinha
+          const assets = window.PenguinPet && window.PenguinPet.actionStates;
+          const caveirinhaSrc =
+            (assets && assets.caveirinha) || "assets/pinguin caveirinha.svg";
+          if (p.caveirinhaTimeoutId) {
+            clearTimeout(p.caveirinhaTimeoutId);
+          }
+          if (typeof p.lockVisualSprite === "function") {
+            p.lockVisualSprite(caveirinhaSrc, 4000);
+          } else {
+            p.img.src = caveirinhaSrc;
+          }
+          if (typeof p.setState === "function") p.setState("scared");
+          p.caveirinhaTimeoutId = setTimeout(() => {
+            if (typeof p.unlockVisualSprite === "function") {
+              p.unlockVisualSprite();
+            }
             if (typeof p.setState === "function") p.setState("idle");
-          }, 1800);
+          }, 4000);
         }
       }
       return;

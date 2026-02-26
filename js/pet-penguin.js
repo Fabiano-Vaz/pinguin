@@ -109,6 +109,12 @@
       this.isWalkingAway = false;
       this.walkAwayReturnX = this.x;
       this.walkAwayReturnY = this.y;
+      this.visualLockUntil = 0;
+      this.caveirinhaTimeoutId = null;
+      this.windTilt = 0;
+      this.windTiltPhaseATimeoutId = null;
+      this.windTiltPhaseBTimeoutId = null;
+      this.nextBehaviorTimeoutId = null;
 
       this.foodTargets = [];
       this.currentFoodTarget = null;
@@ -245,7 +251,8 @@
       const sideOffset = umbrellaSize * 0.25 * (this.facingRight ? 1 : -1);
       const left = this.x + halfPenguinSize - umbrellaSize / 2 + sideOffset;
       // Align so the pole base (56% from top of SVG) sits at the penguin's upper body
-      const top = this.y - umbrellaSize * 0.38;
+      const liftOffset = this.umbrellaLiftOffset || 0;
+      const top = this.y - umbrellaSize * 0.38 - liftOffset;
       this.umbrellaEl.style.left = left + "px";
       this.umbrellaEl.style.top = top + "px";
       this.umbrellaEl.style.zIndex = String(

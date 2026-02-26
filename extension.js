@@ -92,6 +92,9 @@ function getWebviewContent(webview, extensionUri) {
   const bootstrapJsUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "js", "script.js"),
   );
+  const runnerGameJsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extensionUri, "js", "penguin-runner-game.js"),
+  );
   const backgroundUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "assets", "backgroung-dark.png"),
   );
@@ -135,6 +138,7 @@ function getWebviewContent(webview, extensionUri) {
   <script nonce="${nonce}" src="${penguinInteractionsJsUri}"></script>
   <script nonce="${nonce}" src="${penguinJsUri}"></script>
   <script nonce="${nonce}" src="${bootstrapJsUri}"></script>
+  <script nonce="${nonce}" src="${runnerGameJsUri}"></script>
 </body>
 </html>`;
 }

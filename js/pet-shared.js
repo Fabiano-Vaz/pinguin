@@ -3,6 +3,7 @@
     idle: "pinguin sentado balançando os pezinhos.svg",
     default: "pinguin.svg",
     running: "pinguin correndo.svg",
+    runningCrouched: "pinguin correndo abaixado.svg",
     jumping: "pinguin pulando feliz.svg",
     dancing: "pinguin dançando.svg",
     sleeping: "pinguin dormindo.svg",
@@ -20,6 +21,10 @@
     turningBack: "pinguin de costas.svg",
     umbrella: "umbrella.svg",
     caveirinha: "pinguin caveirinha.svg",
+    trace: "trace.svg",
+    runnerBackground: "backgroung.png",
+    helicopterA: "helicopterA.gif",
+    helicopterB: "helicopterB.gif",
   };
 
   const DEFAULT_CONFIG = {

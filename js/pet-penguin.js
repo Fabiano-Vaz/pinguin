@@ -191,7 +191,11 @@
         movedThisFrame = true;
 
         if (this.currentState !== "jumping" && this.currentState !== "flying") {
-          if (!this.isWalkingAway) this.setState("running");
+          if (!this.isWalkingAway) {
+            const isHuntingFood =
+              Boolean(this.currentFoodTarget) && !this.isEatingFood;
+            this.setState(isHuntingFood ? "runningCrouched" : "running");
+          }
         }
 
         if (dx < 0 && this.facingRight) {
@@ -207,7 +211,11 @@
         this.setState("idle");
       }
 
-      if (!movedThisFrame && this.currentState === "running") {
+      if (
+        !movedThisFrame &&
+        (this.currentState === "running" ||
+          this.currentState === "runningCrouched")
+      ) {
         this.setState("idle");
       }
 

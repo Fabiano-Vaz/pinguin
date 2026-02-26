@@ -517,3 +517,108 @@ body.fish-cursor-enabled {
         padding: 10px 15px;
     }
 }
+
+body.runner-mode .penguin,
+body.runner-mode .penguin-umbrella,
+body.runner-mode .speech-bubble,
+body.runner-mode .particle,
+body.runner-mode .clickEffect,
+body.runner-mode .food-drop,
+body.runner-mode .snowflake,
+body.runner-mode .rain-drop,
+body.runner-mode .lightning-flash,
+body.runner-mode .lightning-bolt,
+body.runner-mode .wind-gust {
+    display: none !important;
+}
+
+.runner-game {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.runner-game.active {
+    display: block;
+}
+
+.runner-hud {
+    position: fixed;
+    top: 20px;
+    left: 24px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 3px 9px rgba(0, 0, 0, 0.45);
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.runner-hint {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    font-size: 14px;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    z-index: 2;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .runner-hud {
+        top: 12px;
+        left: 12px;
+        font-size: 14px;
+    }
+
+    .runner-hint {
+        top: 34px;
+        left: 12px;
+        right: auto;
+        max-width: calc(100vw - 24px);
+        font-size: 12px;
+        white-space: normal;
+    }
+}
+
+.runner-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: #ffffff;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+}
+
+.runner-penguin {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    z-index: 2;
+    transform-origin: center 80%;
+}
+
+.runner-ground {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 78vh;
+    height: 0;
+    background: transparent;
+    z-index: 1;
+}
+
+.runner-obstacle {
+    position: fixed;
+    z-index: 2;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    background: rgba(145, 200, 255, 0.35);
+}

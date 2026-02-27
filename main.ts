@@ -4,6 +4,7 @@ import { GameFramework } from './phaser/core/GameFramework';
 import type { RuntimeConfig } from './runtime/types';
 import './runtime/types';
 import './styles/framework.css';
+import './css/style.css';
 
 window.Phaser = Phaser;
 

@@ -5,7 +5,7 @@ Projeto com comportamento legacy preservado (pet passivo, interacoes de mouse, c
 ## Como funciona
 
 - O runtime agora fica na raiz: `legacy/`, `phaser/`, `runtime/`, `styles/` e `main.ts`.
-- A logica legacy foi migrada para TypeScript em `legacy/modules/*.ts`.
+- A logica legacy foi modularizada por camada em `legacy/layers/**`.
 - `main.ts` sobe o framework Phaser e inicializa o bootstrap legacy em TS.
 - `Phaser` segue disponivel em `window.Phaser` sem mudar o comportamento final.
 - Na extensao, o webview roda exclusivamente o bundle Vite (`dist/web/app.js`).

@@ -115,30 +115,69 @@ class PenguinSidebarProvider {
   refresh() {
     if (!this.currentView) return;
     const webview = this.currentView.webview;
-
-    const appJsPath = vscode.Uri.joinPath(
-      this.extensionUri,
-      "dist",
-      "web",
-      "app.js",
-    ).fsPath;
-
-    const useViteBundle = fs.existsSync(appJsPath);
+    const bundle = resolveViteBundleFiles(this.extensionUri);
+    const scriptSegments = bundle.scriptPath.replace(/^\.\//, "").split("/");
+    const appJsPath = bundle
+      ? vscode.Uri.joinPath(
+          this.extensionUri,
+          "dist",
+          "web",
+          ...scriptSegments,
+        ).fsPath
+      : null;
+    const useViteBundle = Boolean(appJsPath && fs.existsSync(appJsPath));
     this.currentView.webview.html = useViteBundle
-      ? getViteWebviewContent(webview, this.extensionUri, Date.now())
+      ? getViteWebviewContent(webview, this.extensionUri, bundle, Date.now())
       : getMissingBuildWebviewContent();
   }
 }
 
-function getViteWebviewContent(webview, extensionUri, version = 0) {
+function resolveViteBundleFiles(extensionUri) {
+  const indexPath = vscode.Uri.joinPath(
+    extensionUri,
+    "dist",
+    "web",
+    "index.html",
+  ).fsPath;
+
+  if (!fs.existsSync(indexPath)) {
+    return { scriptPath: "app.js", cssPath: "assets/style.css" };
+  }
+
+  try {
+    const html = fs.readFileSync(indexPath, "utf8");
+    const scriptMatch = html.match(
+      /<script[^>]+type=["']module["'][^>]+src=["']([^"']+)["']/i,
+    );
+    const cssMatch = html.match(
+      /<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["']/i,
+    );
+
+    return {
+      scriptPath: scriptMatch ? scriptMatch[1].replace(/^\//, "") : "app.js",
+      cssPath: cssMatch ? cssMatch[1].replace(/^\//, "") : "assets/style.css",
+    };
+  } catch {
+    return { scriptPath: "app.js", cssPath: "assets/style.css" };
+  }
+}
+
+function getViteWebviewContent(webview, extensionUri, bundle, version = 0) {
   const nonce = createNonce();
   const withVersion = (uri) => `${uri.toString()}?v=${version}`;
 
+  const scriptSegments = bundle.scriptPath.replace(/^\.\//, "").split("/");
+  const cssSegments = bundle.cssPath.replace(/^\.\//, "").split("/");
+
   const appJsUri = withVersion(
-    webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "dist", "web", "app.js")),
+    webview.asWebviewUri(
+      vscode.Uri.joinPath(extensionUri, "dist", "web", ...scriptSegments),
+    ),
   );
   const cssUri = withVersion(
-    webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, "dist", "web", "assets", "style.css")),
+    webview.asWebviewUri(
+      vscode.Uri.joinPath(extensionUri, "dist", "web", ...cssSegments),
+    ),
   );
 
   const backgroundUri = webview.asWebviewUri(

@@ -2,19 +2,27 @@ import type { RuntimeConfig } from '../runtime/types';
 
 type LegacyModuleLoader = () => Promise<unknown>;
 
-const LEGACY_MODULE_LOADERS: LegacyModuleLoader[] = [
-  () => import('./modules/pet-shared'),
-  () => import('./modules/pet-config'),
-  () => import('./modules/pet-content'),
-  () => import('./modules/pet-effects'),
-  () => import('./modules/pet-penguin-state'),
-  () => import('./modules/pet-penguin-speech'),
-  () => import('./modules/pet-penguin-motion'),
-  () => import('./modules/pet-penguin-ai'),
-  () => import('./modules/pet-penguin-interactions'),
-  () => import('./modules/pet-penguin'),
-  () => import('./modules/script'),
-  () => import('./modules/penguin-runner-game'),
+type LegacyLayer = 'background' | 'environment' | 'actor' | 'overlay' | 'orchestration';
+
+type LegacyStep = {
+  layer: LegacyLayer;
+  load: LegacyModuleLoader;
+};
+
+const LEGACY_BOOT_SEQUENCE: LegacyStep[] = [
+  { layer: 'orchestration', load: () => import('./layers/orchestration/pet-shared') },
+  { layer: 'orchestration', load: () => import('./layers/orchestration/pet-config') },
+  { layer: 'overlay', load: () => import('./layers/overlay/pet-content') },
+  { layer: 'environment', load: () => import('./layers/environment/pet-effects') },
+  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-state') },
+  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-speech') },
+  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-motion') },
+  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-ai') },
+  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-interactions') },
+  { layer: 'actor', load: () => import('./layers/actor/pet-penguin') },
+  { layer: 'orchestration', load: () => import('./layers/orchestration/script') },
+  { layer: 'environment', load: () => import('./layers/environment/penguin-runner-game') },
+  { layer: 'background', load: async () => undefined },
 ];
 
 const ensureGlobalConfig = (runtime: RuntimeConfig): void => {
@@ -51,7 +59,7 @@ export const bootstrapLegacyRuntime = async (runtime: RuntimeConfig): Promise<vo
   ensureGlobalConfig(runtime);
   loadCss(runtime.cssHref ?? '/css/style.css');
 
-  for (const loadModule of LEGACY_MODULE_LOADERS) {
-    await loadModule();
+  for (const step of LEGACY_BOOT_SEQUENCE) {
+    await step.load();
   }
 };

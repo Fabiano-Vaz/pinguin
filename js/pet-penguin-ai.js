@@ -281,6 +281,14 @@
     },
 
     applyCursorEatingState() {
+      if (this.isFishingActive) {
+        if (this.isCursorTouchEating) {
+          this.isCursorTouchEating = false;
+          this.cursorTouchEatingUntil = 0;
+        }
+        return;
+      }
+
       const now = Date.now();
 
       if (this.isDragging || this.currentFoodTarget || this.isEatingFood) {
@@ -620,10 +628,16 @@
       const fishingSessionId = `${Date.now()}-${Math.random()}`;
       this.activeFishingSessionId = fishingSessionId;
       this.isFishingActive = true;
+      this.fishCursorEnabledBeforeFishing = runtime.isFishCursorEnabled !== false;
+      if (typeof runtime.setFishCursorEnabled === "function") {
+        runtime.setFishCursorEnabled(false);
+      } else {
+        runtime.isFishCursorEnabled = false;
+      }
       const totalDurationMs = Number.isFinite(step.duration)
         ? Math.max(10000, step.duration)
         : 30000;
-      const rewardIntervalMs = 10000;
+      const rewardIntervalMs = 5000;
       const fishPerTick =
         Number.isFinite(step.fishPerTick) && step.fishPerTick > 0
           ? Math.round(step.fishPerTick)
@@ -665,6 +679,17 @@
         if (this.activeFishingSessionId !== fishingSessionId) return;
         this.activeFishingSessionId = null;
         this.isFishingActive = false;
+        const shouldRestoreFishCursor =
+          this.fishCursorEnabledBeforeFishing &&
+          (typeof runtime.getFishStock !== "function" || runtime.getFishStock() > 0);
+        if (shouldRestoreFishCursor) {
+          if (typeof runtime.setFishCursorEnabled === "function") {
+            runtime.setFishCursorEnabled(true);
+          } else {
+            runtime.isFishCursorEnabled = true;
+          }
+        }
+        this.fishCursorEnabledBeforeFishing = null;
         if (typeof this.unlockVisualSprite === "function") {
           this.unlockVisualSprite();
         }

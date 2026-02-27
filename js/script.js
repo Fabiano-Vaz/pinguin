@@ -132,6 +132,8 @@
         currentPenguin.isDragging ||
         currentPenguin.isWalkingAway ||
         currentPenguin.isRanting ||
+        currentPenguin.isFishingActive ||
+        currentPenguin.currentState === "fishing" ||
         currentPenguin.isEatingFood ||
         currentPenguin.currentFoodTarget
       ) {

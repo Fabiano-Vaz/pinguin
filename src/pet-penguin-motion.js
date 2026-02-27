@@ -6,19 +6,35 @@
     halfPenguinSize,
     snowTopRatio,
     phrases,
+    motion,
   }) => ({
     startJumpArc(targetX, targetY) {
+      const cfg = motion || {};
       const clampedX = Math.max(
         0,
         Math.min(targetX, window.innerWidth - penguinSize),
       );
       const clampedY = this.clampY(targetY);
       const horizontalDistance = Math.abs(clampedX - this.x);
-      const realisticDistance = Math.min(70, horizontalDistance);
-      const apex = Math.max(10, Math.min(28, 12 + realisticDistance * 0.12));
+      const realisticDistance = Math.min(
+        cfg.jumpArcDistanceCapPx || 70,
+        horizontalDistance,
+      );
+      const apex = Math.max(
+        cfg.jumpArcApexMinPx || 10,
+        Math.min(
+          cfg.jumpArcApexMaxPx || 28,
+          (cfg.jumpArcApexBasePx || 12) +
+            realisticDistance * (cfg.jumpArcApexDistanceFactor || 0.12),
+        ),
+      );
       const duration = Math.max(
-        380,
-        Math.min(620, 420 + realisticDistance * 2.1),
+        cfg.jumpArcDurationMinMs || 380,
+        Math.min(
+          cfg.jumpArcDurationMaxMs || 620,
+          (cfg.jumpArcDurationBaseMs || 420) +
+            realisticDistance * (cfg.jumpArcDurationDistanceFactor || 2.1),
+        ),
       );
 
       this.customMotion = {
@@ -38,11 +54,12 @@
     },
 
     startDropFall() {
+      const cfg = motion || {};
       this.customMotion = {
         type: "fall",
         vy: 0,
-        gravity: 1900,
-        maxVy: 1400,
+        gravity: cfg.fallGravityPxPerSec2 || 1900,
+        maxVy: cfg.fallMaxVelocityPxPerSec || 1400,
         targetY: this.getWalkMinY(),
       };
       this.isMoving = true;
@@ -94,6 +111,7 @@
       }
 
       if (this.customMotion.type === "walkAwayExit") {
+        const cfg = motion || {};
         const motion = this.customMotion;
         motion.elapsed += dtSeconds * 1000;
         const t = Math.min(1, motion.elapsed / motion.duration);
@@ -101,7 +119,10 @@
 
         this.x = motion.startX + (motion.targetX - motion.startX) * eased;
         this.y = motion.startY;
-        this.visualScale = Math.max(0.22, 1 - eased * 0.78);
+        this.visualScale = Math.max(
+          cfg.walkAwayExitMinVisualScale || 0.22,
+          1 - eased * (cfg.walkAwayExitScaleReductionFactor || 0.78),
+        );
         this.applyTransform(1);
 
         if (t >= 1) {
@@ -118,13 +139,14 @@
             );
             const returnY = this.clampY(this.walkAwayReturnY, false);
             const exitedToRight = motion.targetX > motion.startX;
+            const offscreenPadding = cfg.walkAwayOffscreenPaddingPx || 12;
             this.x = exitedToRight
-              ? window.innerWidth + penguinSize + 12
-              : -penguinSize - 12;
+              ? window.innerWidth + penguinSize + offscreenPadding
+              : -penguinSize - offscreenPadding;
             this.y = this.getGroundTopY();
             this.targetX = this.x;
             this.targetY = this.y;
-            this.visualScale = 0.55;
+            this.visualScale = cfg.walkAwayReturnStartVisualScale || 0.55;
             this.element.style.opacity = "1";
             this.facingRight = true;
             this.setVisualState("default");
@@ -136,16 +158,17 @@
               startY: this.y,
               targetX: returnX,
               targetY: returnY,
-              duration: 2200,
+              duration: cfg.walkAwayReturnDurationMs || 2200,
               elapsed: 0,
             };
             this.isMoving = true;
-          }, 700);
+          }, cfg.walkAwayReturnDelayMs || 700);
         }
         return;
       }
 
       if (this.customMotion.type === "returnAfterWalkAway") {
+        const cfg = motion || {};
         const motion = this.customMotion;
         motion.elapsed += dtSeconds * 1000;
         const t = Math.min(1, motion.elapsed / motion.duration);
@@ -153,7 +176,7 @@
 
         this.x = motion.startX + (motion.targetX - motion.startX) * eased;
         this.y = motion.startY + (motion.targetY - motion.startY) * eased;
-        this.visualScale = 0.55 + eased * 0.45;
+        this.visualScale = (cfg.walkAwayReturnStartVisualScale || 0.55) + eased * 0.45;
         this.applyTransform(1);
 
         if (t >= 1) {
@@ -176,7 +199,7 @@
           if (droppedList.length > 0) {
             this.showSpeech(
               droppedList[Math.floor(Math.random() * droppedList.length)],
-              3200,
+              cfg.walkAwayFinalSpeechDurationMs || 3200,
             );
           }
 
@@ -187,7 +210,7 @@
             } else {
               this.scheduleNextBehavior();
             }
-          }, 3300);
+          }, cfg.walkAwayAiUnlockDelayMs || 3300);
         }
       }
     },
@@ -211,11 +234,16 @@
     },
 
     getWalkMaxY() {
-      return this.getWalkMinY() + Math.round(window.innerHeight * 0.13);
+      const cfg = motion || {};
+      return (
+        this.getWalkMinY() +
+        Math.round(window.innerHeight * (cfg.walkMaxYOffsetRatio || 0.13))
+      );
     },
 
     getFlyMinY() {
-      return Math.max(0, this.getWalkMinY() - 90);
+      const cfg = motion || {};
+      return Math.max(0, this.getWalkMinY() - (cfg.flyMinYOffsetPx || 90));
     },
 
     clampY(y, allowAir = false) {
@@ -230,8 +258,9 @@
     },
 
     randomFlyY() {
+      const cfg = motion || {};
       const minY = this.getFlyMinY();
-      const maxY = Math.max(minY, this.getWalkMinY() + 20);
+      const maxY = Math.max(minY, this.getWalkMinY() + (cfg.flyRandomYOffsetPx || 20));
       return minY + Math.random() * Math.max(1, maxY - minY);
     },
 
@@ -247,14 +276,21 @@
     },
 
     randomTarget(nearEdge) {
+      const cfg = motion || {};
       const w = Math.max(0, window.innerWidth - penguinSize);
-      const inset = Math.min(70, Math.max(18, Math.round(w * 0.12)));
+      const inset = Math.min(
+        cfg.randomTargetInsetMaxPx || 70,
+        Math.max(
+          cfg.randomTargetInsetMinPx || 18,
+          Math.round(w * (cfg.randomTargetInsetRatio || 0.12)),
+        ),
+      );
       const safeMin = Math.min(inset, w);
       const safeMax = Math.max(safeMin, w - inset);
       const randomY = this.randomWalkY();
 
       if (nearEdge) {
-        const jitter = (Math.random() - 0.5) * 24;
+        const jitter = (Math.random() - 0.5) * (cfg.randomTargetEdgeJitterPx || 24);
         const chooseLeft = Math.random() < 0.5;
         const x = chooseLeft ? safeMin + jitter : safeMax + jitter;
         return {
@@ -270,8 +306,9 @@
     },
 
     randomShortWalkTarget() {
-      const maxOffset = 120;
-      const sideInset = 16;
+      const cfg = motion || {};
+      const maxOffset = cfg.randomShortWalkMaxOffsetPx || 120;
+      const sideInset = cfg.randomShortWalkSideInsetPx || 16;
       const minX = halfPenguinSize + sideInset;
       const maxX = window.innerWidth - halfPenguinSize - sideInset;
       const targetCenterX = Math.max(

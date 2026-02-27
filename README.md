@@ -87,3 +87,28 @@ Um pinguim interativo no painel **Explorer** do VS Code, com IA de comportamento
 | Propriedade | Tipo | Padrão | Descrição |
 | --- | --- | --- | --- |
 | `pinguin.autoOpenOnStartup` | `boolean` | `true` | Abre automaticamente o painel do pinguim ao iniciar o VS Code |
+
+## 🧱 Estrutura do projeto
+
+Estrutura atual organizada por domínio e responsabilidade:
+
+```text
+src/
+├─ app/
+│  └─ pet-bootstrap.js              # composição da app (wire-up dos módulos)
+├─ runtime/
+│  ├─ pet-fish-economy.js           # estoque de peixe, HUD e regras de consumo/reposição
+│  └─ pet-environment-events.js     # eventos globais (mouse, clique, clima)
+├─ games/
+│  └─ runner/
+│     ├─ runner-context.js          # estado base, cena e utilitários do runner
+│     ├─ runner-obstacles.js        # geração de obstáculos e colisão
+│     └─ penguin-runner-game.js     # runtime do runner (loop, input, física)
+├─ pet-*.js                         # núcleo do pet (estado, IA, movimento, etc.)
+└─ script.js                        # entrypoint leve (delegação para bootstrap)
+```
+
+Essa organização já facilita migração futura para framework porque separa:
+- `app`: camada de inicialização/composição.
+- `runtime`: regras de domínio e eventos do mundo.
+- `games`: features independentes (podem virar módulo/lazy feature depois).

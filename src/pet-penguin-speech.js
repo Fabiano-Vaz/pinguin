@@ -9,10 +9,13 @@
     phrases,
     penguinSize,
     halfPenguinSize,
+    speech,
   }) => ({
     getNextBubbleDelay() {
+      const cfg = speech || {};
       return (
-        BUBBLE_BASE_INTERVAL_MS + Math.random() * BUBBLE_INTERVAL_JITTER_MS
+        (cfg.baseIntervalMs || BUBBLE_BASE_INTERVAL_MS) +
+        Math.random() * (cfg.intervalJitterMs || BUBBLE_INTERVAL_JITTER_MS)
       );
     },
 
@@ -21,19 +24,24 @@
     },
 
     scaleEmotionDuration(durationMs) {
+      const cfg = speech || {};
       return Math.max(
-        300,
-        Math.round(durationMs * EMOTION_DURATION_MULTIPLIER),
+        cfg.emotionMinDurationMs || 300,
+        Math.round(
+          durationMs *
+            (cfg.emotionDurationMultiplier || EMOTION_DURATION_MULTIPLIER),
+        ),
       );
     },
 
     playLaughThenIdleThenLaugh(totalDuration, onDone) {
+      const cfg = speech || {};
       const duration = Math.max(
-        900,
-        this.scaleEmotionDuration(totalDuration || 2000),
+        cfg.laughMinDurationMs || 900,
+        this.scaleEmotionDuration(totalDuration || cfg.laughFallbackDurationMs || 2000),
       );
-      const firstLaugh = Math.round(duration * 0.4);
-      const neutral = Math.round(duration * 0.2);
+      const firstLaugh = Math.round(duration * (cfg.laughFirstRatio || 0.4));
+      const neutral = Math.round(duration * (cfg.laughNeutralRatio || 0.2));
       const secondLaugh = duration - firstLaugh - neutral;
 
       this.element.style.animation = "";
@@ -53,7 +61,12 @@
       }, firstLaugh);
     },
 
-    showSpeech(text, durationMs = 3000, shouldReschedule = true) {
+    showSpeech(text, durationMs, shouldReschedule = true) {
+      const cfg = speech || {};
+      const finalDuration =
+        Number.isFinite(durationMs) && durationMs > 0
+          ? durationMs
+          : cfg.bubbleDefaultDurationMs || 3000;
       if (this.bubble) this.bubble.remove();
       if (this.bubbleTimeout) clearTimeout(this.bubbleTimeout);
 
@@ -97,15 +110,16 @@
           this.bubble.remove();
           this.bubble = null;
         }
-      }, durationMs);
+      }, finalDuration);
 
       if (shouldReschedule) this.scheduleNextBubble();
     },
 
     speak() {
+      const cfg = speech || {};
       const now = Date.now();
       if (now < this.nextBubbleAt) return;
-      if (Math.random() > BUBBLE_SHOW_CHANCE) {
+      if (Math.random() > (cfg.showChance || BUBBLE_SHOW_CHANCE)) {
         this.scheduleNextBubble();
         return;
       }
@@ -124,14 +138,15 @@
     },
 
     updateBubblePosition() {
+      const cfg = speech || {};
       if (!this.bubble) return;
 
       const content = this.bubble.querySelector(".bubble-content");
       if (!content) return;
 
       const cw = content.offsetWidth || penguinSize;
-      const ch = content.offsetHeight || 47;
-      const viewportMargin = 8;
+      const ch = content.offsetHeight || cfg.bubbleContentFallbackHeightPx || 47;
+      const viewportMargin = cfg.bubbleViewportMarginPx || 8;
 
       let bubbleLeft = this.x + halfPenguinSize - cw / 2;
       bubbleLeft = Math.max(
@@ -139,9 +154,9 @@
         Math.min(bubbleLeft, window.innerWidth - cw - viewportMargin),
       );
 
-      let bubbleTop = this.y - ch - 24;
+      let bubbleTop = this.y - ch - (cfg.bubbleTopOffsetPx || 24);
       if (bubbleTop < viewportMargin) {
-        bubbleTop = this.y + penguinSize + 16;
+        bubbleTop = this.y + penguinSize + (cfg.bubbleBelowOffsetPx || 16);
       }
 
       this.bubble.style.left = bubbleLeft + "px";
@@ -163,14 +178,17 @@
       const nx = dx / dist;
       const ny = dy / dist;
 
-      const specs = [
+      const specs = Array.isArray(cfg.bubbleDotSpecs) ? cfg.bubbleDotSpecs : [];
+      const fallbackSpecs = [
         { size: 10, gap: 10 },
         { size: 7, gap: 19 },
         { size: 4, gap: 27 },
       ];
 
       dots.forEach((dot, i) => {
-        const { size, gap } = specs[i];
+        const spec = specs[i] || fallbackSpecs[i] || fallbackSpecs[fallbackSpecs.length - 1];
+        const size = Number(spec.size) || 4;
+        const gap = Number(spec.gap) || 0;
         dot.style.width = size + "px";
         dot.style.height = size + "px";
         dot.style.left = startX + nx * gap - size / 2 + "px";

@@ -27,6 +27,9 @@
     MOUSE_IDLE_TRIGGER_MS,
     MOUSE_IDLE_REACTION_COOLDOWN_MS,
   } = constants;
+  const petConfig = constants.pet || {};
+  const speechConfig = petConfig.speech || constants.speech || {};
+  const motionConfig = petConfig.motion || constants.motion || {};
 
   const actionStates = pet.actionStates || {};
   const phrases = pet.phrases || {};
@@ -325,6 +328,8 @@
     SPEED_FLEE,
     MOUSE_IDLE_TRIGGER_MS,
     MOUSE_IDLE_REACTION_COOLDOWN_MS,
+    speech: speechConfig,
+    motion: motionConfig,
   };
 
   Object.assign(

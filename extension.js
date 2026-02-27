@@ -1,5 +1,5 @@
 const vscode = require("vscode");
-const penguinShared = require("./js/pet-shared");
+const penguinShared = require("./src/pet-shared");
 
 const SIDEBAR_VIEW_ID = "pinguinPet.sidebar";
 
@@ -45,7 +45,7 @@ class PenguinSidebarProvider {
         vscode.Uri.joinPath(this.extensionUri, "assets"),
         vscode.Uri.joinPath(this.extensionUri, "image"),
         vscode.Uri.joinPath(this.extensionUri, "css"),
-        vscode.Uri.joinPath(this.extensionUri, "js"),
+        vscode.Uri.joinPath(this.extensionUri, "src"),
       ],
     };
     webviewView.webview.html = getWebviewContent(
@@ -59,42 +59,35 @@ function getWebviewContent(webview, extensionUri) {
   const cssUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "css", "style.css"),
   );
-  const sharedJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-shared.js"),
-  );
-  const configJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-config.js"),
-  );
-  const contentJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-content.js"),
-  );
-  const effectsJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-effects.js"),
-  );
-  const penguinStateJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-state.js"),
-  );
-  const penguinSpeechJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-speech.js"),
-  );
-  const penguinMotionJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-motion.js"),
-  );
-  const penguinAiJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-ai.js"),
-  );
-  const penguinInteractionsJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin-interactions.js"),
-  );
-  const penguinJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "pet-penguin.js"),
-  );
-  const bootstrapJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "script.js"),
-  );
-  const runnerGameJsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, "js", "penguin-runner-game.js"),
-  );
+  const nonce = createNonce();
+  const scriptEntries = [
+    "pet-shared.js",
+    "config/pet-config.js",
+    "config/game-config.js",
+    "pet-content.js",
+    "pet-effects.js",
+    "pet-penguin-state.js",
+    "pet-penguin-speech.js",
+    "pet-penguin-motion.js",
+    "pet-penguin-ai.js",
+    "pet-penguin-interactions.js",
+    "pet-penguin.js",
+    "runtime/pet-fish-economy.js",
+    "runtime/pet-environment-events.js",
+    "app/pet-bootstrap.js",
+    "script.js",
+    "games/runner/runner-context.js",
+    "games/runner/runner-obstacles.js",
+    "games/runner/penguin-runner-game.js",
+  ];
+  const scriptTags = scriptEntries
+    .map((scriptPath) => {
+      const scriptUri = webview.asWebviewUri(
+        vscode.Uri.joinPath(extensionUri, "src", ...scriptPath.split("/")),
+      );
+      return `  <script nonce="${nonce}" src="${scriptUri}"></script>`;
+    })
+    .join("\n");
   const backgroundUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "assets", "backgroung-dark.png"),
   );
@@ -111,8 +104,6 @@ function getWebviewContent(webview, extensionUri) {
     backgroundImage: backgroundUri.toString(),
   });
 
-  const nonce = createNonce();
-
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -127,18 +118,7 @@ function getWebviewContent(webview, extensionUri) {
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
     window.PENGUIN_CONFIG = ${JSON.stringify(webviewConfig)};
   </script>
-  <script nonce="${nonce}" src="${sharedJsUri}"></script>
-  <script nonce="${nonce}" src="${configJsUri}"></script>
-  <script nonce="${nonce}" src="${contentJsUri}"></script>
-  <script nonce="${nonce}" src="${effectsJsUri}"></script>
-  <script nonce="${nonce}" src="${penguinStateJsUri}"></script>
-  <script nonce="${nonce}" src="${penguinSpeechJsUri}"></script>
-  <script nonce="${nonce}" src="${penguinMotionJsUri}"></script>
-  <script nonce="${nonce}" src="${penguinAiJsUri}"></script>
-  <script nonce="${nonce}" src="${penguinInteractionsJsUri}"></script>
-  <script nonce="${nonce}" src="${penguinJsUri}"></script>
-  <script nonce="${nonce}" src="${bootstrapJsUri}"></script>
-  <script nonce="${nonce}" src="${runnerGameJsUri}"></script>
+${scriptTags}
 </body>
 </html>`;
 }

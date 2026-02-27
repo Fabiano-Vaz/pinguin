@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { BootScene } from '../scenes/BootScene';
 import { MainScene } from '../scenes/MainScene';
+import { RunnerScene } from '../scenes/RunnerScene';
+import { UIScene } from '../scenes/UIScene';
 
 export const createFrameworkGameConfig = (
   parent: string,
@@ -22,5 +24,5 @@ export const createFrameworkGameConfig = (
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, MainScene],
+  scene: [BootScene, MainScene, RunnerScene, UIScene],
 });

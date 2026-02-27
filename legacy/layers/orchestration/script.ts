@@ -16,6 +16,11 @@
   let noFishTantrumTimeoutId = null;
   let noFishAutoFishingTimeoutId = null;
 
+  const emitRuntimeEvent = (eventName, payload) => {
+    if (typeof runtime.emitEvent !== "function") return;
+    runtime.emitEvent(eventName, payload);
+  };
+
   const hasUneatenFishOnGround = () =>
     Boolean(document.querySelector(".food-fish-drop:not(.eaten)"));
 
@@ -215,6 +220,10 @@
   const updateFishStockHud = () => {
     if (!fishStockCountEl) return;
     fishStockCountEl.textContent = String(Math.max(0, remainingFish));
+    emitRuntimeEvent("hud:fish-stock-changed", {
+      count: Math.max(0, remainingFish),
+      source: "legacy",
+    });
   };
 
   const mountFishStockHud = () => {
@@ -275,10 +284,12 @@
 
   const applyFishCursorState = () => {
     if (!document.body) return;
-    document.body.classList.toggle(
-      "fish-cursor-enabled",
-      runtime.isFishCursorEnabled !== false,
-    );
+    const isEnabled = runtime.isFishCursorEnabled !== false;
+    document.body.classList.toggle("fish-cursor-enabled", isEnabled);
+    emitRuntimeEvent("cursor:fish-mode-changed", {
+      enabled: isEnabled,
+      source: "legacy",
+    });
   };
 
   runtime.setFishCursorEnabled = (enabled) => {
@@ -334,10 +345,6 @@
     });
   }
 
-  if (typeof Penguin !== "function") {
-    return;
-  }
-
   applyFishCursorState();
   mountFishStockHud();
   runtime.fishStock = remainingFish;
@@ -346,7 +353,17 @@
     scheduleNoFishAutoFishing();
   }
 
-  const penguin = new Penguin();
+  const existingPenguin =
+    window.PenguinPet && window.PenguinPet.penguin
+      ? window.PenguinPet.penguin
+      : null;
+  const penguin =
+    existingPenguin || (typeof Penguin === "function" ? new Penguin() : null);
+
+  if (!penguin) {
+    return;
+  }
+
   window.PenguinPet = {
     ...pet,
     runtime,
@@ -381,9 +398,10 @@
   const RAIN_DOUBLE_CLICK_MS = 600;
 
   // Detecção de agitação do mouse
-  const SHAKE_WINDOW_MS = 200;
-  const SHAKE_SPEED_THRESHOLD = 4000; // px/s
-  const SHAKE_COOLDOWN_MS = 1200;
+  const SHAKE_WINDOW_MS = 240;
+  const SHAKE_SPEED_THRESHOLD = 5200; // px/s
+  const SHAKE_COOLDOWN_MS = 1800;
+  const SHAKE_MIN_DIRECTION_FLIPS = 2;
   let shakeSamples = [];
   let lastWindAt = 0;
 
@@ -410,12 +428,23 @@
     }
     const elapsed = Math.max(1, now - shakeSamples[0].t) / 1000;
     const speed = totalDist / elapsed;
+    let directionFlips = 0;
+    let lastDir = 0;
+    let accumulatedDx = 0;
 
-    if (speed >= SHAKE_SPEED_THRESHOLD) {
+    for (let i = 1; i < shakeSamples.length; i += 1) {
+      const dx = shakeSamples[i].x - shakeSamples[i - 1].x;
+      accumulatedDx += dx;
+      if (Math.abs(dx) < 6) continue;
+      const dir = dx > 0 ? 1 : -1;
+      if (lastDir !== 0 && dir !== lastDir) directionFlips += 1;
+      lastDir = dir;
+    }
+
+    if (speed >= SHAKE_SPEED_THRESHOLD && directionFlips >= SHAKE_MIN_DIRECTION_FLIPS) {
       lastWindAt = now;
       // Direção dominante horizontal (antes de limpar)
-      const first = shakeSamples[0];
-      const dir = first && x >= first.x ? 1 : -1;
+      const dir = accumulatedDx >= 0 ? 1 : -1;
       shakeSamples = [];
       const eff = window.PenguinPet && window.PenguinPet.effects;
       if (eff && typeof eff.createWindGust === "function") {

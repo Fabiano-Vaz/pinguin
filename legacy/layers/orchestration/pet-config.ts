@@ -1,5 +1,17 @@
 // @ts-nocheck
 (() => {
+  const hostRuntime = window.PINGUIN_RUNTIME || {};
+  const runtimeAssets =
+    hostRuntime && typeof hostRuntime === "object" && hostRuntime.penguinAssets
+      ? hostRuntime.penguinAssets
+      : {};
+  const runtimeConfig =
+    hostRuntime && typeof hostRuntime === "object" && hostRuntime.penguinConfig
+      ? hostRuntime.penguinConfig
+      : {};
+  const assetOverrides = window.PENGUIN_ASSETS || runtimeAssets || {};
+  const configOverrides = window.PENGUIN_CONFIG || runtimeConfig || {};
+
   const shared =
     typeof window !== "undefined" && window.PenguinPetShared
       ? window.PenguinPetShared
@@ -8,38 +20,32 @@
   const actionStates =
     shared && typeof shared.getActionStates === "function"
       ? shared.getActionStates(
-          window.PENGUIN_ASSETS || {},
+          assetOverrides,
           (fileName) => `assets/${fileName}`,
         )
       : shared && typeof shared.buildAssetPaths === "function"
         ? {
             ...shared.buildAssetPaths((fileName) => `assets/${fileName}`),
-            ...(window.PENGUIN_ASSETS || {}),
+            ...assetOverrides,
           }
-        : window.PENGUIN_ASSETS || {};
+        : assetOverrides;
 
   const mergedConfig =
     shared && typeof shared.getMergedConfig === "function"
-      ? shared.getMergedConfig(window.PENGUIN_CONFIG || {})
+      ? shared.getMergedConfig(configOverrides)
       : {
-          size:
-            window.PENGUIN_CONFIG &&
-            Number.isFinite(window.PENGUIN_CONFIG.size) &&
-            window.PENGUIN_CONFIG.size > 0
-              ? window.PENGUIN_CONFIG.size
-              : 120,
-          groundRatio:
-            window.PENGUIN_CONFIG &&
-            Number.isFinite(window.PENGUIN_CONFIG.groundRatio) &&
-            window.PENGUIN_CONFIG.groundRatio > 0 &&
-            window.PENGUIN_CONFIG.groundRatio <= 1
-              ? window.PENGUIN_CONFIG.groundRatio
+          size: Number.isFinite(configOverrides.size) && configOverrides.size > 0
+            ? configOverrides.size
+            : 120,
+          groundRatio: Number.isFinite(configOverrides.groundRatio) &&
+            configOverrides.groundRatio > 0 &&
+            configOverrides.groundRatio <= 1
+              ? configOverrides.groundRatio
               : 0.86,
           backgroundImage:
-            window.PENGUIN_CONFIG &&
-            typeof window.PENGUIN_CONFIG.backgroundImage === "string" &&
-            window.PENGUIN_CONFIG.backgroundImage.length > 0
-              ? window.PENGUIN_CONFIG.backgroundImage
+            typeof configOverrides.backgroundImage === "string" &&
+            configOverrides.backgroundImage.length > 0
+              ? configOverrides.backgroundImage
               : "assets/backgroung-dark.png",
         };
 
@@ -85,6 +91,15 @@
       mouseY: window.innerHeight / 2,
       isMouseInsideViewport: true,
       isFishCursorEnabled: true,
+      isRunnerActive: Boolean(hostRuntime.isRunnerActive),
+      onEvent:
+        typeof hostRuntime.onEvent === "function" ? hostRuntime.onEvent : undefined,
+      offEvent:
+        typeof hostRuntime.offEvent === "function" ? hostRuntime.offEvent : undefined,
+      emitEvent:
+        typeof hostRuntime.emitEvent === "function"
+          ? hostRuntime.emitEvent
+          : undefined,
     },
   };
 })();

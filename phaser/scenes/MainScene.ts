@@ -14,9 +14,14 @@ export class MainScene extends Phaser.Scene {
   create(): void {
     this.layerManager = new LayerManager(this);
     this.petBridgeSystem = new PetBridgeSystem(this);
+    this.petBridgeSystem.init();
 
     const overlayLayer = this.layerManager.get(LayerIds.Overlay);
     overlayLayer.setName('phaser-framework-overlay');
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.petBridgeSystem.destroy();
+    });
   }
 
   update(): void {

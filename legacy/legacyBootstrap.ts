@@ -2,30 +2,23 @@ import type { RuntimeConfig } from '../runtime/types';
 
 type LegacyModuleLoader = () => Promise<unknown>;
 
-type LegacyLayer = 'background' | 'environment' | 'actor' | 'overlay' | 'orchestration';
-
-type LegacyStep = {
-  layer: LegacyLayer;
-  load: LegacyModuleLoader;
-};
-
-const LEGACY_BOOT_SEQUENCE: LegacyStep[] = [
-  { layer: 'orchestration', load: () => import('./layers/orchestration/pet-shared') },
-  { layer: 'orchestration', load: () => import('./layers/orchestration/pet-config') },
-  { layer: 'overlay', load: () => import('./layers/overlay/pet-content') },
-  { layer: 'environment', load: () => import('./layers/environment/pet-effects') },
-  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-state') },
-  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-speech') },
-  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-motion') },
-  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-ai') },
-  { layer: 'actor', load: () => import('./layers/actor/pet-penguin-interactions') },
-  { layer: 'actor', load: () => import('./layers/actor/pet-penguin') },
-  { layer: 'orchestration', load: () => import('./layers/orchestration/script') },
-  { layer: 'environment', load: () => import('./layers/environment/penguin-runner-game') },
-  { layer: 'background', load: async () => undefined },
+const LEGACY_BOOT_MODULES: LegacyModuleLoader[] = [
+  () => import('./layers/orchestration/pet-shared'),
+  () => import('./layers/orchestration/pet-config'),
+  () => import('./layers/overlay/pet-content'),
+  () => import('./layers/environment/pet-effects'),
+  () => import('./layers/actor/pet-penguin-state'),
+  () => import('./layers/actor/pet-penguin-speech'),
+  () => import('./layers/actor/pet-penguin-motion'),
+  () => import('./layers/actor/pet-penguin-ai'),
+  () => import('./layers/actor/pet-penguin-interactions'),
+  () => import('./layers/actor/pet-penguin'),
+  () => import('./layers/orchestration/script'),
 ];
 
 const ensureGlobalConfig = (runtime: RuntimeConfig): void => {
+  const hostRuntime = window.PINGUIN_RUNTIME ?? {};
+
   if (!window.PENGUIN_CONFIG) {
     window.PENGUIN_CONFIG = {
       size: 120,
@@ -34,12 +27,14 @@ const ensureGlobalConfig = (runtime: RuntimeConfig): void => {
     };
   }
 
-  if (runtime.penguinAssets) {
-    window.PENGUIN_ASSETS = runtime.penguinAssets;
+  const resolvedAssets = runtime.penguinAssets ?? hostRuntime.penguinAssets;
+  if (resolvedAssets) {
+    window.PENGUIN_ASSETS = resolvedAssets;
   }
 
-  if (runtime.penguinConfig) {
-    window.PENGUIN_CONFIG = runtime.penguinConfig;
+  const resolvedConfig = runtime.penguinConfig ?? hostRuntime.penguinConfig;
+  if (resolvedConfig) {
+    window.PENGUIN_CONFIG = resolvedConfig;
   }
 };
 
@@ -57,9 +52,9 @@ const loadCss = (href: string): void => {
 
 export const bootstrapLegacyRuntime = async (runtime: RuntimeConfig): Promise<void> => {
   ensureGlobalConfig(runtime);
-  loadCss(runtime.cssHref ?? '/css/style.css');
+  loadCss(runtime.cssHref ?? window.PINGUIN_RUNTIME?.cssHref ?? '/css/style.css');
 
-  for (const step of LEGACY_BOOT_SEQUENCE) {
-    await step.load();
+  for (const loadModule of LEGACY_BOOT_MODULES) {
+    await loadModule();
   }
 };

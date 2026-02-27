@@ -234,6 +234,15 @@
     game.active = enabled;
     const runtime =
       pet.runtime || (window.PenguinPet && window.PenguinPet.runtime);
+    if (runtime) {
+      runtime.isRunnerActive = enabled;
+      if (typeof runtime.emitEvent === "function") {
+        runtime.emitEvent("runner:mode-changed", {
+          active: enabled,
+          source: "legacy",
+        });
+      }
+    }
 
     if (enabled) {
       game.fishCursorWasEnabledClass = document.body.classList.contains(
@@ -977,6 +986,22 @@
     playEnterTransition();
     requestAnimationFrame(frame);
   };
+
+  const runtime =
+    pet.runtime || (window.PenguinPet && window.PenguinPet.runtime);
+  if (runtime && typeof runtime.onEvent === "function") {
+    runtime.onEvent("runner:start-request", () => {
+      if (!game.active) {
+        startGame();
+      }
+    });
+
+    runtime.onEvent("runner:stop-request", () => {
+      if (game.active) {
+        stopGame();
+      }
+    });
+  }
 
   const isJumpKey = (event) =>
     event.code === "ArrowUp" ||

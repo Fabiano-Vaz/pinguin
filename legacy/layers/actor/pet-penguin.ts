@@ -42,6 +42,29 @@
     typeof effects.createClickEffect === "function"
       ? effects.createClickEffect
       : () => {};
+  const resolveAssetUri = (assetKey, fallbackPath) => {
+    const fromActionStates =
+      actionStates && typeof actionStates[assetKey] === "string"
+        ? actionStates[assetKey]
+        : "";
+    if (fromActionStates) return fromActionStates;
+
+    const fromGlobalAssets =
+      window.PENGUIN_ASSETS && typeof window.PENGUIN_ASSETS[assetKey] === "string"
+        ? window.PENGUIN_ASSETS[assetKey]
+        : "";
+    if (fromGlobalAssets) return fromGlobalAssets;
+
+    const fromRuntimeAssets =
+      window.PINGUIN_RUNTIME &&
+      window.PINGUIN_RUNTIME.penguinAssets &&
+      typeof window.PINGUIN_RUNTIME.penguinAssets[assetKey] === "string"
+        ? window.PINGUIN_RUNTIME.penguinAssets[assetKey]
+        : "";
+    if (fromRuntimeAssets) return fromRuntimeAssets;
+
+    return fallbackPath;
+  };
 
   class Penguin {
     constructor() {
@@ -54,10 +77,16 @@
       this.umbrellaEl = document.createElement("img");
       this.umbrellaEl.className = "penguin-umbrella";
       this.umbrellaEl.draggable = false;
-      this.umbrellaEl.src =
-        window.PENGUIN_ASSETS && window.PENGUIN_ASSETS.umbrella
-          ? window.PENGUIN_ASSETS.umbrella
-          : "assets/umbrella.svg";
+      this.umbrellaEl.src = resolveAssetUri("umbrella", "assets/umbrella.svg");
+      this.umbrellaEl.addEventListener("error", () => {
+        const retrySrc = resolveAssetUri("umbrella", "");
+        if (retrySrc && this.umbrellaEl.src !== retrySrc) {
+          this.umbrellaEl.src = retrySrc;
+          return;
+        }
+        // Evita ícone quebrado no webview quando a URI estiver indisponível.
+        this.umbrellaEl.style.display = "none";
+      });
       document.body.appendChild(this.umbrellaEl);
 
       document.body.appendChild(this.element);

@@ -14,7 +14,7 @@ export class GameFramework {
     canvas.style.position = 'fixed';
     canvas.style.inset = '0';
     canvas.style.zIndex = '0';
-    canvas.style.opacity = '0';
+    canvas.style.opacity = '1';
   }
 
   stop(): void {

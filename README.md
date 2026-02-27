@@ -1,6 +1,6 @@
 # Pinguim Pet
 
-Projeto com runtime híbrido em `Vite + TypeScript + Phaser`, mantendo uma camada legacy mínima para compatibilidade de comportamento.
+Projeto Phaser-only em `Vite + TypeScript + Phaser`.
 
 ## Arquitetura Final
 
@@ -26,23 +26,12 @@ Contrato único de eventos entre legacy e Phaser.
 - `main.ts`
 Sobe o framework Phaser e depois injeta compatibilidade legacy.
 
-### Legacy (Compatibilidade Mínima)
-
-- `legacy/legacyBootstrap.ts`
-Carrega apenas módulos legacy ainda necessários para integração gradual.
-- `legacy/layers/environment/pet-effects.ts`
-Bridge de efeitos para eventos Phaser.
-- `legacy/layers/actor/pet-penguin-speech.ts`
-Bridge de falas para `UIScene`.
-- `legacy/layers/**`
-Módulos ainda não totalmente migrados permanecem funcionando via bootstrap.
-
 ## Fluxo de Renderização
 
 1. `GameFramework` cria canvas Phaser.
 2. `BootScene` sobe `UIScene` e `MainScene`.
-3. `MainScene` sincroniza estado com runtime via `PetBridgeSystem`.
-4. Módulos legacy emitem eventos (`effects:*`, `ui:*`) no event bus.
+3. `MainScene` instancia pet e sistemas Phaser (`PetState`, `PetMotion`, `PetInteractions`, `PetAI`).
+4. `PetBridgeSystem` sincroniza estado com runtime/event bus.
 5. `UIScene` renderiza efeitos/UI com Phaser.
 
 ## Comandos

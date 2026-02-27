@@ -6,7 +6,7 @@ type RunnerSceneData = {
 };
 
 type RunnerObstacleTemplate = {
-  id: 'iceberg' | 'snowman' | 'airplane';
+  id: 'icebergTall' | 'icebergJagged' | 'icebergSpire' | 'snowman' | 'airplane';
   textureKey: string;
   minWidth: number;
   maxWidth: number;
@@ -23,6 +23,7 @@ type RunnerObstacle = Phaser.Physics.Arcade.Image & {
     requiresCrouch: boolean;
     passed: boolean;
     score: number;
+    airplaneVariant?: 'a' | 'b';
   };
 };
 
@@ -35,6 +36,8 @@ export class RunnerScene extends Phaser.Scene {
   };
 
   private runnerModeChangedHandler?: RuntimeEventHandler<'runner:mode-changed'>;
+  private boundWindowKeydown?: (event: KeyboardEvent) => void;
+  private boundWindowKeyup?: (event: KeyboardEvent) => void;
 
   private activeRunner = false;
   private isGameOver = false;
@@ -79,14 +82,16 @@ export class RunnerScene extends Phaser.Scene {
   private obstacles!: Phaser.Physics.Arcade.Group;
   private groundDecor!: Phaser.Physics.Arcade.Group;
   private obstacleCollider?: Phaser.Physics.Arcade.Collider;
+  private readonly failedTextureKeys = new Set<string>();
+  private nextHelicopterIndex = 0;
 
   private readonly obstacleTemplates: RunnerObstacleTemplate[] = [
     {
-      id: 'iceberg',
-      textureKey: 'runner-obstacle-iceberg',
+      id: 'icebergTall',
+      textureKey: 'runner-obstacle-iceberg-tall',
       minWidth: 34,
-      maxWidth: 60,
-      minHeight: 30,
+      maxWidth: 52,
+      minHeight: 36,
       maxHeight: 60,
       topOffset: 9,
       requiresCrouch: false,
@@ -104,8 +109,30 @@ export class RunnerScene extends Phaser.Scene {
       score: 5,
     },
     {
+      id: 'icebergJagged',
+      textureKey: 'runner-obstacle-iceberg-jagged',
+      minWidth: 40,
+      maxWidth: 60,
+      minHeight: 30,
+      maxHeight: 50,
+      topOffset: 9,
+      requiresCrouch: false,
+      score: 5,
+    },
+    {
+      id: 'icebergSpire',
+      textureKey: 'runner-obstacle-iceberg-spire',
+      minWidth: 30,
+      maxWidth: 44,
+      minHeight: 42,
+      maxHeight: 68,
+      topOffset: 9,
+      requiresCrouch: false,
+      score: 5,
+    },
+    {
       id: 'airplane',
-      textureKey: 'runner-obstacle-airplane',
+      textureKey: 'runner-obstacle-airplane-a',
       minWidth: 52,
       maxWidth: 72,
       minHeight: 18,
@@ -122,40 +149,149 @@ export class RunnerScene extends Phaser.Scene {
 
   preload(): void {
     const pet = window.PenguinPet as { actionStates?: Record<string, string> } | undefined;
+    const runtimeAssets = window.PINGUIN_RUNTIME?.penguinAssets ?? {};
     const resolveAsset = (assetKey: string, fallbackPath: string): string => {
       const mappedPath =
+        runtimeAssets[assetKey] ||
+        (window.PENGUIN_ASSETS && window.PENGUIN_ASSETS[assetKey]) ||
         (pet?.actionStates && pet.actionStates[assetKey]) ||
-        (window.PENGUIN_ASSETS && window.PENGUIN_ASSETS[assetKey]);
+        '';
       if (typeof mappedPath === 'string' && mappedPath.length > 0) {
         return mappedPath;
       }
       return fallbackPath;
     };
 
-    if (!this.textures.exists('runner-bg')) {
-      this.load.image('runner-bg', resolveAsset('runnerBackgroundDarkB', 'assets/backgroung-darkB.png'));
-    }
-    if (!this.textures.exists('runner-penguin-running')) {
-      this.load.image('runner-penguin-running', resolveAsset('running', 'assets/pinguin correndo.svg'));
-    }
-    if (!this.textures.exists('runner-penguin-crouching')) {
-      this.load.image(
-        'runner-penguin-crouching',
-        resolveAsset('runningCrouched', 'assets/pinguin correndo abaixado.svg'),
-      );
-    }
-    if (!this.textures.exists('runner-penguin-jumping')) {
-      this.load.image('runner-penguin-jumping', resolveAsset('trace', 'assets/trace.svg'));
-    }
-    if (!this.textures.exists('runner-penguin-front')) {
-      this.load.image('runner-penguin-front', resolveAsset('default', 'assets/pinguin.svg'));
-    }
-    if (!this.textures.exists('runner-obstacle-snowman')) {
-      this.load.image('runner-obstacle-snowman', resolveAsset('snowman', 'assets/snowman.svg'));
-    }
-    if (!this.textures.exists('runner-obstacle-airplane')) {
-      this.load.image('runner-obstacle-airplane', resolveAsset('helicopterA', 'assets/helicopterA.gif'));
-    }
+    const loadFresh = (key: string, assetPath: string): void => {
+      if (this.textures.exists(key)) {
+        this.textures.remove(key);
+      }
+      if (assetPath.toLowerCase().endsWith('.svg')) {
+        this.load.svg(key, assetPath);
+        return;
+      }
+      this.load.image(key, assetPath);
+    };
+
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      this.failedTextureKeys.add(file.key);
+    });
+    this.load.once(Phaser.Loader.Events.COMPLETE, () => {
+      this.ensureCriticalTextureFallbacks();
+      this.failedTextureKeys.clear();
+    });
+
+    loadFresh('runner-bg', resolveAsset('runnerBackgroundDarkB', 'assets/backgroung-darkB.png'));
+    loadFresh('runner-penguin-running', resolveAsset('running', 'assets/pinguin correndo.svg'));
+    loadFresh(
+      'runner-penguin-crouching',
+      resolveAsset('runningCrouched', 'assets/pinguin correndo abaixado.svg'),
+    );
+    loadFresh('runner-penguin-jumping', resolveAsset('trace', 'assets/trace.svg'));
+    loadFresh('runner-penguin-front', resolveAsset('default', 'assets/pinguin.svg'));
+    loadFresh('runner-obstacle-snowman', resolveAsset('snowman', 'assets/snowman.svg'));
+    loadFresh('runner-obstacle-airplane-a', resolveAsset('helicopterA', 'assets/helicopterA.gif'));
+    loadFresh('runner-obstacle-airplane-b', resolveAsset('helicopterB', 'assets/helicopterB.gif'));
+  }
+
+  private ensureCriticalTextureFallbacks(): void {
+    const ensureTexture = (key: string, draw: (g: Phaser.GameObjects.Graphics) => void, w: number, h: number): void => {
+      if (this.textures.exists(key) && !this.failedTextureKeys.has(key)) return;
+      if (this.textures.exists(key)) this.textures.remove(key);
+      const g = this.make.graphics({ x: 0, y: 0 });
+      draw(g);
+      g.generateTexture(key, w, h);
+      g.destroy();
+    };
+
+    ensureTexture(
+      'runner-bg',
+      (g) => {
+        g.fillGradientStyle(0x0f1730, 0x0f1730, 0x1a2a58, 0x1a2a58, 1);
+        g.fillRect(0, 0, 512, 320);
+        g.fillStyle(0xffffff, 0.75);
+        for (let i = 0; i < 32; i += 1) {
+          g.fillCircle(Phaser.Math.Between(0, 511), Phaser.Math.Between(0, 220), Phaser.Math.Between(1, 2));
+        }
+      },
+      512,
+      320,
+    );
+
+    ensureTexture(
+      'runner-penguin-running',
+      (g) => {
+        g.fillStyle(0x0c0c14, 1);
+        g.fillEllipse(34, 42, 38, 46);
+        g.fillStyle(0xf6f6f6, 1);
+        g.fillEllipse(34, 44, 16, 24);
+        g.fillStyle(0xffd234, 1);
+        g.fillEllipse(26, 60, 10, 8);
+        g.fillEllipse(42, 60, 10, 8);
+      },
+      68,
+      68,
+    );
+
+    ensureTexture(
+      'runner-penguin-crouching',
+      (g) => {
+        g.fillStyle(0x0c0c14, 1);
+        g.fillEllipse(34, 48, 44, 34);
+        g.fillStyle(0xf6f6f6, 1);
+        g.fillEllipse(34, 49, 18, 16);
+        g.fillStyle(0xffd234, 1);
+        g.fillEllipse(27, 60, 11, 7);
+        g.fillEllipse(41, 60, 11, 7);
+      },
+      68,
+      68,
+    );
+
+    ensureTexture(
+      'runner-penguin-jumping',
+      (g) => {
+        g.fillStyle(0x0c0c14, 1);
+        g.fillEllipse(34, 36, 36, 44);
+        g.fillStyle(0xf6f6f6, 1);
+        g.fillEllipse(34, 37, 14, 20);
+        g.fillStyle(0xffd234, 1);
+        g.fillEllipse(28, 54, 9, 7);
+        g.fillEllipse(40, 54, 9, 7);
+      },
+      68,
+      68,
+    );
+
+    ensureTexture('runner-penguin-front', (g) => {
+      g.fillStyle(0x0c0c14, 1);
+      g.fillEllipse(34, 42, 34, 44);
+      g.fillStyle(0xf6f6f6, 1);
+      g.fillEllipse(34, 44, 16, 24);
+    }, 68, 68);
+
+    ensureTexture('runner-obstacle-snowman', (g) => {
+      g.fillStyle(0xf5f8ff, 1);
+      g.fillCircle(30, 46, 18);
+      g.fillCircle(30, 24, 12);
+      g.fillStyle(0x0f1730, 1);
+      g.fillCircle(25, 22, 1.5);
+      g.fillCircle(33, 22, 1.5);
+    }, 64, 64);
+
+    ensureTexture('runner-obstacle-airplane-a', (g) => {
+      g.fillStyle(0x7fc8ff, 1);
+      g.fillRoundedRect(4, 10, 56, 10, 3);
+      g.fillTriangle(16, 10, 32, 1, 34, 10);
+      g.fillTriangle(40, 20, 56, 28, 42, 20);
+    }, 64, 32);
+
+    ensureTexture('runner-obstacle-airplane-b', (g) => {
+      g.fillStyle(0x7fc8ff, 1);
+      g.fillRoundedRect(4, 10, 56, 10, 3);
+      g.fillTriangle(16, 10, 32, 1, 34, 10);
+      g.fillTriangle(40, 20, 56, 28, 42, 20);
+    }, 64, 32);
   }
 
   create(data?: RunnerSceneData): void {
@@ -289,22 +425,6 @@ export class RunnerScene extends Phaser.Scene {
 
   private createInput(): void {
     const keyboard = this.input.keyboard;
-    if (!keyboard) return;
-
-    keyboard.addCapture([
-      Phaser.Input.Keyboard.KeyCodes.SPACE,
-      Phaser.Input.Keyboard.KeyCodes.UP,
-      Phaser.Input.Keyboard.KeyCodes.W,
-      Phaser.Input.Keyboard.KeyCodes.DOWN,
-      Phaser.Input.Keyboard.KeyCodes.S,
-      Phaser.Input.Keyboard.KeyCodes.ESC,
-    ]);
-
-    keyboard.on('keydown-ESC', (event: KeyboardEvent) => {
-      if (!this.activeRunner) return;
-      event.preventDefault();
-      this.requestRunnerMode(false);
-    });
 
     const jumpDown = (event: KeyboardEvent): void => {
       event.preventDefault();
@@ -322,33 +442,78 @@ export class RunnerScene extends Phaser.Scene {
       this.requestJump();
     };
 
-    keyboard.on('keydown-SPACE', jumpDown);
-    keyboard.on('keydown-UP', jumpDown);
-    keyboard.on('keydown-W', jumpDown);
-
     const jumpUp = (): void => {
       this.jumpHeld = false;
     };
-    keyboard.on('keyup-SPACE', jumpUp);
-    keyboard.on('keyup-UP', jumpUp);
-    keyboard.on('keyup-W', jumpUp);
+    const crouchDown = (event: KeyboardEvent): void => {
+      if (!this.activeRunner || this.isGameOver) return;
+      event.preventDefault();
+      this.crouchHeld = true;
+    };
+    const crouchUp = (): void => {
+      this.crouchHeld = false;
+    };
+    const escapeDown = (event: KeyboardEvent): void => {
+      if (!this.activeRunner) return;
+      event.preventDefault();
+      this.requestRunnerMode(false);
+    };
 
-    keyboard.on('keydown-DOWN', (event: KeyboardEvent) => {
-      if (!this.activeRunner || this.isGameOver) return;
-      event.preventDefault();
-      this.crouchHeld = true;
-    });
-    keyboard.on('keydown-S', (event: KeyboardEvent) => {
-      if (!this.activeRunner || this.isGameOver) return;
-      event.preventDefault();
-      this.crouchHeld = true;
-    });
-    keyboard.on('keyup-DOWN', () => {
-      this.crouchHeld = false;
-    });
-    keyboard.on('keyup-S', () => {
-      this.crouchHeld = false;
-    });
+    if (keyboard) {
+      keyboard.addCapture([
+        Phaser.Input.Keyboard.KeyCodes.SPACE,
+        Phaser.Input.Keyboard.KeyCodes.UP,
+        Phaser.Input.Keyboard.KeyCodes.W,
+        Phaser.Input.Keyboard.KeyCodes.DOWN,
+        Phaser.Input.Keyboard.KeyCodes.S,
+        Phaser.Input.Keyboard.KeyCodes.ESC,
+      ]);
+
+      keyboard.on('keydown-ESC', escapeDown);
+      keyboard.on('keydown-SPACE', jumpDown);
+      keyboard.on('keydown-UP', jumpDown);
+      keyboard.on('keydown-W', jumpDown);
+      keyboard.on('keyup-SPACE', jumpUp);
+      keyboard.on('keyup-UP', jumpUp);
+      keyboard.on('keyup-W', jumpUp);
+      keyboard.on('keydown-DOWN', crouchDown);
+      keyboard.on('keydown-S', crouchDown);
+      keyboard.on('keyup-DOWN', crouchUp);
+      keyboard.on('keyup-S', crouchUp);
+    }
+
+    // Fallback for extension/webview focus issues where Phaser keyboard doesn't receive events.
+    this.boundWindowKeydown = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+      const key = event.key.toLowerCase();
+      if (key === ' ') {
+        jumpDown(event);
+        return;
+      }
+      if (key === 'arrowup' || key === 'w') {
+        jumpDown(event);
+        return;
+      }
+      if (key === 'arrowdown' || key === 's') {
+        crouchDown(event);
+        return;
+      }
+      if (key === 'escape') {
+        escapeDown(event);
+      }
+    };
+    this.boundWindowKeyup = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      if (key === ' ' || key === 'arrowup' || key === 'w') {
+        jumpUp();
+        return;
+      }
+      if (key === 'arrowdown' || key === 's') {
+        crouchUp();
+      }
+    };
+    window.addEventListener('keydown', this.boundWindowKeydown);
+    window.addEventListener('keyup', this.boundWindowKeyup);
   }
 
   private registerRuntimeEvents(): void {
@@ -366,9 +531,18 @@ export class RunnerScene extends Phaser.Scene {
     if (this.runnerModeChangedHandler) {
       this.runtime.offEvent('runner:mode-changed', this.runnerModeChangedHandler);
     }
+    if (this.boundWindowKeydown) {
+      window.removeEventListener('keydown', this.boundWindowKeydown);
+      this.boundWindowKeydown = undefined;
+    }
+    if (this.boundWindowKeyup) {
+      window.removeEventListener('keyup', this.boundWindowKeyup);
+      this.boundWindowKeyup = undefined;
+    }
   }
 
   private applyRunnerMode(enabled: boolean): void {
+    if (this.activeRunner === enabled) return;
     this.activeRunner = enabled;
     this.background.setVisible(enabled);
     this.ground.setVisible(enabled);
@@ -394,6 +568,7 @@ export class RunnerScene extends Phaser.Scene {
   }
 
   private requestRunnerMode(active: boolean): void {
+    if (this.activeRunner === active) return;
     if (!this.runtime || typeof this.runtime.emitEvent !== 'function') return;
     this.runtime.emitEvent(active ? 'runner:start-request' : 'runner:stop-request', {
       source: 'phaser',
@@ -413,6 +588,7 @@ export class RunnerScene extends Phaser.Scene {
     this.worldTimeMs = 0;
     this.backgroundScrollX = 0;
     this.nextFishDropScore = 100;
+    this.nextHelicopterIndex = 0;
     this.jumpQueuedMs = 0;
     this.coyoteTimerMs = 0;
     this.jumpHeld = false;
@@ -570,8 +746,16 @@ export class RunnerScene extends Phaser.Scene {
     const x = this.scale.width + 48;
     const y = this.getGroundLineY() - height + template.topOffset;
 
+    const airplaneVariant = template.id === 'airplane' ? (this.nextHelicopterIndex++ % 2 === 0 ? 'a' : 'b') : undefined;
+    const textureKey =
+      template.id === 'airplane'
+        ? airplaneVariant === 'b'
+          ? 'runner-obstacle-airplane-b'
+          : 'runner-obstacle-airplane-a'
+        : template.textureKey;
+
     const obstacle = this.physics.add
-      .image(x, y, template.textureKey)
+      .image(x, y, textureKey)
       .setOrigin(0, 0)
       .setDepth(5)
       .setDisplaySize(width, height) as RunnerObstacle;
@@ -585,12 +769,35 @@ export class RunnerScene extends Phaser.Scene {
       requiresCrouch: template.requiresCrouch,
       passed: false,
       score: template.score,
+      airplaneVariant,
     };
 
-    const insetX = Math.round(width * (template.requiresCrouch ? 0.18 : 0.12));
-    const insetY = Math.round(height * (template.requiresCrouch ? 0.14 : 0.1));
-    obstacleBody.setSize(Math.max(8, width - insetX * 2), Math.max(8, height - insetY * 2), false);
-    obstacleBody.setOffset(insetX, insetY);
+    if (template.id === 'airplane') {
+      const hitboxRatios =
+        airplaneVariant === 'b'
+          ? { left: 0.3, right: 0.48, top: 0.2, bottom: 0.28 }
+          : { left: 0.28, right: 0.5, top: 0.22, bottom: 0.26 };
+      const insetLeft = Math.round(width * hitboxRatios.left);
+      const insetRight = Math.round(width * hitboxRatios.right);
+      const insetTop = Math.round(height * hitboxRatios.top);
+      const insetBottom = Math.round(height * hitboxRatios.bottom);
+      obstacleBody.setSize(
+        Math.max(8, width - insetLeft - insetRight),
+        Math.max(8, height - insetTop - insetBottom),
+        false,
+      );
+      obstacleBody.setOffset(insetLeft, insetTop);
+    } else if (template.id === 'snowman') {
+      const insetX = Math.round(width * 0.22);
+      const insetY = Math.round(height * 0.18);
+      obstacleBody.setSize(Math.max(8, width - insetX * 2), Math.max(8, height - insetY * 2), false);
+      obstacleBody.setOffset(insetX, insetY);
+    } else {
+      const insetX = Math.round(width * 0.12);
+      const insetY = Math.round(height * 0.08);
+      obstacleBody.setSize(Math.max(8, width - insetX * 2), Math.max(8, height - insetY * 2), false);
+      obstacleBody.setOffset(insetX, insetY);
+    }
 
     this.obstacles.add(obstacle);
   }
@@ -599,10 +806,13 @@ export class RunnerScene extends Phaser.Scene {
     const level = this.difficultyLevel();
     const roll = Math.random();
 
-    if (level >= 1.5 && roll < 0.2) return this.obstacleTemplates[2];
-    if (level >= 1.5 && roll < 0.4) return this.obstacleTemplates[1];
-    if (level < 1.5 && roll < 0.4) return this.obstacleTemplates[1];
-    return this.obstacleTemplates[0];
+    const byId = (id: RunnerObstacleTemplate['id']) => this.obstacleTemplates.find((item) => item.id === id)!;
+    if (level >= 1.5 && roll < 0.2) return byId('airplane');
+    if (level >= 1.5 && roll < 0.4) return byId('snowman');
+    if (level < 1.5 && roll < 0.4) return byId('snowman');
+    if (roll < 0.6) return byId('icebergTall');
+    if (roll < 0.8) return byId('icebergJagged');
+    return byId('icebergSpire');
   }
 
   private ensureSafeSpawnGap(): boolean {
@@ -747,11 +957,65 @@ export class RunnerScene extends Phaser.Scene {
   }
 
   private createProceduralTextures(): void {
-    if (!this.textures.exists('runner-obstacle-iceberg')) {
+    if (!this.textures.exists('runner-obstacle-iceberg-tall')) {
       const graphics = this.make.graphics({ x: 0, y: 0 });
       graphics.fillStyle(0x9cd4ef, 1);
-      graphics.fillRoundedRect(0, 0, 64, 64, 10);
-      graphics.generateTexture('runner-obstacle-iceberg', 64, 64);
+      graphics.fillPoints(
+        [
+          new Phaser.Geom.Point(9, 64),
+          new Phaser.Geom.Point(0, 39),
+          new Phaser.Geom.Point(8, 31),
+          new Phaser.Geom.Point(18, 14),
+          new Phaser.Geom.Point(30, 0),
+          new Phaser.Geom.Point(47, 6),
+          new Phaser.Geom.Point(64, 27),
+          new Phaser.Geom.Point(59, 64),
+        ],
+        true,
+      );
+      graphics.generateTexture('runner-obstacle-iceberg-tall', 64, 64);
+      graphics.destroy();
+    }
+
+    if (!this.textures.exists('runner-obstacle-iceberg-jagged')) {
+      const graphics = this.make.graphics({ x: 0, y: 0 });
+      graphics.fillStyle(0x93cfe9, 1);
+      graphics.fillPoints(
+        [
+          new Phaser.Geom.Point(0, 64),
+          new Phaser.Geom.Point(4, 43),
+          new Phaser.Geom.Point(13, 28),
+          new Phaser.Geom.Point(21, 34),
+          new Phaser.Geom.Point(30, 17),
+          new Phaser.Geom.Point(40, 29),
+          new Phaser.Geom.Point(48, 15),
+          new Phaser.Geom.Point(56, 32),
+          new Phaser.Geom.Point(64, 46),
+          new Phaser.Geom.Point(64, 64),
+        ],
+        true,
+      );
+      graphics.generateTexture('runner-obstacle-iceberg-jagged', 64, 64);
+      graphics.destroy();
+    }
+
+    if (!this.textures.exists('runner-obstacle-iceberg-spire')) {
+      const graphics = this.make.graphics({ x: 0, y: 0 });
+      graphics.fillStyle(0x86c4df, 1);
+      graphics.fillPoints(
+        [
+          new Phaser.Geom.Point(12, 64),
+          new Phaser.Geom.Point(6, 44),
+          new Phaser.Geom.Point(16, 26),
+          new Phaser.Geom.Point(27, 8),
+          new Phaser.Geom.Point(35, 0),
+          new Phaser.Geom.Point(45, 17),
+          new Phaser.Geom.Point(54, 40),
+          new Phaser.Geom.Point(50, 64),
+        ],
+        true,
+      );
+      graphics.generateTexture('runner-obstacle-iceberg-spire', 64, 64);
       graphics.destroy();
     }
 

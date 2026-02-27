@@ -6,6 +6,7 @@ import { PetStateSystem } from './PetStateSystem';
 export class PetAISystem {
   private behaviorEvent?: Phaser.Time.TimerEvent;
   private cooldownUntil = 0;
+  private nextForcedWanderAt = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -15,6 +16,7 @@ export class PetAISystem {
   ) {}
 
   init(): void {
+    this.nextForcedWanderAt = this.scene.time.now + Phaser.Math.Between(2200, 4200);
     this.behaviorEvent = this.scene.time.addEvent({
       delay: 1200,
       loop: true,
@@ -36,6 +38,7 @@ export class PetAISystem {
 
   private tickBehavior(): void {
     if (this.pet.isDragging || this.pet.isFishingActive) return;
+    if (this.pet.isEatingFood || this.pet.currentFoodTarget) return;
     if (this.scene.time.now < this.cooldownUntil) return;
     if (this.pet.isMoving) return;
 
@@ -79,6 +82,15 @@ export class PetAISystem {
       const target = this.motionSystem.randomTarget(Math.random() < 0.35);
       this.motionSystem.moveToPosition(target.x + this.pet.displaySize / 2, target.y + this.pet.displaySize / 2, 2.1);
       this.cooldownUntil = this.scene.time.now + 1400;
+      this.nextForcedWanderAt = this.scene.time.now + Phaser.Math.Between(2800, 5200);
+      return;
+    }
+
+    if (this.scene.time.now >= this.nextForcedWanderAt) {
+      const target = this.motionSystem.randomTarget(false);
+      this.motionSystem.moveToPosition(target.x + this.pet.displaySize / 2, target.y + this.pet.displaySize / 2, 2.05);
+      this.cooldownUntil = this.scene.time.now + 1200;
+      this.nextForcedWanderAt = this.scene.time.now + Phaser.Math.Between(2800, 5200);
     }
   }
 }

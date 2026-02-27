@@ -4,6 +4,9 @@ export type PetAssetMap = {
   idle: string;
   default: string;
   running: string;
+  eating?: string;
+  fishing?: string;
+  umbrella?: string;
   scared?: string;
   peeking?: string;
   flying?: string;
@@ -35,22 +38,38 @@ export class PetPenguin {
   public speed = 2.2;
   public visualScale = 1;
   public windTilt = 0;
+  public umbrellaLiftOffset = 0;
   public stepQueue: Array<unknown> = [];
   public nextBehaviorTimeoutId: number | null = null;
+  public currentFoodTarget?: {
+    element?: HTMLElement | null;
+    x: number;
+    y: number;
+  } | null;
+  public isEatingFood = false;
 
-  // Legacy compatibility: callers expect `element.style.animation`.
-  public readonly element: { style: Record<string, string> } = { style: {} };
+  public readonly element: HTMLDivElement;
+  public readonly img: HTMLImageElement;
+  private currentAssetSrc = '';
 
   private readonly runtime: RuntimeLike;
   private readonly size: number;
   private readonly halfSize: number;
   private readonly groundRatio: number;
   private readonly assets: PetAssetMap;
-
-  private readonly container: Phaser.GameObjects.Container;
-  private readonly sprite: Phaser.GameObjects.Sprite;
+  private readonly hitZone: Phaser.GameObjects.Zone;
+  private readonly umbrellaImg?: HTMLImageElement;
+  private readonly foodTargets: Array<{
+    element?: HTMLElement | null;
+    x: number;
+    y: number;
+  }> = [];
   private activeSpeech?: Phaser.GameObjects.Text;
   private speechTimeout?: Phaser.Time.TimerEvent;
+  private fishingTimeoutId: number | null = null;
+  private fishingTickIntervalId: number | null = null;
+  private fishCursorEnabledBeforeFishing: boolean | null = null;
+  private umbrellaHideTimeoutId: number | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -64,24 +83,41 @@ export class PetPenguin {
     this.groundRatio = Phaser.Math.Clamp(config.groundRatio || 0.86, 0.55, 0.95);
     this.runtime = (window.PenguinPet?.runtime ?? window.PINGUIN_RUNTIME ?? {}) as RuntimeLike;
 
-    this.sprite = scene.add.sprite(0, 0, assets.idle);
-    this.sprite.setOrigin(0.5, 1);
-    this.sprite.setDisplaySize(this.size, this.size);
+    this.element = document.createElement('div');
+    this.element.className = 'penguin';
+    this.element.style.pointerEvents = 'none';
+    this.element.style.width = `${this.size}px`;
+    this.element.style.height = `${this.size}px`;
+    this.element.style.zIndex = '10';
 
-    this.container = scene.add.container(0, 0, [this.sprite]);
-    this.container.setDepth(10);
-    this.container.setSize(this.size, this.size);
-    parentLayer.add(this.container);
+    this.img = document.createElement('img');
+    this.img.src = this.assets.idle;
+    this.img.draggable = false;
+    this.element.appendChild(this.img);
+
+    if (this.assets.umbrella) {
+      this.umbrellaImg = document.createElement('img');
+      this.umbrellaImg.src = this.assets.umbrella;
+      this.umbrellaImg.className = 'penguin-umbrella';
+      this.umbrellaImg.draggable = false;
+      document.body.appendChild(this.umbrellaImg);
+    }
+
+    document.body.appendChild(this.element);
+
+    this.hitZone = scene.add.zone(0, 0, this.size, this.size);
+    this.hitZone.setDepth(10);
+    parentLayer.add(this.hitZone);
 
     this.x = scene.scale.width / 2 - this.halfSize;
-    this.y = this.getGroundTopY();
+    this.y = this.getWalkMaxY();
     this.targetX = this.x;
     this.targetY = this.y;
     this.applyTransform();
   }
 
-  get gameObject(): Phaser.GameObjects.Container {
-    return this.container;
+  get gameObject(): Phaser.GameObjects.Zone {
+    return this.hitZone;
   }
 
   get displaySize(): number {
@@ -98,6 +134,26 @@ export class PetPenguin {
 
   getRuntime(): RuntimeLike {
     return this.runtime;
+  }
+
+  destroy(): void {
+    this.speechTimeout?.destroy();
+    this.activeSpeech?.destroy();
+    this.hitZone.destroy();
+    this.element.remove();
+    this.umbrellaImg?.remove();
+    if (this.fishingTickIntervalId !== null) {
+      window.clearInterval(this.fishingTickIntervalId);
+      this.fishingTickIntervalId = null;
+    }
+    if (this.fishingTimeoutId !== null) {
+      window.clearTimeout(this.fishingTimeoutId);
+      this.fishingTimeoutId = null;
+    }
+    if (this.umbrellaHideTimeoutId !== null) {
+      window.clearTimeout(this.umbrellaHideTimeoutId);
+      this.umbrellaHideTimeoutId = null;
+    }
   }
 
   onMouseMove(mouseX: number, mouseY: number): void {
@@ -120,7 +176,7 @@ export class PetPenguin {
         padding: { x: 8, y: 5 },
       })
       .setOrigin(0.5, 1)
-      .setDepth(this.container.depth + 2);
+      .setDepth(999);
 
     this.speechTimeout = this.scene.time.delayedCall(durationMs, () => {
       this.activeSpeech?.destroy();
@@ -130,10 +186,10 @@ export class PetPenguin {
 
   setState(state: string): void {
     this.currentState = state;
-    const nextTexture = this.resolveTextureForState(state);
-    if (this.sprite.texture.key !== nextTexture) {
-      this.sprite.setTexture(nextTexture);
-    }
+    const nextSrc = this.resolveAssetForState(state);
+    if (nextSrc === this.currentAssetSrc) return;
+    this.currentAssetSrc = nextSrc;
+    this.img.src = nextSrc;
   }
 
   setVisualState(state: string): void {
@@ -143,11 +199,21 @@ export class PetPenguin {
   applyTransform(flipOverride?: number): void {
     const flip = typeof flipOverride === 'number' ? flipOverride : this.facingRight ? 1 : -1;
     const depth = this.getDepthScale();
-    this.container.setPosition(this.centerX, this.y + this.size);
-    this.container.setScale(this.visualScale * depth, this.visualScale * depth);
-    this.container.setRotation(Phaser.Math.DegToRad(this.windTilt));
-    this.sprite.setFlipX(flip < 0);
-    this.container.setDepth(Math.round(10 + ((depth - 0.65) / 0.35) * 8));
+    const scale = this.visualScale * depth;
+
+    this.element.style.left = `${Math.round(this.x)}px`;
+    this.element.style.top = `${Math.round(this.y)}px`;
+    this.element.style.transform = `scaleX(${flip < 0 ? -scale : scale}) scaleY(${scale}) rotate(${this.windTilt}deg)`;
+    this.element.style.transformOrigin = 'center 85%';
+    this.element.style.zIndex = String(Math.round(10 + ((depth - 0.65) / 0.35) * 8));
+
+    if (this.umbrellaImg) {
+      this.updateUmbrellaPosition();
+    }
+
+    this.hitZone.setPosition(this.centerX, this.y + this.size);
+    this.hitZone.setSize(this.size, this.size);
+    this.hitZone.setDepth(Math.round(10 + ((depth - 0.65) / 0.35) * 8));
 
     if (this.activeSpeech) {
       this.activeSpeech.setPosition(this.centerX, this.y - 10);
@@ -184,7 +250,12 @@ export class PetPenguin {
     const distance = Math.hypot(dx, dy);
     if (distance <= 2) {
       this.isMoving = false;
-      this.setState('idle');
+      if (this.currentFoodTarget && !this.isEatingFood) {
+        this.eatCurrentFoodTarget();
+      } else {
+        this.setState('idle');
+        this.tryConsumeNextFoodTarget();
+      }
       return;
     }
 
@@ -218,29 +289,66 @@ export class PetPenguin {
     return Phaser.Math.Between(Math.round(this.getWalkMinY()), Math.round(this.getWalkMaxY()));
   }
 
-  scheduleNextBehavior(): void {
-    // Placeholder for legacy compatibility.
-  }
+  scheduleNextBehavior(): void {}
 
-  startNextBehavior(): void {
-    // Placeholder for legacy compatibility.
-  }
+  startNextBehavior(): void {}
 
   runNextStep(): void {
-    // Placeholder for legacy compatibility.
+    if (this.isFishingActive) return;
+    const step = this.stepQueue.shift() as
+      | {
+          type?: string;
+          state?: string;
+          duration?: number;
+        }
+      | undefined;
+    if (!step) return;
+
+    if (step.type === 'act' && step.state === 'fishing') {
+      this.startFishing(step.duration);
+    }
+  }
+
+  enqueueFoodTargets(targets: Array<{ element?: HTMLElement; x: number; y: number }>): void {
+    for (const target of targets) {
+      if (!target || !Number.isFinite(target.x) || !Number.isFinite(target.y)) continue;
+      this.foodTargets.push({
+        element: target.element ?? null,
+        x: Number(target.x),
+        y: Number(target.y),
+      });
+    }
+    this.tryConsumeNextFoodTarget();
   }
 
   showUmbrella(): void {
-    // Placeholder for legacy compatibility with effects module.
+    if (!this.umbrellaImg) return;
+    if (this.umbrellaHideTimeoutId !== null) {
+      window.clearTimeout(this.umbrellaHideTimeoutId);
+      this.umbrellaHideTimeoutId = null;
+    }
+    this.umbrellaImg.classList.remove('closing');
+    this.umbrellaImg.classList.add('open');
   }
 
   hideUmbrella(): void {
-    // Placeholder for legacy compatibility with effects module.
+    if (!this.umbrellaImg) return;
+    this.umbrellaImg.classList.remove('open');
+    this.umbrellaImg.classList.add('closing');
+    if (this.umbrellaHideTimeoutId !== null) {
+      window.clearTimeout(this.umbrellaHideTimeoutId);
+    }
+    this.umbrellaHideTimeoutId = window.setTimeout(() => {
+      this.umbrellaImg?.classList.remove('closing');
+      this.umbrellaHideTimeoutId = null;
+    }, 360);
   }
 
-  private resolveTextureForState(state: string): string {
+  private resolveAssetForState(state: string): string {
     if (state === 'running' || state === 'runningCrouched') return this.assets.running;
     if (state === 'idle' || state === 'default') return this.assets.idle;
+    if (state === 'eating' && this.assets.eating) return this.assets.eating;
+    if (state === 'fishing' && this.assets.fishing) return this.assets.fishing;
     if (state === 'flying' && this.assets.flying) return this.assets.flying;
     if (state === 'thinking' && this.assets.thinking) return this.assets.thinking;
     if (state === 'waving' && this.assets.waving) return this.assets.waving;
@@ -261,5 +369,107 @@ export class PetPenguin {
       0,
       this.scene.scale.height - this.size,
     );
+  }
+
+  private eatCurrentFoodTarget(): void {
+    const target = this.currentFoodTarget;
+    if (!target) return;
+
+    this.isEatingFood = true;
+    this.setState('eating');
+
+    if (target.element) {
+      target.element.classList.add('eaten');
+      window.setTimeout(() => {
+        target.element?.remove();
+      }, 280);
+    }
+
+    window.setTimeout(() => {
+      this.currentFoodTarget = null;
+      this.isEatingFood = false;
+      this.setState('idle');
+      this.tryConsumeNextFoodTarget();
+    }, 720);
+  }
+
+  private tryConsumeNextFoodTarget(): void {
+    if (this.currentFoodTarget || this.isEatingFood || this.isFishingActive) return;
+    while (this.foodTargets.length > 0) {
+      const next = this.foodTargets.shift();
+      if (!next) continue;
+      if (next.element && !next.element.isConnected) continue;
+      this.currentFoodTarget = next;
+      this.moveToPosition(next.x, next.y, 2.4);
+      return;
+    }
+  }
+
+  private startFishing(durationMs?: number): void {
+    const runtime = this.runtime as RuntimeLike & {
+      setFishCursorEnabled?: (enabled: boolean) => void;
+      isFishCursorEnabled?: boolean;
+      addFishStock?: (amount?: number) => number;
+      getFishStock?: () => number;
+    };
+
+    this.isFishingActive = true;
+    this.aiLocked = true;
+    this.isMoving = false;
+    this.foodTargets.length = 0;
+    this.currentFoodTarget = null;
+    this.setState('fishing');
+
+    this.fishCursorEnabledBeforeFishing = runtime.isFishCursorEnabled !== false;
+    runtime.setFishCursorEnabled?.(false);
+
+    const safeDuration = Math.max(1000, Math.round(Number(durationMs) || 15000));
+    this.fishingTickIntervalId = window.setInterval(() => {
+      runtime.addFishStock?.(1);
+    }, 5000);
+
+    this.fishingTimeoutId = window.setTimeout(() => {
+      this.isFishingActive = false;
+      this.aiLocked = false;
+      this.setState('idle');
+
+      if (
+        this.fishCursorEnabledBeforeFishing &&
+        (typeof runtime.getFishStock !== 'function' || runtime.getFishStock() > 0)
+      ) {
+        runtime.setFishCursorEnabled?.(true);
+      }
+
+      if (this.fishingTickIntervalId !== null) {
+        window.clearInterval(this.fishingTickIntervalId);
+        this.fishingTickIntervalId = null;
+      }
+      this.fishingTimeoutId = null;
+      this.fishCursorEnabledBeforeFishing = null;
+      this.tryConsumeNextFoodTarget();
+    }, safeDuration);
+  }
+
+  private updateUmbrellaPosition(): void {
+    if (!this.umbrellaImg) return;
+    const depthScale = this.getDepthScale();
+    const umbrellaSize = this.size * 0.85 * depthScale;
+    const sideOffsetRatio = this.facingRight ? 0.25 : 0.16;
+    const sideOffset = umbrellaSize * sideOffsetRatio * (this.facingRight ? 1 : -1);
+    const left = this.x + this.halfSize - umbrellaSize / 2 + sideOffset;
+    const liftOffset = this.umbrellaLiftOffset || 0;
+    const top = this.y - umbrellaSize * 0.3 - liftOffset;
+
+    this.umbrellaImg.style.width = `${umbrellaSize}px`;
+    this.umbrellaImg.style.left = `${left}px`;
+    this.umbrellaImg.style.top = `${top}px`;
+    this.umbrellaImg.style.zIndex = String(Math.round(11 + ((depthScale - 0.65) / 0.35) * 8));
+
+    const centerX = this.scene.scale.width / 2;
+    const mouseX = Number(this.runtime.mouseX ?? centerX);
+    const tiltMax = 10;
+    const rawTilt = ((mouseX - centerX) / Math.max(1, centerX)) * tiltMax;
+    const tilt = Math.max(-tiltMax, Math.min(tiltMax, rawTilt));
+    this.umbrellaImg.style.setProperty('--umbrella-tilt', `${tilt.toFixed(2)}deg`);
   }
 }

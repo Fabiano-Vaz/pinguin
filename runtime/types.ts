@@ -19,6 +19,10 @@ export type RuntimeEventPayloadMap = {
     enabled: boolean;
     source: 'legacy' | 'phaser' | 'system';
   };
+  'pet:fishing:request': {
+    source: 'legacy' | 'phaser' | 'system';
+    reason: 'hud' | 'auto' | 'manual';
+  };
   'ui:speech:show': {
     text: string;
     x: number;
@@ -76,8 +80,14 @@ export type RuntimeConfig = {
   nonce?: string;
   cssHref?: string;
   isRunnerActive?: boolean;
+  manageRunnerInLegacy?: boolean;
   fishStock?: number;
   isFishCursorEnabled?: boolean;
+  manageHudInPhaser?: boolean;
+  setFishCursorEnabled?: (enabled: boolean) => void;
+  consumeFishStock?: (amount?: number) => boolean;
+  addFishStock?: (amount?: number) => number;
+  getFishStock?: () => number;
   penguinAssets?: Record<string, string>;
   penguinConfig?: {
     size?: number;

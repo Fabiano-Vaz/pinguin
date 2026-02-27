@@ -6,7 +6,6 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.scene.launch('framework:runner', { active: false });
     this.scene.launch('framework:ui');
     this.scene.start('framework:main');
   }

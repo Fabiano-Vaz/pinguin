@@ -77,6 +77,10 @@ export class PetPenguin {
     assets: PetAssetMap,
     config: { size: number; groundRatio: number },
   ) {
+    document.querySelectorAll('[data-pinguin-pet="1"], [data-pinguin-umbrella="1"]').forEach((node) => {
+      node.remove();
+    });
+
     this.assets = assets;
     this.size = Math.max(64, Math.round(config.size || 120));
     this.halfSize = this.size / 2;
@@ -85,6 +89,7 @@ export class PetPenguin {
 
     this.element = document.createElement('div');
     this.element.className = 'penguin';
+    this.element.setAttribute('data-pinguin-pet', '1');
     this.element.style.pointerEvents = 'none';
     this.element.style.width = `${this.size}px`;
     this.element.style.height = `${this.size}px`;
@@ -99,6 +104,7 @@ export class PetPenguin {
       this.umbrellaImg = document.createElement('img');
       this.umbrellaImg.src = this.assets.umbrella;
       this.umbrellaImg.className = 'penguin-umbrella';
+      this.umbrellaImg.setAttribute('data-pinguin-umbrella', '1');
       this.umbrellaImg.draggable = false;
       document.body.appendChild(this.umbrellaImg);
     }
@@ -197,6 +203,16 @@ export class PetPenguin {
   }
 
   applyTransform(flipOverride?: number): void {
+    const allowAir =
+      this.isDragging || this.isFishingActive || this.currentState === 'flying' || this.currentState === 'jumping';
+    this.y = this.clampY(this.y, allowAir);
+    this.targetY = this.clampY(this.targetY, allowAir);
+
+    if (!allowAir && !this.isMoving && !this.currentFoodTarget && !this.isEatingFood) {
+      this.y = this.getWalkMaxY();
+      this.targetY = this.y;
+    }
+
     const flip = typeof flipOverride === 'number' ? flipOverride : this.facingRight ? 1 : -1;
     const depth = this.getDepthScale();
     const scale = this.visualScale * depth;

@@ -3,24 +3,24 @@ import type Phaser from 'phaser';
 export type RuntimeEventPayloadMap = {
   'runner:mode-changed': {
     active: boolean;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'runner:start-request': {
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'runner:stop-request': {
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'hud:fish-stock-changed': {
     count: number;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'cursor:fish-mode-changed': {
     enabled: boolean;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'pet:fishing:request': {
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
     reason: 'hud' | 'auto' | 'manual';
   };
   'ui:speech:show': {
@@ -28,40 +28,40 @@ export type RuntimeEventPayloadMap = {
     x: number;
     y: number;
     durationMs?: number;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:click': {
     x: number;
     y: number;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:snow:burst': {
     x: number;
     y: number;
     count?: number;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:lightning:flash': {
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:lightning:bolt': {
     x: number;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:wind:gust': {
     direction: 1 | -1;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:weather:start-snow': {
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:weather:start-rain': {
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
   'effects:weather:state': {
     snowing: boolean;
     raining: boolean;
-    source: 'legacy' | 'phaser' | 'system';
+    source: 'phaser' | 'system';
   };
 };
 
@@ -80,7 +80,6 @@ export type RuntimeConfig = {
   nonce?: string;
   cssHref?: string;
   isRunnerActive?: boolean;
-  manageRunnerInLegacy?: boolean;
   fishStock?: number;
   isFishCursorEnabled?: boolean;
   manageHudInPhaser?: boolean;

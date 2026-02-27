@@ -7,6 +7,8 @@ export class PetAISystem {
   private behaviorEvent?: Phaser.Time.TimerEvent;
   private cooldownUntil = 0;
   private nextForcedWanderAt = 0;
+  private fallbackWanderElapsedMs = 0;
+  private fallbackWanderDelayMs = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -17,6 +19,7 @@ export class PetAISystem {
 
   init(): void {
     this.nextForcedWanderAt = this.scene.time.now + Phaser.Math.Between(2200, 4200);
+    this.fallbackWanderDelayMs = Phaser.Math.Between(2600, 4600);
     this.behaviorEvent = this.scene.time.addEvent({
       delay: 1200,
       loop: true,
@@ -29,11 +32,30 @@ export class PetAISystem {
     this.behaviorEvent = undefined;
   }
 
-  update(): void {
+  update(deltaMs = 16): void {
     const runtime = this.pet.getRuntime();
     if (runtime.isMouseInsideViewport && Number.isFinite(runtime.mouseX)) {
       this.stateSystem.faceTo(Number(runtime.mouseX));
     }
+
+    // Extension/webview fallback: keep autonomous wandering driven by frame updates,
+    // even if timed events become inconsistent.
+    if (this.pet.isDragging || this.pet.isFishingActive) return;
+    if (this.pet.isEatingFood || this.pet.currentFoodTarget) return;
+    if (this.pet.isMoving) {
+      this.fallbackWanderElapsedMs = 0;
+      return;
+    }
+    if (this.scene.time.now < this.cooldownUntil) return;
+
+    this.fallbackWanderElapsedMs += Math.max(0, Number(deltaMs) || 0);
+    if (this.fallbackWanderElapsedMs < this.fallbackWanderDelayMs) return;
+
+    const target = this.motionSystem.randomTarget(false);
+    this.motionSystem.moveToPosition(target.x + this.pet.displaySize / 2, target.y + this.pet.displaySize / 2, 2.05);
+    this.cooldownUntil = this.scene.time.now + 1000;
+    this.fallbackWanderElapsedMs = 0;
+    this.fallbackWanderDelayMs = Phaser.Math.Between(2600, 4600);
   }
 
   private tickBehavior(): void {

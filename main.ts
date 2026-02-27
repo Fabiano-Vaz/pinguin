@@ -10,7 +10,6 @@ import './css/style.css';
 window.Phaser = Phaser;
 
 const runtime: RuntimeConfig = ensureRuntimeBridge(window.PINGUIN_RUNTIME ?? {});
-runtime.manageRunnerInLegacy = false;
 runtime.manageHudInPhaser = true;
 runtime.isRunnerActive = false;
 installFishEconomy(runtime);

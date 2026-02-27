@@ -20,6 +20,7 @@ export class PetBridgeSystem {
   private fishHudElement?: HTMLDivElement;
   private fishHudCountElement?: HTMLSpanElement;
   private fishHudClickHandler?: (event: MouseEvent) => void;
+  private boundWindowKeydown?: (event: KeyboardEvent) => void;
 
   private readonly eventHandlers: Partial<{
     [K in RuntimeEventName]: RuntimeEventHandler<K>;
@@ -29,6 +30,7 @@ export class PetBridgeSystem {
 
   init(): void {
     this.mountFishHud();
+    this.bindWindowKeyboardShortcuts();
 
     const runtime = this.getRuntime();
     if (!runtime || typeof runtime.onEvent !== 'function') return;
@@ -62,6 +64,7 @@ export class PetBridgeSystem {
 
   destroy(): void {
     this.unmountFishHud();
+    this.unbindWindowKeyboardShortcuts();
 
     const runtime = this.getRuntime();
     if (!runtime || typeof runtime.offEvent !== 'function') return;
@@ -111,41 +114,36 @@ export class PetBridgeSystem {
   private applyRunnerState(isActive: boolean): void {
     const scenePlugin = this.scene.scene;
     const canvas = this.scene.game.canvas;
-    const runtime = this.getRuntime();
-    const hasRunnerScene = Boolean((this.scene.game.scene as unknown as { keys?: Record<string, unknown> }).keys?.['framework:runner']);
-    const isLegacyRunnerManaged = runtime?.manageRunnerInLegacy !== false;
+    const hasRunnerScene = this.hasRunnerSceneRegistered();
     // Keep Phaser canvas visible so UIScene effects (snow/rain/wind/lightning) remain rendered.
-    // Only toggle pointer interaction with runner mode.
+    // Keep pointer interaction enabled so MainScene interactions continue working.
     canvas.style.opacity = '1';
-    canvas.style.pointerEvents = !hasRunnerScene || isLegacyRunnerManaged ? 'none' : isActive ? 'auto' : 'none';
-
-    if (isLegacyRunnerManaged) {
-      if (scenePlugin.isActive('framework:runner')) {
-        scenePlugin.stop('framework:runner');
-      }
-      this.lastRunnerState = isActive;
-      this.scene.registry.set('runner.active', isActive);
-      return;
-    }
+    canvas.style.pointerEvents = 'auto';
 
     if (!hasRunnerScene) {
+      const runtime = this.getRuntime();
       if (runtime) runtime.isRunnerActive = false;
       this.lastRunnerState = false;
       this.scene.registry.set('runner.active', false);
       return;
     }
 
-    if (isActive && !scenePlugin.isActive('framework:runner')) {
-      scenePlugin.launch('framework:runner', { active: true });
+    if (isActive) {
+      if (!scenePlugin.isActive('framework:runner')) {
+        scenePlugin.launch('framework:runner', { active: true });
+      } else {
+        scenePlugin.setVisible(true, 'framework:runner');
+      }
+      this.lastRunnerState = true;
+      this.scene.registry.set('runner.active', true);
+      return;
     }
-
-    if (this.lastRunnerState === isActive) return;
-    this.lastRunnerState = isActive;
 
     if (scenePlugin.isActive('framework:runner')) {
-      scenePlugin.setVisible(isActive, 'framework:runner');
+      scenePlugin.stop('framework:runner');
     }
-    this.scene.registry.set('runner.active', isActive);
+    this.lastRunnerState = false;
+    this.scene.registry.set('runner.active', false);
   }
 
   private applyFishStock(nextFishStock: number): void {
@@ -212,6 +210,33 @@ export class PetBridgeSystem {
     });
   }
 
+  private bindWindowKeyboardShortcuts(): void {
+    this.boundWindowKeydown = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+      const key = event.key.toLowerCase();
+      const runtime = this.getRuntime();
+      const isRunnerActive = Boolean(runtime?.isRunnerActive);
+
+      if (!isRunnerActive && (key === ' ' || key === 'arrowup' || key === 'w')) {
+        event.preventDefault();
+        this.requestRunnerMode(true);
+        return;
+      }
+
+      if (isRunnerActive && key === 'escape') {
+        event.preventDefault();
+        this.requestRunnerMode(false);
+      }
+    };
+    window.addEventListener('keydown', this.boundWindowKeydown);
+  }
+
+  private unbindWindowKeyboardShortcuts(): void {
+    if (!this.boundWindowKeydown) return;
+    window.removeEventListener('keydown', this.boundWindowKeydown);
+    this.boundWindowKeydown = undefined;
+  }
+
   private bind(eventName: RuntimeEventName): void {
     const runtime = this.getRuntime();
     const handler = this.eventHandlers[eventName];
@@ -236,6 +261,15 @@ export class PetBridgeSystem {
     return (window.PenguinPet?.runtime ?? window.PINGUIN_RUNTIME) as
       | (ConnectedRuntime & RuntimeEventApi)
       | undefined;
+  }
+
+  private hasRunnerSceneRegistered(): boolean {
+    try {
+      this.scene.game.scene.getScene('framework:runner');
+      return true;
+    } catch {
+      return false;
+    }
   }
 
 }

@@ -22,9 +22,9 @@ Sistemas de bridge, estado, movimento, interações e IA em Phaser.
 - `runtime/eventBus.ts`
 Padroniza `onEvent/offEvent/emitEvent`.
 - `runtime/types.ts`
-Contrato único de eventos entre legacy e Phaser.
+Contrato único de eventos do runtime Phaser.
 - `main.ts`
-Sobe o framework Phaser e depois injeta compatibilidade legacy.
+Sobe o framework Phaser.
 
 ## Fluxo de Renderização
 

@@ -103,14 +103,23 @@ export class MainScene extends Phaser.Scene {
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.petAISystem.destroy();
+      this.petInteractionsSystem.destroy();
       this.petBridgeSystem.destroy();
       this.pet.destroy();
     });
   }
 
   update(_time: number, delta: number): void {
+    if (this.pet.isDragging && !this.input.activePointer.isDown) {
+      this.pet.isDragging = false;
+      this.pet.setState('idle');
+    }
+    if (this.pet.currentState === 'flying' && !this.pet.isDragging && !this.pet.isFishingActive) {
+      this.pet.setState('idle');
+    }
+
     this.petBridgeSystem.update();
-    this.petAISystem.update();
+    this.petAISystem.update(delta);
     this.petMotionSystem.update(delta);
     this.petStateSystem.update();
   }

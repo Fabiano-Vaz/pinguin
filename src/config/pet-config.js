@@ -145,6 +145,8 @@
     },
     environment: {
       weatherStartDelayMs: 10000,
+      snowStartDelayMs: 40000,
+      rainStartDelayMs: 10000,
       snowActiveDurationMs: 55000,
       snowCooldownDurationMs: 300000,
       snowSpawnIntervalMs: 400,
@@ -185,6 +187,8 @@
       MOUSE_IDLE_TRIGGER_MS: petConfig.mouse.idleTriggerMs,
       MOUSE_IDLE_REACTION_COOLDOWN_MS: petConfig.mouse.idleReactionCooldownMs,
       WEATHER_START_DELAY_MS: petConfig.environment.weatherStartDelayMs,
+      SNOW_START_DELAY_MS: petConfig.environment.snowStartDelayMs,
+      RAIN_START_DELAY_MS: petConfig.environment.rainStartDelayMs,
       SNOW_ACTIVE_DURATION_MS: petConfig.environment.snowActiveDurationMs,
       SNOW_COOLDOWN_DURATION_MS: petConfig.environment.snowCooldownDurationMs,
       SNOW_SPAWN_INTERVAL_MS: petConfig.environment.snowSpawnIntervalMs,

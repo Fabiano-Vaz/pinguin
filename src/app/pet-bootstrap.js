@@ -61,16 +61,24 @@
     const weatherStartDelayMs = Number.isFinite(constants.WEATHER_START_DELAY_MS)
       ? constants.WEATHER_START_DELAY_MS
       : 20000;
+    const snowStartDelayMs = Number.isFinite(constants.SNOW_START_DELAY_MS)
+      ? constants.SNOW_START_DELAY_MS
+      : weatherStartDelayMs;
+    const rainStartDelayMs = Number.isFinite(constants.RAIN_START_DELAY_MS)
+      ? constants.RAIN_START_DELAY_MS
+      : weatherStartDelayMs;
 
     setTimeout(() => {
       if (typeof effects.startSnowCycle === "function") {
         effects.startSnowCycle();
       }
+    }, Math.max(0, snowStartDelayMs));
 
+    setTimeout(() => {
       if (typeof effects.startRainCycle === "function") {
         effects.startRainCycle();
       }
-    }, Math.max(0, weatherStartDelayMs));
+    }, Math.max(0, rainStartDelayMs));
   };
 
   window.PenguinPetModules = {

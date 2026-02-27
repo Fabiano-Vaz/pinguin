@@ -166,13 +166,19 @@
           this.stopWaddleSteps();
           this.setVisualState("default");
           this.applyTransform();
-          const droppedList = (phrases && phrases.dropped) || [
-            "Se me jogar novamente eu não volto",
-          ];
-          this.showSpeech(
-            droppedList[Math.floor(Math.random() * droppedList.length)],
-            3200,
-          );
+          const droppedList =
+            Array.isArray(phrases && phrases.dropped) &&
+            phrases.dropped.length > 0
+              ? phrases.dropped
+              : Array.isArray(phrases && phrases.idle)
+                ? phrases.idle
+                : [];
+          if (droppedList.length > 0) {
+            this.showSpeech(
+              droppedList[Math.floor(Math.random() * droppedList.length)],
+              3200,
+            );
+          }
 
           setTimeout(() => {
             this.aiLocked = false;

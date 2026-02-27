@@ -5,7 +5,7 @@
   function createParticle(x, y) {
     const particle = document.createElement("div");
     particle.className = "particle";
-    particle.textContent = ["❄️", "🧊", "❄️"][Math.floor(Math.random() * 3)];
+    particle.textContent = ["❄️"][Math.floor(Math.random() * 3)];
     particle.style.left = x + (Math.random() - 0.5) * 100 + "px";
     particle.style.top = y + (Math.random() - 0.5) * 100 + "px";
     particle.style.fontSize = Math.random() * 20 + 12 + "px";
@@ -69,10 +69,6 @@
         fish.style.top = `${landedY}px`;
       });
 
-      setTimeout(() => {
-        if (fish.isConnected) fish.remove();
-      }, 14000);
-
       targets.push({
         element: fish,
         x: landedX,
@@ -97,6 +93,7 @@
 
   let snowSpawnIntervalId = null;
   let snowCooldownTimeoutId = null;
+  let snowActiveTimeoutId = null;
 
   function createRainDrop() {
     const drop = document.createElement("div");
@@ -114,18 +111,52 @@
 
   let rainSpawnIntervalId = null;
   let rainCooldownTimeoutId = null;
+  let rainActiveTimeoutId = null;
   const WEATHER_RETRY_DELAY_MS = 5000;
+
+  function stopSnowCycle(clearVisuals = false) {
+    if (snowSpawnIntervalId !== null) {
+      clearInterval(snowSpawnIntervalId);
+      snowSpawnIntervalId = null;
+    }
+    if (snowCooldownTimeoutId !== null) {
+      clearTimeout(snowCooldownTimeoutId);
+      snowCooldownTimeoutId = null;
+    }
+    if (snowActiveTimeoutId !== null) {
+      clearTimeout(snowActiveTimeoutId);
+      snowActiveTimeoutId = null;
+    }
+    if (clearVisuals) {
+      document.querySelectorAll(".particle").forEach((el) => el.remove());
+    }
+  }
+
+  function stopRainCycle(clearVisuals = false) {
+    if (rainSpawnIntervalId !== null) {
+      clearInterval(rainSpawnIntervalId);
+      rainSpawnIntervalId = null;
+    }
+    if (rainCooldownTimeoutId !== null) {
+      clearTimeout(rainCooldownTimeoutId);
+      rainCooldownTimeoutId = null;
+    }
+    if (rainActiveTimeoutId !== null) {
+      clearTimeout(rainActiveTimeoutId);
+      rainActiveTimeoutId = null;
+    }
+    if (clearVisuals) {
+      document.querySelectorAll(".rain-drop").forEach((el) => el.remove());
+    }
+    const p = window.PenguinPet && window.PenguinPet.penguin;
+    if (p && typeof p.hideUmbrella === "function") {
+      p.hideUmbrella();
+    }
+  }
 
   function startRainCycle() {
     if (rainSpawnIntervalId !== null) return;
-    if (snowSpawnIntervalId !== null) {
-      if (rainCooldownTimeoutId !== null) clearTimeout(rainCooldownTimeoutId);
-      rainCooldownTimeoutId = setTimeout(
-        startRainCycle,
-        WEATHER_RETRY_DELAY_MS,
-      );
-      return;
-    }
+    if (snowSpawnIntervalId !== null) stopSnowCycle(true);
 
     const penguin = window.PenguinPet && window.PenguinPet.penguin;
     if (penguin && typeof penguin.showUmbrella === "function") {
@@ -137,7 +168,8 @@
       constants.RAIN_SPAWN_INTERVAL_MS,
     );
 
-    setTimeout(() => {
+    rainActiveTimeoutId = setTimeout(() => {
+      rainActiveTimeoutId = null;
       if (rainSpawnIntervalId !== null) {
         clearInterval(rainSpawnIntervalId);
         rainSpawnIntervalId = null;
@@ -156,21 +188,15 @@
 
   function startSnowCycle() {
     if (snowSpawnIntervalId !== null) return;
-    if (rainSpawnIntervalId !== null) {
-      if (snowCooldownTimeoutId !== null) clearTimeout(snowCooldownTimeoutId);
-      snowCooldownTimeoutId = setTimeout(
-        startSnowCycle,
-        WEATHER_RETRY_DELAY_MS,
-      );
-      return;
-    }
+    if (rainSpawnIntervalId !== null) stopRainCycle(true);
 
     snowSpawnIntervalId = setInterval(
       createBackgroundParticles,
       constants.SNOW_SPAWN_INTERVAL_MS,
     );
 
-    setTimeout(() => {
+    snowActiveTimeoutId = setTimeout(() => {
+      snowActiveTimeoutId = null;
       if (snowSpawnIntervalId !== null) {
         clearInterval(snowSpawnIntervalId);
         snowSpawnIntervalId = null;
@@ -198,7 +224,7 @@
     for (let i = 0; i < count; i += 1) {
       const p = document.createElement("div");
       p.className = "particle";
-      p.textContent = ["❄️", "🧊", "❄️", "❄️"][Math.floor(Math.random() * 4)];
+      p.textContent = ["❄️", "❄️"][Math.floor(Math.random() * 2)];
       p.style.left = x + (Math.random() - 0.5) * 120 + "px";
       p.style.top = y + (Math.random() - 0.5) * 60 + "px";
       p.style.fontSize = Math.random() * 18 + 10 + "px";

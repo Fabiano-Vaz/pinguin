@@ -147,6 +147,15 @@
         return;
       }
 
+      if (this.isFishingActive) {
+        this.customMotion = null;
+        this.isMoving = false;
+        this.isChasing = false;
+        this.allowAirMovement = false;
+        this.targetX = this.x;
+        this.targetY = this.y;
+      }
+
       if (this.customMotion) {
         this.updateCustomMotion(dtSeconds);
         if (this.customMotion && this.customMotion.type === "walkAwayExit") {

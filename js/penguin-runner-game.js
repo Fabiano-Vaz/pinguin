@@ -21,40 +21,16 @@
     flying: resolveSprite("flying", "assets/pinguin voando.svg"),
     caveirinha: resolveSprite("caveirinha", "assets/pinguin caveirinha.svg"),
   };
-  const configuredBackgroundImage =
-    window.PENGUIN_CONFIG &&
-    typeof window.PENGUIN_CONFIG.backgroundImage === "string"
-      ? window.PENGUIN_CONFIG.backgroundImage
-      : "";
-  const runnerBackgroundLightImage = resolveSprite(
-    "runnerBackground",
-    "assets/backgroung.png",
+  const runnerBackgroundDarkBImage = resolveSprite(
+    "runnerBackgroundDarkB",
+    "assets/backgroung-darkB.png",
   );
-  const runnerBackgroundDarkImage = (() => {
-    if (configuredBackgroundImage && configuredBackgroundImage.length > 0) {
-      if (configuredBackgroundImage.indexOf("backgroung.png") !== -1) {
-        return configuredBackgroundImage.replace(
-          "backgroung.png",
-          "backgroung-dark.png",
-        );
-      }
-      return configuredBackgroundImage;
-    }
-
-    if (runnerBackgroundLightImage.indexOf("backgroung.png") !== -1) {
-      return runnerBackgroundLightImage.replace(
-        "backgroung.png",
-        "backgroung-dark.png",
-      );
-    }
-
-    return "assets/backgroung-dark.png";
-  })();
+  const snowmanObstacleImage = resolveSprite("snowman", "assets/snowman.svg");
   const helicopterVariants = [
     {
       key: "A",
       src: resolveSprite("helicopterA", "assets/helicopterA.gif"),
-      scale: 5,
+      scale: 4,
       hitboxInsetRatios: {
         left: 0.28,
         right: 0.5,
@@ -75,6 +51,9 @@
     },
   ];
   const RUNNER_PENGUIN_VISUAL_OFFSET_Y = 10;
+  const DEBUG = false;
+  const RUNNER_BACKGROUND_SCROLL_SPEED_PX_PER_SEC = 8;
+  const RUNNER_GROUND_DECOR_SCROLL_SPEED_PX_PER_SEC = 180;
 
   const STORAGE_KEY_BEST_SCORE = "pinguinRunnerBestScore";
 
@@ -124,9 +103,11 @@
     fishRain: [],
     nextHelicopterIndex: 0,
     nextFishDropScore: 100,
-    currentRunnerBackground: "",
+    backgroundScrollX: 0,
     fishCursorWasEnabledClass: false,
     fishCursorWasEnabledRuntime: null,
+    debugLastCollisionAt: 0,
+    debugCollisionHideTimeoutId: 0,
     penguin: {
       x: 0,
       y: 0,
@@ -185,6 +166,8 @@
   transitionOverlay.style.pointerEvents = "none";
   transitionOverlay.style.background = "#000000";
   transitionOverlay.style.opacity = "0";
+  const debugCollisionDot = document.createElement("div");
+  debugCollisionDot.className = "runner-debug-collision-dot";
 
   stage.appendChild(hud);
   stage.appendChild(hint);
@@ -192,6 +175,7 @@
   stage.appendChild(penguinEl);
   stage.appendChild(ground);
   stage.appendChild(transitionOverlay);
+  stage.appendChild(debugCollisionDot);
   document.body.appendChild(stage);
 
   const getPlayfieldHeight = () => Math.floor(window.innerHeight * 0.78);
@@ -309,32 +293,27 @@
   };
 
   const clearGroundDecor = () => {
-    game.groundDecor.forEach((piece) => piece.remove());
+    game.groundDecor.forEach((piece) => piece.el.remove());
     game.groundDecor = [];
   };
 
-  const updateRunnerBackgroundByScore = (force = false) => {
-    const scoreBand = Math.floor(game.score / 500);
-    const useLightBackground = scoreBand % 2 === 1;
-    const nextBackground = useLightBackground
-      ? runnerBackgroundLightImage
-      : runnerBackgroundDarkImage;
-
-    if (!force && game.currentRunnerBackground === nextBackground) return;
-
-    stage.style.backgroundImage = `url("${nextBackground}")`;
-    game.currentRunnerBackground = nextBackground;
+  const updateRunnerBackgroundMotion = (deltaMs = 0) => {
+    if (deltaMs > 0 && !game.isGameOver) {
+      game.backgroundScrollX +=
+        RUNNER_BACKGROUND_SCROLL_SPEED_PX_PER_SEC * (deltaMs / 1000);
+    }
+    stage.style.backgroundPosition = `${(-game.backgroundScrollX).toFixed(1)}px bottom`;
   };
 
   const updateGroundPresentation = () => {
     const groundLineY = getGroundLineY();
     ground.style.top = `${groundLineY}px`;
 
-    updateRunnerBackgroundByScore(true);
+    stage.style.backgroundImage = `url("${runnerBackgroundDarkBImage}")`;
     stage.style.backgroundColor = "#1c2b56";
-    stage.style.backgroundSize = "cover";
-    stage.style.backgroundPosition = "center bottom";
-    stage.style.backgroundRepeat = "no-repeat";
+    stage.style.backgroundSize = "auto 100%";
+    updateRunnerBackgroundMotion();
+    stage.style.backgroundRepeat = "repeat-x";
   };
 
   const createGroundDecor = () => {
@@ -356,10 +335,27 @@
       piece.style.width = `${w}px`;
       piece.style.height = `${h}px`;
       piece.style.left = `${x}px`;
-      piece.style.top = `${baseline + 8 + Math.random() * 16}px`;
+      const y = baseline + 8 + Math.random() * 16;
+      piece.style.top = `${y}px`;
       stage.appendChild(piece);
-      game.groundDecor.push(piece);
+      game.groundDecor.push({ el: piece, x, y, width: w });
     }
+  };
+
+  const updateGroundDecorMotion = (deltaMs) => {
+    if (!game.groundDecor.length) return;
+    const dt = deltaMs / 1000;
+    const width = window.innerWidth;
+
+    game.groundDecor.forEach((piece) => {
+      piece.x -= RUNNER_GROUND_DECOR_SCROLL_SPEED_PX_PER_SEC * dt;
+
+      if (piece.x + piece.width < -8) {
+        piece.x = width + Math.random() * 80;
+      }
+
+      piece.el.style.left = `${Math.round(piece.x)}px`;
+    });
   };
 
   const difficultyLevel = () => {
@@ -380,16 +376,16 @@
       color:
         "linear-gradient(180deg, rgba(244,252,255,0.97), rgba(145,214,236,0.86))",
     },
-    icebergWide: {
-      id: "icebergWide",
-      minWidth: 54,
-      maxWidth: 88,
-      minHeight: 14,
-      maxHeight: 26,
+    snowman: {
+      id: "snowman",
+      minWidth: 56,
+      maxWidth: 78,
+      minHeight: 64,
+      maxHeight: 94,
       topOffset: 9,
       requiresCrouch: false,
       color:
-        "linear-gradient(180deg, rgba(243,252,255,0.98), rgba(161,220,241,0.84))",
+        "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(231,241,252,0.94))",
     },
     icebergJagged: {
       id: "icebergJagged",
@@ -413,17 +409,6 @@
       color:
         "linear-gradient(180deg, rgba(244,252,255,0.98), rgba(125,196,224,0.9))",
     },
-    icebergFlat: {
-      id: "icebergFlat",
-      minWidth: 62,
-      maxWidth: 96,
-      minHeight: 18,
-      maxHeight: 30,
-      topOffset: 9,
-      requiresCrouch: false,
-      color:
-        "linear-gradient(180deg, rgba(241,251,255,0.98), rgba(167,224,243,0.84))",
-    },
     airplane: {
       id: "airplane",
       minWidth: 52,
@@ -433,7 +418,7 @@
       topOffset: -52,
       requiresCrouch: true,
       color:
-        "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(167,220,255,0.82))",
+        "transparent",
     },
   };
 
@@ -441,12 +426,12 @@
     const level = difficultyLevel();
     const roll = Math.random();
 
-    if (level >= 1.5 && roll > 0.8) return obstacleTemplates.airplane;
-    if (roll > 0.78) return obstacleTemplates.icebergSpire;
-    if (roll > 0.62) return obstacleTemplates.icebergJagged;
-    if (roll > 0.42) return obstacleTemplates.icebergTall;
-    if (roll > 0.2) return obstacleTemplates.icebergWide;
-    return obstacleTemplates.icebergFlat;
+    if (level >= 1.5 && roll < 0.2) return obstacleTemplates.airplane;
+    if (level >= 1.5 && roll < 0.4) return obstacleTemplates.snowman;
+    if (level < 1.5 && roll < 0.4) return obstacleTemplates.snowman;
+    if (roll < 0.6) return obstacleTemplates.icebergTall;
+    if (roll < 0.8) return obstacleTemplates.icebergJagged;
+    return obstacleTemplates.icebergSpire;
   };
 
   const createObstacleVisual = (el, template, width, height) => {
@@ -458,6 +443,7 @@
     if (template.id === "airplane") {
       el.classList.add("runner-obstacle--airplane");
       el.style.background = "transparent";
+      el.style.border = "none";
       el.style.boxShadow = "none";
       el.style.overflow = "visible";
       const heliImg = document.createElement("img");
@@ -527,10 +513,17 @@
       return;
     }
 
-    if (template.id === "icebergFlat") {
-      el.style.clipPath =
-        "polygon(0% 100%, 4% 70%, 20% 48%, 43% 40%, 66% 44%, 88% 60%, 100% 76%, 100% 100%)";
-      el.style.borderRadius = "10px";
+    if (template.id === "snowman") {
+      el.classList.add("runner-obstacle--snowman");
+      el.style.background = "transparent";
+      el.style.border = "none";
+      el.style.boxShadow = "none";
+      const snowmanImg = document.createElement("img");
+      snowmanImg.className = "runner-snowman";
+      snowmanImg.src = snowmanObstacleImage;
+      snowmanImg.alt = "snowman";
+      snowmanImg.draggable = false;
+      el.appendChild(snowmanImg);
       return;
     }
 
@@ -605,9 +598,37 @@
     );
   };
 
+  const showDebugCollisionDot = (a, b) => {
+    if (!DEBUG) return;
+
+    const overlapLeft = Math.max(a.x, b.x);
+    const overlapTop = Math.max(a.y, b.y);
+    const overlapRight = Math.min(a.x + a.width, b.x + b.width);
+    const overlapBottom = Math.min(a.y + a.height, b.y + b.height);
+    const hasOverlap = overlapRight > overlapLeft && overlapBottom > overlapTop;
+
+    const centerX = hasOverlap
+      ? overlapLeft + (overlapRight - overlapLeft) / 2
+      : b.x + b.width / 2;
+    const centerY = hasOverlap
+      ? overlapTop + (overlapBottom - overlapTop) / 2
+      : b.y + b.height / 2;
+
+    debugCollisionDot.style.left = `${Math.round(centerX)}px`;
+    debugCollisionDot.style.top = `${Math.round(centerY)}px`;
+    debugCollisionDot.classList.add("is-visible");
+
+    if (game.debugCollisionHideTimeoutId) {
+      clearTimeout(game.debugCollisionHideTimeoutId);
+    }
+    game.debugCollisionHideTimeoutId = setTimeout(() => {
+      debugCollisionDot.classList.remove("is-visible");
+      game.debugCollisionHideTimeoutId = 0;
+    }, 160);
+  };
+
   const getObstacleHitbox = (obstacle) => {
-    const isHelicopter = obstacle.id === "airplane";
-    if (isHelicopter) {
+    if (obstacle.id === "airplane") {
       const helicopterEl = obstacle.el.querySelector(".runner-helicopter");
       if (helicopterEl) {
         const rect = helicopterEl.getBoundingClientRect();
@@ -626,6 +647,17 @@
           height: Math.max(8, rect.height - insetTop - insetBottom),
         };
       }
+    }
+
+    if (obstacle.id === "snowman") {
+      const insetX = Math.round(obstacle.width * 0.22);
+      const insetY = Math.round(obstacle.height * 0.18);
+      return {
+        x: obstacle.x + insetX,
+        y: obstacle.y + insetY,
+        width: Math.max(8, obstacle.width - insetX * 2),
+        height: Math.max(8, obstacle.height - insetY * 2),
+      };
     }
 
     const horizontalInsetRatio = obstacle.requiresCrouch ? 0.16 : 0.12;
@@ -807,10 +839,16 @@
         game.score += obstacle.requiresCrouch ? 7 : 5;
       }
 
-      if (
-        !game.isGameOver &&
-        hasCollision(penguinBox, getObstacleHitbox(obstacle))
-      ) {
+      const obstacleHitbox = getObstacleHitbox(obstacle);
+      if (!game.isGameOver && hasCollision(penguinBox, obstacleHitbox)) {
+        if (DEBUG) {
+          const now = performance.now();
+          if (now - game.debugLastCollisionAt > 80) {
+            showDebugCollisionDot(penguinBox, obstacleHitbox);
+            game.debugLastCollisionAt = now;
+          }
+          continue;
+        }
         endGame();
         return;
       }
@@ -825,9 +863,13 @@
   const updateDifficultyAndSpawns = (deltaMs) => {
     game.worldTimeMs += deltaMs;
     game.score += (deltaMs / 1000) * 10;
-    updateRunnerBackgroundByScore();
     while (game.score >= game.nextFishDropScore) {
       spawnScoreFishDrop();
+      const runtime =
+        (window.PenguinPet && window.PenguinPet.runtime) || pet.runtime;
+      if (runtime && typeof runtime.addFishStock === "function") {
+        runtime.addFishStock(1);
+      }
       game.nextFishDropScore += 100;
     }
 
@@ -868,6 +910,8 @@
 
     updatePenguin(deltaMs);
     updateObstacles(deltaMs);
+    updateRunnerBackgroundMotion(deltaMs);
+    updateGroundDecorMotion(deltaMs);
     renderHud();
 
     requestAnimationFrame(frame);
@@ -876,6 +920,7 @@
   const resetRound = () => {
     clearObstacles();
     clearFishRain();
+    game.backgroundScrollX = 0;
     updateGroundPresentation();
     createGroundDecor();
 
@@ -885,9 +930,14 @@
     game.spawnTimerMs = 860;
     game.lastFrameAt = 0;
     game.worldTimeMs = 0;
-    game.nextFishDropScore = 100;
     game.nextHelicopterIndex = 0;
-    game.currentRunnerBackground = "";
+    game.nextFishDropScore = 100;
+    game.debugLastCollisionAt = 0;
+    if (game.debugCollisionHideTimeoutId) {
+      clearTimeout(game.debugCollisionHideTimeoutId);
+      game.debugCollisionHideTimeoutId = 0;
+    }
+    debugCollisionDot.classList.remove("is-visible");
 
     game.penguin.velocityY = 0;
     game.penguin.isJumping = false;
@@ -910,6 +960,11 @@
     game.isGameOver = false;
     game.penguin.isJumpPressed = false;
     game.penguin.isCrouching = false;
+    if (game.debugCollisionHideTimeoutId) {
+      clearTimeout(game.debugCollisionHideTimeoutId);
+      game.debugCollisionHideTimeoutId = 0;
+    }
+    debugCollisionDot.classList.remove("is-visible");
     setRunnerMode(false);
     penguinEl.style.animation = "";
     message.textContent = "";

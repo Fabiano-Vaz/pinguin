@@ -1,15 +1,274 @@
 (() => {
   const pet = window.PenguinPet || {};
   const constants = pet.constants || {};
+  const phrases = pet.phrases || {};
   const runtime = pet.runtime || {};
   const Penguin = pet.Penguin;
   const effects = pet.effects || {};
-  const FISH_THROW_STREAK_LIMIT = 7;
-  const FISH_THROW_STREAK_GAP_MS = 900;
-  const FISH_THROW_COOLDOWN_MS = 3 * 60 * 1000;
-  let fishThrowStreak = 0;
-  let lastFishThrowClickAt = 0;
-  let fishThrowBlockedUntil = 0;
+  const INITIAL_FISH_STOCK = 5;
+  const NO_FISH_TANTRUM_MIN_MS = 8000;
+  const NO_FISH_TANTRUM_MAX_MS = 16000;
+  const NO_FISH_AUTO_FISH_DELAY_MS = 10000;
+  let remainingFish = INITIAL_FISH_STOCK;
+  let fishStockCountEl = null;
+  let lastFishWarningLevel = null;
+  let noFishTantrumTimeoutId = null;
+  let noFishAutoFishingTimeoutId = null;
+
+  const hasUneatenFishOnGround = () =>
+    Boolean(document.querySelector(".food-fish-drop:not(.eaten)"));
+
+  const getPhraseList = (key, fallbackKey = "idle") => {
+    const candidate = phrases && phrases[key];
+    if (Array.isArray(candidate) && candidate.length > 0) return candidate;
+    const fallback = phrases && phrases[fallbackKey];
+    return Array.isArray(fallback) ? fallback : [];
+  };
+
+  const pickRandomLine = (lines) => {
+    if (!Array.isArray(lines) || lines.length === 0) return "";
+    return lines[Math.floor(Math.random() * lines.length)];
+  };
+
+  const speakFishStatus = (text) => {
+    if (!text) return;
+    const currentPenguin =
+      window.PenguinPet && window.PenguinPet.penguin
+        ? window.PenguinPet.penguin
+        : null;
+    if (!currentPenguin || typeof currentPenguin.showSpeech !== "function") {
+      return;
+    }
+    currentPenguin.showSpeech(text, 2600, false);
+  };
+
+  const announceFishIfNeeded = () => {
+    if (remainingFish === lastFishWarningLevel) return;
+
+    if (remainingFish === 0) {
+      lastFishWarningLevel = 0;
+      speakFishStatus(pickRandomLine(getPhraseList("fishEmpty")));
+      return;
+    }
+
+    if (remainingFish === 1) {
+      lastFishWarningLevel = 1;
+      speakFishStatus(pickRandomLine(getPhraseList("fishLast")));
+      return;
+    }
+
+    if (remainingFish <= 3) {
+      lastFishWarningLevel = remainingFish;
+      speakFishStatus(pickRandomLine(getPhraseList("fishLow")));
+    }
+  };
+
+  const complainNoFishOnClick = () => {
+    if (hasUneatenFishOnGround()) return;
+    const currentPenguin =
+      window.PenguinPet && window.PenguinPet.penguin
+        ? window.PenguinPet.penguin
+        : null;
+    if (!currentPenguin || typeof currentPenguin.showSpeech !== "function") {
+      return;
+    }
+    currentPenguin.showSpeech(
+      pickRandomLine(getPhraseList("fishRage", "angry")),
+      2200,
+      false,
+    );
+    if (typeof currentPenguin.setState === "function") {
+      currentPenguin.setState("angry");
+      setTimeout(() => {
+        if (typeof currentPenguin.setState === "function") {
+          currentPenguin.setState("idle");
+        }
+      }, 900);
+    }
+  };
+
+  const clearNoFishTantrum = () => {
+    if (noFishTantrumTimeoutId) {
+      clearTimeout(noFishTantrumTimeoutId);
+      noFishTantrumTimeoutId = null;
+    }
+  };
+
+  const clearNoFishAutoFishing = () => {
+    if (noFishAutoFishingTimeoutId) {
+      clearTimeout(noFishAutoFishingTimeoutId);
+      noFishAutoFishingTimeoutId = null;
+    }
+  };
+
+  const getNoFishTantrumDelay = () =>
+    Math.round(
+      NO_FISH_TANTRUM_MIN_MS +
+        Math.random() * (NO_FISH_TANTRUM_MAX_MS - NO_FISH_TANTRUM_MIN_MS),
+    );
+
+  const scheduleNoFishTantrum = () => {
+    clearNoFishTantrum();
+    if (remainingFish > 0) return;
+
+    noFishTantrumTimeoutId = setTimeout(() => {
+      noFishTantrumTimeoutId = null;
+
+      if (remainingFish > 0) return;
+      if (document.body && document.body.classList.contains("runner-mode")) {
+        scheduleNoFishTantrum();
+        return;
+      }
+
+      const currentPenguin =
+        window.PenguinPet && window.PenguinPet.penguin
+          ? window.PenguinPet.penguin
+          : null;
+      if (!currentPenguin || !currentPenguin.element) {
+        scheduleNoFishTantrum();
+        return;
+      }
+      if (
+        currentPenguin.isDragging ||
+        currentPenguin.isWalkingAway ||
+        currentPenguin.isRanting ||
+        currentPenguin.isEatingFood ||
+        currentPenguin.currentFoodTarget
+      ) {
+        scheduleNoFishTantrum();
+        return;
+      }
+      if (hasUneatenFishOnGround()) {
+        scheduleNoFishTantrum();
+        return;
+      }
+
+      if (typeof currentPenguin.showSpeech === "function") {
+        currentPenguin.showSpeech(
+          pickRandomLine(getPhraseList("fishRage", "angry")),
+          2200,
+          false,
+        );
+      }
+      if (typeof currentPenguin.setState === "function") {
+        currentPenguin.setState("angry");
+      }
+      currentPenguin.element.style.animation = "bounce 0.45s ease 2";
+      setTimeout(() => {
+        if (currentPenguin.element) {
+          currentPenguin.element.style.animation = "";
+        }
+        if (
+          typeof currentPenguin.setState === "function" &&
+          !currentPenguin.isMoving
+        ) {
+          currentPenguin.setState("idle");
+        }
+      }, 980);
+
+      scheduleNoFishTantrum();
+    }, getNoFishTantrumDelay());
+  };
+
+  const tryStartNoFishAutoFishing = () => {
+    noFishAutoFishingTimeoutId = null;
+    if (remainingFish > 0) return;
+    if (document.body && document.body.classList.contains("runner-mode")) {
+      scheduleNoFishAutoFishing();
+      return;
+    }
+
+    const currentPenguin =
+      window.PenguinPet && window.PenguinPet.penguin
+        ? window.PenguinPet.penguin
+        : null;
+    if (
+      !currentPenguin ||
+      typeof currentPenguin.runNextStep !== "function" ||
+      currentPenguin.isDragging ||
+      currentPenguin.isWalkingAway ||
+      currentPenguin.isRanting ||
+      currentPenguin.isEatingFood ||
+      currentPenguin.currentFoodTarget
+    ) {
+      scheduleNoFishAutoFishing();
+      return;
+    }
+
+    currentPenguin.aiLocked = true;
+    currentPenguin.stepQueue = [{ type: "act", state: "fishing", duration: 15000 }];
+    currentPenguin.runNextStep();
+  };
+
+  const scheduleNoFishAutoFishing = () => {
+    clearNoFishAutoFishing();
+    if (remainingFish > 0) return;
+    noFishAutoFishingTimeoutId = setTimeout(
+      tryStartNoFishAutoFishing,
+      NO_FISH_AUTO_FISH_DELAY_MS,
+    );
+  };
+
+  const updateFishStockHud = () => {
+    if (!fishStockCountEl) return;
+    fishStockCountEl.textContent = String(Math.max(0, remainingFish));
+  };
+
+  const mountFishStockHud = () => {
+    if (!document.body) return;
+    const hud = document.createElement("div");
+    hud.className = "fish-stock-hud";
+
+    const icon = document.createElement("span");
+    icon.className = "fish-stock-icon";
+    icon.textContent = "🐟";
+
+    const count = document.createElement("span");
+    count.className = "fish-stock-count";
+
+    hud.appendChild(icon);
+    hud.appendChild(count);
+    hud.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const currentPenguin =
+        window.PenguinPet && window.PenguinPet.penguin
+          ? window.PenguinPet.penguin
+          : null;
+      if (!currentPenguin) return;
+
+      if (typeof currentPenguin.showSpeech === "function") {
+        currentPenguin.showSpeech("Ta me mandando ir pescar éh!?", 2600, false);
+      }
+
+      if (
+        currentPenguin.isDragging ||
+        currentPenguin.isWalkingAway ||
+        currentPenguin.isRanting
+      ) {
+        return;
+      }
+
+      if (currentPenguin.currentState === "fishing" || currentPenguin.isFishingActive) {
+        return;
+      }
+
+      if (currentPenguin.nextBehaviorTimeoutId) {
+        clearTimeout(currentPenguin.nextBehaviorTimeoutId);
+        currentPenguin.nextBehaviorTimeoutId = null;
+      }
+
+      currentPenguin.aiLocked = true;
+      currentPenguin.stepQueue = [{ type: "act", state: "fishing", duration: 15000 }];
+      if (typeof currentPenguin.runNextStep === "function") {
+        currentPenguin.runNextStep();
+      }
+    });
+    document.body.appendChild(hud);
+    fishStockCountEl = count;
+    updateFishStockHud();
+  };
 
   const applyFishCursorState = () => {
     if (!document.body) return;
@@ -20,9 +279,40 @@
   };
 
   runtime.setFishCursorEnabled = (enabled) => {
-    runtime.isFishCursorEnabled = Boolean(enabled);
+    const wantsEnabled = Boolean(enabled);
+    runtime.isFishCursorEnabled = wantsEnabled && remainingFish > 0;
     applyFishCursorState();
   };
+
+  runtime.consumeFishStock = (amount = 1) => {
+    const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
+    if (remainingFish < safeAmount) return false;
+    remainingFish -= safeAmount;
+    runtime.fishStock = remainingFish;
+    updateFishStockHud();
+    announceFishIfNeeded();
+    if (remainingFish <= 0) {
+      runtime.setFishCursorEnabled(false);
+      scheduleNoFishTantrum();
+      scheduleNoFishAutoFishing();
+    }
+    return true;
+  };
+
+  runtime.addFishStock = (amount = 1) => {
+    const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
+    remainingFish += safeAmount;
+    runtime.fishStock = remainingFish;
+    updateFishStockHud();
+    clearNoFishTantrum();
+    clearNoFishAutoFishing();
+    if (runtime.isFishCursorEnabled === false && remainingFish > 0) {
+      runtime.setFishCursorEnabled(true);
+    }
+    return remainingFish;
+  };
+
+  runtime.getFishStock = () => remainingFish;
 
   if (typeof document !== "undefined" && document.body) {
     const backgroundTargetElements = [document.documentElement, document.body];
@@ -46,6 +336,12 @@
   }
 
   applyFishCursorState();
+  mountFishStockHud();
+  runtime.fishStock = remainingFish;
+  if (remainingFish <= 0) {
+    scheduleNoFishTantrum();
+    scheduleNoFishAutoFishing();
+  }
 
   const penguin = new Penguin();
   window.PenguinPet = {
@@ -89,6 +385,12 @@
   let lastWindAt = 0;
 
   function detectMouseShake(x, y) {
+    const currentPenguin =
+      window.PenguinPet && window.PenguinPet.penguin
+        ? window.PenguinPet.penguin
+        : null;
+    if (currentPenguin && currentPenguin.isFishingActive) return;
+
     const now = Date.now();
     shakeSamples.push({ x, y, t: now });
     // Manter apenas amostras dentro da janela
@@ -120,6 +422,8 @@
   }
 
   document.addEventListener("click", (e) => {
+    if (penguin && penguin.isFishingActive) return;
+
     if (typeof penguin.onScreenClick === "function") {
       penguin.onScreenClick();
     }
@@ -196,24 +500,14 @@
     // --- Comportamento padrão: joga peixe ---
     if (typeof effects.createFoodDrops !== "function") return;
     if (typeof penguin.enqueueFoodTargets !== "function") return;
-    const now = Date.now();
-    if (now < fishThrowBlockedUntil) return;
-
-    if (now - lastFishThrowClickAt <= FISH_THROW_STREAK_GAP_MS) {
-      fishThrowStreak += 1;
-    } else {
-      fishThrowStreak = 1;
+    if (typeof runtime.consumeFishStock !== "function") return;
+    if (!runtime.consumeFishStock(1)) {
+      complainNoFishOnClick();
+      return;
     }
-    lastFishThrowClickAt = now;
 
-    const targets = effects.createFoodDrops(e.clientX, e.clientY, 2);
+    const targets = effects.createFoodDrops(e.clientX, e.clientY, 1);
     penguin.enqueueFoodTargets(targets);
-
-    if (fishThrowStreak >= FISH_THROW_STREAK_LIMIT) {
-      fishThrowBlockedUntil = now + FISH_THROW_COOLDOWN_MS;
-      fishThrowStreak = 0;
-      lastFishThrowClickAt = 0;
-    }
   });
 
   if (typeof effects.startSnowCycle === "function") {

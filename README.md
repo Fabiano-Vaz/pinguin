@@ -7,6 +7,7 @@ Um pinguim interativo no painel **Explorer** do VS Code, com IA de comportamento
 ### 🎭 Estados visuais do pinguim
 
 - Idle (sentado)
+- Pescando no gelo
 - Correndo
 - Correndo abaixado (durante caça de peixe no chão)
 - Pulando
@@ -25,6 +26,8 @@ Um pinguim interativo no painel **Explorer** do VS Code, com IA de comportamento
 - Voando
 - De costas
 - Caveirinha
+- Animações refinadas de pesca (vara, linha, boia, batida de pé e olhos semicerrados)
+- Animação de comer peixe com consumo visual único (não reaparece no mesmo ciclo)
 
 ### 🧠 Comportamento e interações
 
@@ -36,7 +39,14 @@ Um pinguim interativo no painel **Explorer** do VS Code, com IA de comportamento
 - Modo de reclamação após spam de cliques
 - Queda de peixe e prioridade automática para caça/comida
 - Cursor de peixe com lógica de “comer cursor”
+- Estoque de peixe com HUD, consumo e reposição em runtime
+- Frases de fome/contexto sem peixe (inclui convite para jogar e ganhar peixe)
+- Ação de pesca com duração de 30s e ganho progressivo (+1 peixe a cada 10s)
+- Sem peixe: 90% de chance de priorizar pesca no próximo comportamento
+- Sem peixe: auto-início de pesca após 10s
 - Guarda-chuva animado com posicionamento e inclinação dinâmica
+- Guarda-chuva com cúpula superior mais achatada (visual atualizado)
+- Com chuva ativa, o pinguim não tenta executar voo automático
 
 ### 🌦️ Ambiente e efeitos
 

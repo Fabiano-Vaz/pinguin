@@ -17,14 +17,18 @@
     laughing: "pinguin gargalhando.svg",
     thinking: "pinguin-apaixonado.svg",
     eating: "pinguin comendo peixe.svg",
+    fishing: "pinguin pescando no gelo.svg",
     flying: "pinguin voando.svg",
     turningBack: "pinguin de costas.svg",
     umbrella: "umbrella.svg",
     caveirinha: "pinguin caveirinha.svg",
     trace: "trace.svg",
     runnerBackground: "backgroung.png",
+    runnerBackgroundDark: "backgroung-dark.png",
+    runnerBackgroundDarkB: "backgroung-darkB.png",
     helicopterA: "helicopterA.gif",
     helicopterB: "helicopterB.gif",
+    snowman: "snowman.svg",
   };
 
   const DEFAULT_CONFIG = {

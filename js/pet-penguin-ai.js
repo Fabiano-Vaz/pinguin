@@ -2,6 +2,7 @@
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.ai = ({
+    actionStates,
     runtime,
     behaviors,
     penguinSize,
@@ -18,7 +19,45 @@
     halfPenguinSize,
     phrases,
   }) => ({
+    syncFoodTargetsFromGround() {
+      const fishOnGround = document.querySelectorAll(
+        ".food-fish-drop:not(.eaten)",
+      );
+      if (!fishOnGround.length) return;
+
+      const tracked = new Set();
+      if (
+        this.currentFoodTarget &&
+        this.currentFoodTarget.element &&
+        this.currentFoodTarget.element.isConnected
+      ) {
+        tracked.add(this.currentFoodTarget.element);
+      }
+      if (Array.isArray(this.foodTargets) && this.foodTargets.length > 0) {
+        this.foodTargets.forEach((target) => {
+          if (target && target.element && target.element.isConnected) {
+            tracked.add(target.element);
+          }
+        });
+      }
+
+      fishOnGround.forEach((fishEl) => {
+        if (tracked.has(fishEl)) return;
+        const rect = fishEl.getBoundingClientRect();
+        const targetY =
+          typeof this.getWalkMinY === "function"
+            ? this.getWalkMinY() + halfPenguinSize
+            : rect.top + rect.height / 2;
+        this.foodTargets.push({
+          element: fishEl,
+          x: rect.left + rect.width / 2,
+          y: targetY,
+        });
+      });
+    },
+
     pruneFoodTargets() {
+      this.syncFoodTargetsFromGround();
       if (!Array.isArray(this.foodTargets) || this.foodTargets.length === 0) {
         this.foodTargets = [];
         return;
@@ -49,8 +88,10 @@
     },
 
     enforceFoodPriority() {
+      if (this.isFishingActive) return false;
       if (!this.hasPendingFoodTargets()) return false;
 
+      this.activeFishingSessionId = null;
       this.aiLocked = true;
       this.stepQueue = [];
       this.isChasing = false;
@@ -182,8 +223,15 @@
       this.isChasing = false;
       this.element.style.animation = "";
       this.setState("thinking");
-      const loveList = (phrases && phrases.love) || ["Te amo!"];
-      this.showSpeech(loveList[Math.floor(Math.random() * loveList.length)]);
+      const loveList =
+        Array.isArray(phrases && phrases.love) && phrases.love.length > 0
+          ? phrases.love
+          : Array.isArray(phrases && phrases.idle)
+            ? phrases.idle
+            : [];
+      if (loveList.length > 0) {
+        this.showSpeech(loveList[Math.floor(Math.random() * loveList.length)]);
+      }
 
       setTimeout(() => {
         if (!this.isMoving && !this.isDragging) this.setState("idle");
@@ -198,6 +246,7 @@
     },
 
     handleFoodHunt() {
+      if (this.isFishingActive) return;
       if (this.isDragging) return;
       this.pruneFoodTargets();
 
@@ -261,6 +310,14 @@
 
       const touching = this.isCursorTouchingPenguin();
       if (touching) {
+        if (typeof runtime.consumeFishStock === "function") {
+          const consumed = runtime.consumeFishStock(1);
+          if (!consumed) {
+            this.setFishCursorEnabled(false);
+            return;
+          }
+        }
+        this.fishEatenCount += 1;
         this.isCursorTouchEating = true;
         this.cursorTouchEatingUntil = now + 4000;
         this.isChasing = false;
@@ -271,6 +328,7 @@
     },
 
     onScreenClick() {
+      if (this.isFishingActive) return;
       const now = Date.now();
       if (this.isRanting || now < this.rantCooldownUntil) return;
 
@@ -305,12 +363,12 @@
       this.element.style.animation = "shake 0.4s ease";
       this.setState("angry");
 
-      const rantLines = (phrases && phrases.rant) || [
-        "PARA P#!@ !!!!",
-        "PARAAA!!!",
-        "NÃO QUERO MAAAAIISS",
-        "PARA DE CLICAR NESSA M#$%@!",
-      ];
+      const rantLines =
+        Array.isArray(phrases && phrases.rant) && phrases.rant.length > 0
+          ? phrases.rant
+          : Array.isArray(phrases && phrases.angry)
+            ? phrases.angry
+            : [];
 
       const rantStepMs = 1000;
       rantLines.forEach((line, index) => {
@@ -372,7 +430,36 @@
       }
       if (this.enforceFoodPriority()) return;
       if (this.aiLocked) return;
-      const seq = behaviors[Math.floor(Math.random() * behaviors.length)]();
+      const fishingBehavior = behaviors.find((builder) => {
+        if (typeof builder !== "function") return false;
+        const steps = builder();
+        return (
+          Array.isArray(steps) &&
+          steps.some(
+            (step) =>
+              step &&
+              step.type === "act" &&
+              typeof step.state === "string" &&
+              step.state === "fishing",
+          )
+        );
+      });
+      const fishStock =
+        typeof runtime.getFishStock === "function"
+          ? runtime.getFishStock()
+          : Number.isFinite(runtime.fishStock)
+            ? runtime.fishStock
+            : null;
+      const shouldPrioritizeFishing =
+        fishStock !== null && fishStock <= 0 && Math.random() < 0.9;
+      const fallbackBehavior =
+        behaviors[Math.floor(Math.random() * behaviors.length)];
+      const selectedBehavior =
+        shouldPrioritizeFishing && fishingBehavior
+          ? fishingBehavior
+          : fallbackBehavior;
+      const seq =
+        typeof selectedBehavior === "function" ? selectedBehavior() : [];
       const withPrelude = Math.random() < PRELUDE_CHANCE;
 
       this.stepQueue = withPrelude
@@ -449,6 +536,18 @@
           }
         }, 100);
       } else if (step.type === "flyMove") {
+        const isRainingNow = Boolean(
+          window.PenguinPet &&
+            window.PenguinPet.effects &&
+            typeof window.PenguinPet.effects.isRaining === "function" &&
+            window.PenguinPet.effects.isRaining(),
+        );
+        if (isRainingNow) {
+          this.stepQueue.unshift({ type: "walkShort" });
+          this.runNextStep();
+          return;
+        }
+
         const targetX = Math.max(
           halfPenguinSize,
           Math.min(
@@ -489,6 +588,11 @@
           this.runNextStep();
         });
       } else if (step.type === "act") {
+        if (step.state === "fishing") {
+          this.runFishingAction(step);
+          return;
+        }
+
         const actDuration = this.scaleEmotionDuration(step.duration || 1200);
 
         if (step.state === "laughing") {
@@ -510,6 +614,64 @@
           this.runNextStep();
         }, actDuration);
       }
+    },
+
+    runFishingAction(step) {
+      const fishingSessionId = `${Date.now()}-${Math.random()}`;
+      this.activeFishingSessionId = fishingSessionId;
+      this.isFishingActive = true;
+      const totalDurationMs = Number.isFinite(step.duration)
+        ? Math.max(10000, step.duration)
+        : 30000;
+      const rewardIntervalMs = 10000;
+      const fishPerTick =
+        Number.isFinite(step.fishPerTick) && step.fishPerTick > 0
+          ? Math.round(step.fishPerTick)
+          : 1;
+      const rewardTicks = Math.floor(totalDurationMs / rewardIntervalMs);
+
+      this.element.style.animation = "";
+      this.customMotion = null;
+      this.isMoving = false;
+      this.isChasing = false;
+      this.allowAirMovement = false;
+      this.targetX = this.x;
+      this.targetY = this.y;
+      this.setState("fishing");
+      if (
+        actionStates &&
+        actionStates.fishing &&
+        typeof this.lockVisualSprite === "function"
+      ) {
+        this.lockVisualSprite(actionStates.fishing, totalDurationMs + 250);
+      }
+      this.speak();
+
+      for (let tick = 1; tick <= rewardTicks; tick += 1) {
+        setTimeout(() => {
+          if (
+            this.activeFishingSessionId !== fishingSessionId ||
+            !this.isFishingActive
+          ) {
+            return;
+          }
+          if (typeof runtime.addFishStock === "function") {
+            runtime.addFishStock(fishPerTick);
+          }
+        }, tick * rewardIntervalMs);
+      }
+
+      setTimeout(() => {
+        if (this.activeFishingSessionId !== fishingSessionId) return;
+        this.activeFishingSessionId = null;
+        this.isFishingActive = false;
+        if (typeof this.unlockVisualSprite === "function") {
+          this.unlockVisualSprite();
+        }
+        this.element.style.animation = "";
+        if (!this.isMoving) this.setState("idle");
+        this.runNextStep();
+      }, totalDurationMs);
     },
   });
 })();

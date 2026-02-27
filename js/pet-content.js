@@ -31,6 +31,12 @@
     thinking: ["...", "*pensa*", "hmm..."],
 
     eating: ["*nom nom*", "*come*", "mmm."],
+    fishing: [
+      "aff, vou ter que pescar...",
+      "ninguem me da peixe, ne...",
+      "la vou eu pescar de novo.",
+      "tomara que venha um peixao.",
+    ],
 
     flying: ["*bate as asinhas*", "...", "*flap flap*"],
 
@@ -55,6 +61,31 @@
       "NÃO QUERO MAAAAIISS",
       "PARA DE CLICAR NESSA M#$%@!",
     ],
+
+    fishLow: [
+      "Meus peixinhos estao acabando...",
+      "Sobram poucos peixinhos!",
+      "Ja esta quase no fim dos peixinhos.",
+    ],
+
+    fishLast: [
+      "Ultimo peixinho!",
+    ],
+
+    fishEmpty: [
+      "Estou com fome... quero mais peixinhos!",
+      "Acabaram os peixinhos. Quero mais!",
+      "Sem peixe...",
+      "Vamos jogar para ganhar peixe?",
+    ],
+
+    fishRage: [
+      "QUERO PEIXEEE!!!!",
+      "CADE MEU PEIXE?! QUERO AGORA!",
+      "SEM PEIXE DE NOVO NAO! QUERO PEIXEEE!!!!",
+    ],
+
+    loveSymbol: ["♥"],
   };
 
   window.PenguinPet.behaviors = [
@@ -138,6 +169,12 @@
     () => [
       { type: "walkEdge" },
       { type: "act", state: "sleeping", duration: 45000 },
+      { type: "walkShort" },
+    ],
+    // Sessao de pesca: 30s rendendo peixes ao longo do tempo
+    () => [
+      { type: "walkEdge" },
+      { type: "act", state: "fishing", duration: 15000 },
       { type: "walkShort" },
     ],
   ];

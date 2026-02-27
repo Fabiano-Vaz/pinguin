@@ -5,6 +5,7 @@
 
   modules.interactions = ({
     runtime,
+    phrases,
     createClickEffect,
     SPEED_WALK,
     SPEED_CHASE,
@@ -16,6 +17,7 @@
   }) => ({
     onMouseMove(mouseX, mouseY) {
       if (!Number.isFinite(mouseX) || !Number.isFinite(mouseY)) return;
+      if (this.isFishingActive) return;
       if (this.isWalkingAway || this.isDragging || this.isRanting) return;
       if (
         typeof this.hasPendingFoodTargets === "function" &&
@@ -97,7 +99,32 @@
           this.applyTransform();
         }
 
+        const isRainingNow = Boolean(
+          window.PenguinPet &&
+            window.PenguinPet.effects &&
+            typeof window.PenguinPet.effects.isRaining === "function" &&
+            window.PenguinPet.effects.isRaining(),
+        );
+
         if (Math.random() < 0.55) {
+          this.setState("peeking");
+          if (Math.random() < 0.45) this.speak();
+
+          setTimeout(() => {
+            if (
+              typeof this.enforceFoodPriority === "function" &&
+              this.enforceFoodPriority()
+            ) {
+              return;
+            }
+            if (!this.isMoving) this.setState("idle");
+            this.aiLocked = false;
+            this.scheduleNextBehavior();
+          }, this.scaleEmotionDuration(1000));
+          return;
+        }
+
+        if (isRainingNow) {
           this.setState("peeking");
           if (Math.random() < 0.45) this.speak();
 
@@ -215,6 +242,7 @@
     },
 
     handleMouseProximity() {
+      if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
       if (!runtime.isMouseInsideViewport) return;
       if (this.aiLocked) return;
@@ -474,6 +502,7 @@
     },
 
     onDragStart(e) {
+      if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
       if (
         typeof this.hasPendingFoodTargets === "function" &&
@@ -627,6 +656,7 @@
     },
 
     onClickPenguin() {
+      if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
       if (
         typeof this.hasPendingFoodTargets === "function" &&
@@ -698,6 +728,7 @@
     },
 
     onDoubleClickPenguin() {
+      if (this.isFishingActive) return;
       if (this.isWalkingAway || this.isDragging) return;
 
       if (this.pendingPenguinClickTimeoutId) {
@@ -714,7 +745,18 @@
         this.aiLocked = true;
         this.stepQueue = [];
         this.setState("thinking");
-        this.showSpeech("♥");
+        const loveSymbols =
+          Array.isArray(phrases && phrases.loveSymbol) &&
+          phrases.loveSymbol.length > 0
+            ? phrases.loveSymbol
+            : Array.isArray(phrases && phrases.love)
+              ? phrases.love
+              : [];
+        if (loveSymbols.length > 0) {
+          this.showSpeech(
+            loveSymbols[Math.floor(Math.random() * loveSymbols.length)],
+          );
+        }
         setTimeout(() => {
           if (!this.isMoving) this.setState("idle");
           this.aiLocked = false;

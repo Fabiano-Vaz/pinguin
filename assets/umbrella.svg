@@ -1,26 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
     <!-- Panel 1 - yellow -->
-    <path d="M50,56 L5,56 A45,50 0 0,1 27,13 Z" fill="#FFD600" />
+    <path d="M50,56 L5,56 A45,36 0 0,1 27,20 Z" fill="#FFD600" />
     <!-- Panel 2 - light yellow -->
-    <path d="M50,56 L27,13 A45,50 0 0,1 50,6 Z" fill="#FFE95C" />
+    <path d="M50,56 L27,20 A45,36 0 0,1 50,14 Z" fill="#FFE95C" />
     <!-- Panel 3 - yellow -->
-    <path d="M50,56 L50,6 A45,50 0 0,1 73,13 Z" fill="#FFD600" />
+    <path d="M50,56 L50,14 A45,36 0 0,1 73,20 Z" fill="#FFD600" />
     <!-- Panel 4 - light yellow -->
-    <path d="M50,56 L73,13 A45,50 0 0,1 95,56 Z" fill="#FFE95C" />
+    <path d="M50,56 L73,20 A45,36 0 0,1 95,56 Z" fill="#FFE95C" />
     <!-- Dome outline -->
-    <path d="M5,56 A45,50 0 0,1 95,56" fill="none" stroke="#E6B800" stroke-width="1.5" />
+    <path d="M5,56 A45,36 0 0,1 95,56" fill="none" stroke="#E6B800" stroke-width="1.5" />
     <!-- Ribs -->
     <line x1="50" y1="56" x2="5" y2="56" stroke="#E6B800" stroke-width="1.5" />
-    <line x1="50" y1="56" x2="27" y2="13" stroke="#E6B800" stroke-width="1.5" />
-    <line x1="50" y1="56" x2="50" y2="6" stroke="#E6B800" stroke-width="2" />
-    <line x1="50" y1="56" x2="73" y2="13" stroke="#E6B800" stroke-width="1.5" />
+    <line x1="50" y1="56" x2="27" y2="20" stroke="#E6B800" stroke-width="1.5" />
+    <line x1="50" y1="56" x2="50" y2="14" stroke="#E6B800" stroke-width="2" />
+    <line x1="50" y1="56" x2="73" y2="20" stroke="#E6B800" stroke-width="1.5" />
     <line x1="50" y1="56" x2="95" y2="56" stroke="#E6B800" stroke-width="1.5" />
-    <!-- Scalloped bottom edge -->
-    <path d="M5,56 Q16,67 27,56 Q38,67 50,56 Q62,67 73,56 Q84,67 95,56"
-        fill="none" stroke="#E6B800" stroke-width="2" />
     <!-- Pole -->
     <line x1="50" y1="56" x2="50" y2="90" stroke="#8D6E63" stroke-width="4" stroke-linecap="round" />
     <!-- Top finial -->
-    <circle cx="50" cy="6" r="4" fill="#E6B800" />
-    <circle cx="50" cy="6" r="2" fill="white" opacity="0.9" />
+    <circle cx="50" cy="14" r="4" fill="#E6B800" />
+    <circle cx="50" cy="14" r="2" fill="white" opacity="0.9" />
 </svg>

@@ -4,6 +4,9 @@
     noFishTantrumMinMs: 8000,
     noFishTantrumMaxMs: 16000,
     noFishAutoFishDelayMs: 10000,
+    naturalConsumeMinMs: 45000,
+    naturalConsumeMaxMs: 100000,
+    naturalConsumeEnabled: true,
   };
 
   const hasUneatenFishOnGround = () =>
@@ -40,6 +43,7 @@
     let lastFishWarningLevel = null;
     let noFishTantrumTimeoutId = null;
     let noFishAutoFishingTimeoutId = null;
+    let naturalConsumeTimeoutId = null;
 
     const speakFishStatus = (text) => {
       if (!text) return;
@@ -79,6 +83,12 @@
       if (!noFishAutoFishingTimeoutId) return;
       clearTimeout(noFishAutoFishingTimeoutId);
       noFishAutoFishingTimeoutId = null;
+    };
+
+    const clearNaturalConsume = () => {
+      if (!naturalConsumeTimeoutId) return;
+      clearTimeout(naturalConsumeTimeoutId);
+      naturalConsumeTimeoutId = null;
     };
 
     const getNoFishTantrumDelay = () =>
@@ -180,6 +190,75 @@
       }, settings.noFishAutoFishDelayMs);
     };
 
+    const getNaturalConsumeDelay = () =>
+      Math.round(
+        settings.naturalConsumeMinMs +
+          Math.random() *
+            (settings.naturalConsumeMaxMs - settings.naturalConsumeMinMs),
+      );
+
+    const scheduleNaturalConsume = () => {
+      clearNaturalConsume();
+      if (!settings.naturalConsumeEnabled || remainingFish <= 0) return;
+
+      naturalConsumeTimeoutId = setTimeout(() => {
+        naturalConsumeTimeoutId = null;
+
+        if (remainingFish <= 0) return;
+        if (document.body && document.body.classList.contains("runner-mode")) {
+          scheduleNaturalConsume();
+          return;
+        }
+
+        const penguin = getCurrentPenguin();
+        if (
+          !penguin ||
+          penguin.isDragging ||
+          penguin.isWalkingAway ||
+          penguin.isRanting ||
+          penguin.isFishingActive ||
+          penguin.currentState === "fishing" ||
+          penguin.isEatingFood ||
+          penguin.currentFoodTarget ||
+          penguin.isMoving ||
+          hasUneatenFishOnGround()
+        ) {
+          scheduleNaturalConsume();
+          return;
+        }
+
+        const consumed = consumeFishStock(1);
+        if (!consumed) {
+          scheduleNaturalConsume();
+          return;
+        }
+
+        if (typeof penguin.setState === "function") {
+          penguin.setState("eating");
+          setTimeout(() => {
+            if (
+              typeof penguin.setState === "function" &&
+              !penguin.isMoving &&
+              !penguin.currentFoodTarget &&
+              !penguin.isFishingActive
+            ) {
+              penguin.setState("idle");
+            }
+          }, 900);
+        }
+
+        if (typeof penguin.showSpeech === "function") {
+          penguin.showSpeech(
+            pickRandomLine(getPhraseList(phrases, "eating", "idle")),
+            1500,
+            false,
+          );
+        }
+
+        scheduleNaturalConsume();
+      }, getNaturalConsumeDelay());
+    };
+
     const updateFishStockHud = () => {
       if (!fishStockCountEl) return;
       fishStockCountEl.textContent = String(Math.max(0, remainingFish));
@@ -264,6 +343,9 @@
         setFishCursorEnabled(false);
         scheduleNoFishTantrum();
         scheduleNoFishAutoFishing();
+        clearNaturalConsume();
+      } else {
+        scheduleNaturalConsume();
       }
 
       return true;
@@ -281,6 +363,8 @@
       if (runtime.isFishCursorEnabled === false && remainingFish > 0) {
         setFishCursorEnabled(true);
       }
+
+      scheduleNaturalConsume();
 
       return remainingFish;
     };
@@ -314,12 +398,15 @@
       if (remainingFish <= 0) {
         scheduleNoFishTantrum();
         scheduleNoFishAutoFishing();
+      } else {
+        scheduleNaturalConsume();
       }
     };
 
     const dispose = () => {
       clearNoFishTantrum();
       clearNoFishAutoFishing();
+      clearNaturalConsume();
     };
 
     runtime.setFishCursorEnabled = setFishCursorEnabled;

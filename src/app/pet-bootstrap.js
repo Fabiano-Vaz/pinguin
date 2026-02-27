@@ -58,13 +58,19 @@
       environmentEvents.attach();
     }
 
-    if (typeof effects.startSnowCycle === "function") {
-      effects.startSnowCycle();
-    }
+    const weatherStartDelayMs = Number.isFinite(constants.WEATHER_START_DELAY_MS)
+      ? constants.WEATHER_START_DELAY_MS
+      : 20000;
 
-    if (typeof effects.startRainCycle === "function") {
-      effects.startRainCycle();
-    }
+    setTimeout(() => {
+      if (typeof effects.startSnowCycle === "function") {
+        effects.startSnowCycle();
+      }
+
+      if (typeof effects.startRainCycle === "function") {
+        effects.startRainCycle();
+      }
+    }, Math.max(0, weatherStartDelayMs));
   };
 
   window.PenguinPetModules = {

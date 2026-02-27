@@ -26,7 +26,7 @@
             Number.isFinite(window.PENGUIN_CONFIG.size) &&
             window.PENGUIN_CONFIG.size > 0
               ? window.PENGUIN_CONFIG.size
-              : 120,
+              : 68,
           groundRatio:
             window.PENGUIN_CONFIG &&
             Number.isFinite(window.PENGUIN_CONFIG.groundRatio) &&
@@ -144,11 +144,12 @@
       idleReactionCooldownMs: 12000,
     },
     environment: {
-      snowActiveDurationMs: 15000,
-      snowCooldownDurationMs: 1800000,
+      weatherStartDelayMs: 10000,
+      snowActiveDurationMs: 55000,
+      snowCooldownDurationMs: 300000,
       snowSpawnIntervalMs: 400,
-      rainActiveDurationMs: 40000,
-      rainCooldownDurationMs: 600000,
+      rainActiveDurationMs: 50000,
+      rainCooldownDurationMs: 180000,
       rainSpawnIntervalMs: 60,
     },
   };
@@ -183,6 +184,7 @@
       SPEED_FLEE: petConfig.speed.flee,
       MOUSE_IDLE_TRIGGER_MS: petConfig.mouse.idleTriggerMs,
       MOUSE_IDLE_REACTION_COOLDOWN_MS: petConfig.mouse.idleReactionCooldownMs,
+      WEATHER_START_DELAY_MS: petConfig.environment.weatherStartDelayMs,
       SNOW_ACTIVE_DURATION_MS: petConfig.environment.snowActiveDurationMs,
       SNOW_COOLDOWN_DURATION_MS: petConfig.environment.snowCooldownDurationMs,
       SNOW_SPAWN_INTERVAL_MS: petConfig.environment.snowSpawnIntervalMs,

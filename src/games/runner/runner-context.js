@@ -29,6 +29,7 @@
     "runnerBackgroundDarkB",
     "assets/backgroung-darkB.png",
   );
+  const runnerMoonImage = resolveSprite("moon", "assets/lua.png");
   const snowmanObstacleImage = resolveSprite("snowman", "assets/snowman.svg");
 
   const helicopterVariants = [
@@ -37,10 +38,10 @@
       src: resolveSprite("helicopterA", "assets/helicopterA.gif"),
       scale: 4,
       hitboxInsetRatios: {
-        left: 0.28,
-        right: 0.5,
-        top: 0.22,
-        bottom: 0.26,
+        left: 0.37,
+        right: 0.39,
+        top: 0.34,
+        bottom: 0.34,
       },
     },
     {
@@ -48,10 +49,10 @@
       src: resolveSprite("helicopterB", "assets/helicopterB.gif"),
       scale: 8,
       hitboxInsetRatios: {
-        left: 0.39,
-        right: 0.61,
-        top: 0.31,
-        bottom: 0.37,
+        left: 0.4,
+        right: 0.42,
+        top: 0.37,
+        bottom: 0.35,
       },
     },
   ];
@@ -60,6 +61,12 @@
   const DEBUG = Boolean(runnerConfig.debug);
   const RUNNER_BACKGROUND_SCROLL_SPEED_PX_PER_SEC =
     runnerConfig.backgroundScrollSpeedPxPerSec || 8;
+  const RUNNER_MOON_SCROLL_SPEED_PX_PER_SEC =
+    runnerConfig.moonScrollSpeedPxPerSec || 6;
+  const RUNNER_MOON_TOP_PX = runnerConfig.moonTopPx || 36;
+  const RUNNER_MOON_RIGHT_PX = runnerConfig.moonRightPx || 88;
+  const RUNNER_MOON_SIZE_PX = runnerConfig.moonSizePx || 90;
+  const RUNNER_MOON_RESPAWN_PADDING_PX = runnerConfig.moonRespawnPaddingPx || 180;
   const RUNNER_GROUND_DECOR_SCROLL_SPEED_PX_PER_SEC =
     runnerConfig.groundDecorScrollSpeedPxPerSec || 180;
 
@@ -93,11 +100,14 @@
     bestScore: tryLoadBestScore(),
     worldSpeed: runnerConfig.worldSpeedInitial || 220,
     minWorldSpeed: runnerConfig.worldSpeedMin || 220,
-    maxWorldSpeed: runnerConfig.worldSpeedMax || 960,
+    maxWorldSpeed: Number.isFinite(runnerConfig.worldSpeedMax)
+      ? runnerConfig.worldSpeedMax
+      : Number.POSITIVE_INFINITY,
     speedGainPerSecond: runnerConfig.worldSpeedGainPerSec || 9,
     gravity: runnerConfig.gravityPxPerSec2 || 2350,
     fallGravityMultiplier: runnerConfig.fallGravityMultiplier || 1.32,
     lowJumpGravityMultiplier: runnerConfig.lowJumpGravityMultiplier || 1.7,
+    diveGravityMultiplier: runnerConfig.diveGravityMultiplier || 3.2,
     jumpVelocity: runnerConfig.jumpVelocityPxPerSec || -860,
     maxFallSpeed: runnerConfig.maxFallSpeedPxPerSec || 1650,
     jumpBufferMs: runnerConfig.jumpBufferMs || 140,
@@ -113,6 +123,7 @@
     nextHelicopterIndex: 0,
     nextFishDropScore: runnerConfig.fishDropEveryScore || 100,
     backgroundScrollX: 0,
+    moonScrollX: 0,
     fishCursorWasEnabledClass: false,
     fishCursorWasEnabledRuntime: null,
     debugLastCollisionAt: 0,
@@ -154,6 +165,15 @@
   const ground = document.createElement("div");
   ground.className = "runner-ground";
 
+  const moon = document.createElement("img");
+  moon.className = "runner-moon";
+  moon.src = runnerMoonImage;
+  moon.alt = "lua";
+  moon.draggable = false;
+  moon.style.top = `${RUNNER_MOON_TOP_PX}px`;
+  moon.style.right = `${RUNNER_MOON_RIGHT_PX}px`;
+  moon.style.width = `${RUNNER_MOON_SIZE_PX}px`;
+
   const runnerAnimationStyle = document.createElement("style");
   runnerAnimationStyle.textContent = `
     @keyframes runnerGameShake {
@@ -180,6 +200,12 @@
   const debugCollisionDot = document.createElement("div");
   debugCollisionDot.className = "runner-debug-collision-dot";
 
+  const debugHitboxLayer = document.createElement("div");
+  debugHitboxLayer.className = "runner-debug-hitbox-layer";
+  const debugHitboxPool = [];
+
+  stage.appendChild(moon);
+  stage.appendChild(debugHitboxLayer);
   stage.appendChild(hud);
   stage.appendChild(hint);
   stage.appendChild(message);
@@ -317,8 +343,14 @@
     if (deltaMs > 0 && !game.isGameOver) {
       game.backgroundScrollX +=
         RUNNER_BACKGROUND_SCROLL_SPEED_PX_PER_SEC * (deltaMs / 1000);
+      game.moonScrollX += RUNNER_MOON_SCROLL_SPEED_PX_PER_SEC * (deltaMs / 1000);
     }
     stage.style.backgroundPosition = `${(-game.backgroundScrollX).toFixed(1)}px bottom`;
+
+    const moonTravelWidth =
+      window.innerWidth + RUNNER_MOON_SIZE_PX + RUNNER_MOON_RESPAWN_PADDING_PX;
+    const moonOffset = game.moonScrollX % Math.max(1, moonTravelWidth);
+    moon.style.transform = `translate3d(${(-moonOffset).toFixed(1)}px, 0, 0)`;
   };
 
   const updateGroundPresentation = () => {
@@ -372,7 +404,7 @@
   };
 
   const updateGroundDecorMotion = (deltaMs) => {
-    if (!game.groundDecor.length) return;
+    if (game.isGameOver || !game.groundDecor.length) return;
     const dt = deltaMs / 1000;
     const width = window.innerWidth;
 
@@ -390,7 +422,10 @@
   const difficultyLevel = () => {
     const byScore = game.score / (runnerConfig.difficultyScoreDivisor || 250);
     const byTime = game.worldTimeMs / (runnerConfig.difficultyTimeDivisorMs || 16000);
-    return clamp(1 + Math.min(byScore, byTime), 1, runnerConfig.difficultyMaxLevel || 7);
+    const difficultyMaxLevel = Number.isFinite(runnerConfig.difficultyMaxLevel)
+      ? runnerConfig.difficultyMaxLevel
+      : Number.POSITIVE_INFINITY;
+    return clamp(1 + Math.min(byScore, byTime), 1, difficultyMaxLevel);
   };
 
   const getPenguinBox = () => {
@@ -464,6 +499,50 @@
     }, runnerConfig.debugCollisionHideMs || 160);
   };
 
+  const clearDebugHitboxes = () => {
+    debugHitboxPool.forEach((boxEl) => {
+      boxEl.style.display = "none";
+    });
+  };
+
+  const ensureDebugHitboxPool = (count) => {
+    while (debugHitboxPool.length < count) {
+      const boxEl = document.createElement("div");
+      boxEl.className = "runner-debug-hitbox";
+      debugHitboxLayer.appendChild(boxEl);
+      debugHitboxPool.push(boxEl);
+    }
+  };
+
+  const renderDebugHitboxes = (penguinBox, obstacleBoxes = []) => {
+    if (!DEBUG) return;
+
+    const boxes = [];
+    if (penguinBox) {
+      boxes.push({ ...penguinBox, role: "penguin" });
+    }
+    obstacleBoxes.forEach((box) => {
+      if (box) boxes.push({ ...box, role: "obstacle" });
+    });
+
+    ensureDebugHitboxPool(boxes.length);
+
+    boxes.forEach((box, index) => {
+      const boxEl = debugHitboxPool[index];
+      boxEl.classList.toggle("is-penguin", box.role === "penguin");
+      boxEl.classList.toggle("is-obstacle", box.role === "obstacle");
+      boxEl.style.display = "block";
+      boxEl.style.left = `${Math.round(box.x)}px`;
+      boxEl.style.top = `${Math.round(box.y)}px`;
+      boxEl.style.width = `${Math.max(1, Math.round(box.width))}px`;
+      boxEl.style.height = `${Math.max(1, Math.round(box.height))}px`;
+    });
+
+    for (let i = boxes.length; i < debugHitboxPool.length; i += 1) {
+      debugHitboxPool[i].style.display = "none";
+    }
+  };
+
   const renderHud = () => {
     const scoreInt = Math.floor(game.score);
     hud.textContent = `Pontos: ${scoreInt}   Recorde: ${game.bestScore}`;
@@ -488,6 +567,7 @@
       penguinEl,
       ground,
       debugCollisionDot,
+      debugHitboxLayer,
     },
     actions: {
       endGame: null,
@@ -515,6 +595,8 @@
     getPenguinBox,
     hasCollision,
     showDebugCollisionDot,
+    renderDebugHitboxes,
+    clearDebugHitboxes,
     renderHud,
   };
 })();

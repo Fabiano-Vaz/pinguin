@@ -122,6 +122,7 @@
       this.walkAwayReturnY = this.y;
       this.visualLockUntil = 0;
       this.caveirinhaTimeoutId = null;
+      this.isCaveirinhaMode = false;
       this.windTilt = 0;
       this.windTiltPhaseATimeoutId = null;
       this.windTiltPhaseBTimeoutId = null;
@@ -144,6 +145,22 @@
         Math.max(0.001, (now - this.lastUpdateTime) / 1000),
       );
       this.lastUpdateTime = now;
+
+      if (this.isCaveirinhaMode) {
+        this.customMotion = null;
+        this.isMoving = false;
+        this.isChasing = false;
+        this.allowAirMovement = false;
+        this.targetX = this.x;
+        this.targetY = this.y;
+        this.element.style.left = this.x + "px";
+        this.element.style.top = this.y + "px";
+        this.applyTransform(this.isWalkingAway ? 1 : undefined);
+        this.updateBubblePosition();
+        this.updateUmbrellaPosition();
+        requestAnimationFrame((ts) => this.update(ts));
+        return;
+      }
 
       if (this.isDragging) {
         requestAnimationFrame((ts) => this.update(ts));
@@ -204,9 +221,7 @@
 
         if (this.currentState !== "jumping" && this.currentState !== "flying") {
           if (!this.isWalkingAway) {
-            const isHuntingFood =
-              Boolean(this.currentFoodTarget) && !this.isEatingFood;
-            this.setState(isHuntingFood ? "runningCrouched" : "running");
+            this.setState("running");
           }
         }
 
@@ -251,6 +266,8 @@
     }
 
     showUmbrella() {
+      if (this.isFishingActive) return;
+      if (this.umbrellaEl.classList.contains("flying-away")) return;
       if (this.umbrellaEl.classList.contains("open")) return;
       this.updateUmbrellaPosition();
       this.umbrellaEl.classList.remove("closing");
@@ -259,6 +276,9 @@
     }
 
     hideUmbrella() {
+      if (this.umbrellaEl.classList.contains("flying-away")) {
+        this.umbrellaEl.classList.remove("flying-away");
+      }
       if (!this.umbrellaEl.classList.contains("open")) return;
       this.umbrellaEl.classList.remove("open");
       this.umbrellaEl.classList.add("closing");
@@ -272,6 +292,7 @@
 
     updateUmbrellaPosition() {
       if (!this.umbrellaEl) return;
+      if (this.umbrellaEl.classList.contains("flying-away")) return;
       const depthScale =
         typeof this.getDepthScale === "function" ? this.getDepthScale() : 1;
       const umbrellaSize = penguinSize * 0.85 * depthScale;
@@ -297,6 +318,44 @@
       this.umbrellaEl.style.setProperty(
         "--umbrella-tilt",
         tilt.toFixed(2) + "deg",
+      );
+    }
+
+    blowAwayUmbrella(direction = 1) {
+      if (!this.umbrellaEl) return;
+      if (!this.umbrellaEl.classList.contains("open")) return;
+
+      const dir = direction >= 0 ? 1 : -1;
+      const el = this.umbrellaEl;
+      this.updateUmbrellaPosition();
+      el.classList.remove("open", "closing");
+      const travelX = Math.round((window.innerWidth + 260) * dir);
+      const travelY = Math.round(-(window.innerHeight * (0.24 + Math.random() * 0.14)));
+      el.style.setProperty("--umbrella-fly-dir", String(dir));
+      el.style.setProperty(
+        "--umbrella-fly-x",
+        `${travelX}px`,
+      );
+      el.style.setProperty(
+        "--umbrella-fly-y",
+        `${travelY}px`,
+      );
+      el.style.setProperty(
+        "--umbrella-fly-rot",
+        `${Math.round((520 + Math.random() * 280) * dir)}deg`,
+      );
+      void el.offsetWidth;
+      el.classList.add("flying-away");
+
+      el.addEventListener(
+        "animationend",
+        () => {
+          el.classList.remove("flying-away");
+          el.style.removeProperty("--umbrella-fly-x");
+          el.style.removeProperty("--umbrella-fly-y");
+          el.style.removeProperty("--umbrella-fly-rot");
+        },
+        { once: true },
       );
     }
   }

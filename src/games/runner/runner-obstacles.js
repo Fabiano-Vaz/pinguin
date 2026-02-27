@@ -179,13 +179,13 @@
         const rect = helicopterEl.getBoundingClientRect();
         const heliFallback = runnerConfig.helicopterFallbackHitboxRatios || {};
         const leftRatio =
-          Number(obstacle.el.dataset.heliHitboxLeft) || heliFallback.left || 0.28;
+          Number(obstacle.el.dataset.heliHitboxLeft) || heliFallback.left || 0.38;
         const rightRatio =
-          Number(obstacle.el.dataset.heliHitboxRight) || heliFallback.right || 0.5;
+          Number(obstacle.el.dataset.heliHitboxRight) || heliFallback.right || 0.38;
         const topRatio =
-          Number(obstacle.el.dataset.heliHitboxTop) || heliFallback.top || 0.22;
+          Number(obstacle.el.dataset.heliHitboxTop) || heliFallback.top || 0.34;
         const bottomRatio =
-          Number(obstacle.el.dataset.heliHitboxBottom) || heliFallback.bottom || 0.26;
+          Number(obstacle.el.dataset.heliHitboxBottom) || heliFallback.bottom || 0.34;
         const insetLeft = Math.round(rect.width * leftRatio);
         const insetRight = Math.round(rect.width * rightRatio);
         const insetTop = Math.round(rect.height * topRatio);
@@ -236,13 +236,12 @@
     if (game.obstacles.length === 0) return true;
 
     const last = game.obstacles[game.obstacles.length - 1];
-    const minimumGapPx =
-      (runnerConfig.obstacleGapBasePx || 220) +
-      Math.min(
-        runnerConfig.obstacleGapDifficultyMaxBonusPx || 190,
-        runner.difficultyLevel() * (runnerConfig.obstacleGapDifficultyFactor || 24),
-      ) +
-      (last.requiresCrouch ? runnerConfig.obstacleGapCrouchBonusPx || 42 : 0);
+    const minimumGapPx = Math.max(
+      runnerConfig.obstacleGapMinPx || 100,
+      (runnerConfig.obstacleGapBasePx || 220) -
+        runner.difficultyLevel() * (runnerConfig.obstacleGapDifficultyFactor || 7) +
+        (last.requiresCrouch ? runnerConfig.obstacleGapCrouchBonusPx || 42 : 0),
+    );
 
     return last.x < window.innerWidth - minimumGapPx;
   };

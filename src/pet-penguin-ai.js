@@ -193,8 +193,12 @@
       this.targetX = this.x;
       this.targetY = this.y;
       this.element.style.animation = "";
-      this.setState("eating");
-      this.speak();
+      this.setState("runningCrouched");
+      const crouchedFishAsset =
+        actionStates.runningCrouched || "assets/pinguin correndo abaixado.svg";
+      if (typeof this.lockVisualSprite === "function") {
+        this.lockVisualSprite(crouchedFishAsset, 260);
+      }
 
       if (target.element && target.element.isConnected) {
         target.element.classList.add("eaten");
@@ -206,6 +210,15 @@
       }
 
       setTimeout(() => {
+        if (!this.isEatingFood || this.currentFoodTarget !== target) return;
+        if (typeof this.unlockVisualSprite === "function") {
+          this.unlockVisualSprite();
+        }
+        this.setState("eating");
+        this.speak();
+      }, 280);
+
+      setTimeout(() => {
         this.currentFoodTarget = null;
         this.isEatingFood = false;
         if (!this.isMoving) this.setState("idle");
@@ -214,7 +227,7 @@
           this.aiLocked = false;
           this.scheduleNextBehavior();
         }
-      }, this.scaleEmotionDuration(1300));
+      }, this.scaleEmotionDuration(1180));
     },
 
     triggerLoveMoment() {
@@ -488,6 +501,7 @@
     },
 
     runNextStep() {
+      if (this.isCaveirinhaMode) return;
       if (this.enforceFoodPriority()) return;
       if (this.stepQueue.length === 0) {
         this.aiLocked = false;
@@ -628,6 +642,9 @@
       const fishingSessionId = `${Date.now()}-${Math.random()}`;
       this.activeFishingSessionId = fishingSessionId;
       this.isFishingActive = true;
+      if (typeof this.hideUmbrella === "function") {
+        this.hideUmbrella();
+      }
       this.fishCursorEnabledBeforeFishing = runtime.isFishCursorEnabled !== false;
       if (typeof runtime.setFishCursorEnabled === "function") {
         runtime.setFishCursorEnabled(false);
@@ -694,6 +711,18 @@
           this.unlockVisualSprite();
         }
         this.element.style.animation = "";
+        const effects =
+          window.PenguinPet && window.PenguinPet.effects
+            ? window.PenguinPet.effects
+            : null;
+        if (
+          effects &&
+          typeof effects.isRaining === "function" &&
+          effects.isRaining() &&
+          typeof this.showUmbrella === "function"
+        ) {
+          this.showUmbrella();
+        }
         if (!this.isMoving) this.setState("idle");
         this.runNextStep();
       }, totalDurationMs);

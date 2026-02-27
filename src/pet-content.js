@@ -49,11 +49,7 @@
       "*olhar de julgamento*",
     ],
 
-    love: [
-      "Te amo!",
-      "♥",
-      "*cora*",
-    ],
+    love: ["Te amo!", "♥", "*cora*"],
 
     rant: [
       "PARA P#!@ !!!!",
@@ -68,9 +64,7 @@
       "Ja esta quase no fim dos peixinhos.",
     ],
 
-    fishLast: [
-      "Ultimo peixinho!",
-    ],
+    fishLast: ["Ultimo peixinho!"],
 
     fishEmpty: [
       "Estou com fome... quero mais peixinhos!",
@@ -86,6 +80,14 @@
     ],
 
     loveSymbol: ["♥"],
+
+    snowmanFlirt: [
+      "Oi, boneca... seu sorriso derrete meu gelo.",
+      "Se eu for de gelo, voce e meu verao.",
+      "Com voce ate nevasca vira romance.",
+      "Posso ficar aqui te admirando pra sempre?",
+      "Voce caiu do ceu junto com esses floquinhos?",
+    ],
   };
 
   window.PenguinPet.behaviors = [

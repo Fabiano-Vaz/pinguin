@@ -6,7 +6,6 @@
   modules.interactions = ({
     runtime,
     phrases,
-    createClickEffect,
     SPEED_WALK,
     SPEED_CHASE,
     SPEED_FLEE,
@@ -502,6 +501,7 @@
     },
 
     onDragStart(e) {
+      if (this.isCaveirinhaMode) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
       if (
@@ -694,7 +694,6 @@
       const reaction = reactions[Math.floor(Math.random() * reactions.length)];
 
       if (reaction === "laughing") {
-        createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
         this.playLaughThenIdleThenLaugh(2200, () => {
           this.aiLocked = false;
           this.scheduleNextBehavior();
@@ -704,7 +703,6 @@
 
       this.setState(reaction);
       this.speak();
-      createClickEffect(this.x + halfPenguinSize, this.y + halfPenguinSize);
 
       const anims = {
         jumping: "hop 0.52s ease-out 2",

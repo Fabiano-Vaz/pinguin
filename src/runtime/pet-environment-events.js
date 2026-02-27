@@ -55,15 +55,13 @@
     const onClick = (event) => {
       if (!penguin) return;
       if (penguin.isFishingActive) return;
+      if (penguin.isCaveirinhaMode) return;
 
       if (typeof penguin.onScreenClick === "function") {
         penguin.onScreenClick();
       }
 
       if (typeof effects.isSnowing === "function" && effects.isSnowing()) {
-        if (typeof effects.spawnExtraSnow === "function") {
-          effects.spawnExtraSnow(event.clientX, event.clientY);
-        }
         return;
       }
 
@@ -125,6 +123,19 @@
               clearTimeout(currentPenguin.caveirinhaTimeoutId);
             }
 
+            currentPenguin.isCaveirinhaMode = true;
+            currentPenguin.aiLocked = true;
+            currentPenguin.stepQueue = [];
+            currentPenguin.isChasing = false;
+            currentPenguin.isMoving = false;
+            currentPenguin.isDragging = false;
+            currentPenguin.currentFoodTarget = null;
+            currentPenguin.isEatingFood = false;
+            currentPenguin.foodTargets = [];
+            currentPenguin.customMotion = null;
+            currentPenguin.targetX = currentPenguin.x;
+            currentPenguin.targetY = currentPenguin.y;
+
             if (typeof currentPenguin.lockVisualSprite === "function") {
               currentPenguin.lockVisualSprite(caveirinhaSrc, 4000);
             } else {
@@ -136,11 +147,15 @@
             }
 
             currentPenguin.caveirinhaTimeoutId = setTimeout(() => {
+              currentPenguin.isCaveirinhaMode = false;
               if (typeof currentPenguin.unlockVisualSprite === "function") {
                 currentPenguin.unlockVisualSprite();
               }
               if (typeof currentPenguin.setState === "function") {
                 currentPenguin.setState("idle");
+              }
+              if (typeof currentPenguin.scheduleNextBehavior === "function") {
+                currentPenguin.scheduleNextBehavior();
               }
             }, 4000);
           }
@@ -177,6 +192,8 @@
         runtime.mouseX = event.clientX;
         runtime.mouseY = event.clientY;
 
+        if (penguin && penguin.isCaveirinhaMode) return;
+
         if (typeof penguin.onMouseMove === "function") {
           penguin.onMouseMove(event.clientX, event.clientY);
         }
@@ -192,6 +209,55 @@
         runtime.isMouseInsideViewport = false;
       },
       click: onClick,
+      keydown: (event) => {
+        if (!effects) return;
+        if (event.defaultPrevented) return;
+
+        const target = event.target;
+        const isTypingTarget =
+          target &&
+          ((target.tagName === "INPUT" ||
+            target.tagName === "TEXTAREA" ||
+            target.isContentEditable) ||
+            (typeof target.closest === "function" &&
+              target.closest("[contenteditable='true']")));
+        if (isTypingTarget) return;
+
+        const key = typeof event.key === "string" ? event.key.toLowerCase() : "";
+
+        if (key === "n") {
+          event.preventDefault();
+          if (
+            typeof effects.isSnowing === "function" &&
+            effects.isSnowing() &&
+            typeof effects.stopSnowCycle === "function"
+          ) {
+            effects.stopSnowCycle(true);
+            return;
+          }
+
+          if (typeof effects.startSnowCycle === "function") {
+            effects.startSnowCycle(true);
+          }
+          return;
+        }
+
+        if (key === "c") {
+          event.preventDefault();
+          if (
+            typeof effects.isRaining === "function" &&
+            effects.isRaining() &&
+            typeof effects.stopRainCycle === "function"
+          ) {
+            effects.stopRainCycle(true);
+            return;
+          }
+
+          if (typeof effects.startRainCycle === "function") {
+            effects.startRainCycle(true);
+          }
+        }
+      },
     };
 
     const attach = () => {
@@ -200,6 +266,7 @@
       document.addEventListener("mouseenter", handlers.mouseenter);
       document.addEventListener("mouseleave", handlers.mouseleave);
       document.addEventListener("click", handlers.click);
+      document.addEventListener("keydown", handlers.keydown);
     };
 
     const detach = () => {
@@ -208,6 +275,7 @@
       document.removeEventListener("mouseenter", handlers.mouseenter);
       document.removeEventListener("mouseleave", handlers.mouseleave);
       document.removeEventListener("click", handlers.click);
+      document.removeEventListener("keydown", handlers.keydown);
     };
 
     return {

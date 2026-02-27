@@ -114,6 +114,9 @@
       } else if (!penguin.isJumpPressed) {
         gravityMultiplier = game.lowJumpGravityMultiplier;
       }
+      if (penguin.isCrouching) {
+        gravityMultiplier = Math.max(gravityMultiplier, game.diveGravityMultiplier);
+      }
 
       penguin.velocityY += game.gravity * gravityMultiplier * dt;
       penguin.velocityY = Math.min(penguin.velocityY, game.maxFallSpeed);
@@ -165,7 +168,11 @@
     );
 
     const level = runner.difficultyLevel();
-    const spawnRateFactor = runner.clamp(1 - level * 0.08, 0.58, 1);
+    const spawnRateFactor = runner.clamp(
+      1 - level * 0.08,
+      runnerConfig.spawnRateFactorFloor || 0.15,
+      1,
+    );
 
     game.spawnTimerMs -= deltaMs;
     if (game.spawnTimerMs <= 0 && runner.ensureSafeSpawnGap()) {
@@ -189,6 +196,15 @@
 
     updatePenguin(deltaMs);
     runner.updateObstacles(deltaMs);
+    if (runner.DEBUG) {
+      const penguinBox = runner.getPenguinBox();
+      const obstacleBoxes = game.obstacles.map((obstacle) =>
+        runner.getObstacleHitbox(obstacle),
+      );
+      runner.renderDebugHitboxes(penguinBox, obstacleBoxes);
+    } else {
+      runner.clearDebugHitboxes();
+    }
     runner.updateRunnerBackgroundMotion(deltaMs);
     runner.updateGroundDecorMotion(deltaMs);
     runner.renderHud();
@@ -218,6 +234,7 @@
       game.debugCollisionHideTimeoutId = 0;
     }
     debugCollisionDot.classList.remove("is-visible");
+    runner.clearDebugHitboxes();
 
     game.penguin.velocityY = 0;
     game.penguin.isJumping = false;
@@ -247,6 +264,7 @@
     }
 
     debugCollisionDot.classList.remove("is-visible");
+    runner.clearDebugHitboxes();
     runner.setRunnerMode(false);
     penguinEl.style.animation = "";
     message.textContent = "";

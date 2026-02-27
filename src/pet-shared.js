@@ -26,13 +26,14 @@
     runnerBackground: "backgroung.png",
     runnerBackgroundDark: "backgroung-dark.png",
     runnerBackgroundDarkB: "backgroung-darkB.png",
+    moon: "lua.png",
     helicopterA: "helicopterA.gif",
     helicopterB: "helicopterB.gif",
     snowman: "snowman.svg",
   };
 
   const DEFAULT_CONFIG = {
-    size: 120,
+    size: 68,
     groundRatio: 0.86,
     backgroundImage: "assets/backgroung-dark.png",
   };

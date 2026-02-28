@@ -149,8 +149,9 @@
             ? 1
             : -1;
       const depth = this.getDepthScale();
+      const stateScale = this.currentState === "fishing" ? 1.32 : 1;
       const windTilt = Number.isFinite(this.windTilt) ? this.windTilt : 0;
-      this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale * depth}) rotate(${windTilt}deg)`;
+      this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale * depth * stateScale}) rotate(${windTilt}deg)`;
       // Ajusta z-index: mais ao fundo = menor z-index (atrás), mais à frente = maior
       const zBase = 10;
       const zRange = 8;

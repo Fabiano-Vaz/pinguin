@@ -1,0 +1,70 @@
+:root {
+  --font-ui: "Comic Sans MS", cursive, sans-serif;
+
+  --color-white: #ffffff;
+  --color-text-primary: #333333;
+  --color-overlay-dark-45: rgba(0, 0, 0, 0.45);
+  --color-overlay-dark-60: rgba(0, 0, 0, 0.6);
+
+  --shadow-soft: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 6px 12px rgba(0, 0, 0, 0.6);
+  --shadow-bubble: 0 4px 14px rgba(0, 0, 0, 0.18);
+  --shadow-dot: 0 2px 5px rgba(0, 0, 0, 0.18);
+
+  --radius-pill: 999px;
+  --radius-round: 50%;
+
+  --penguin-size-desktop: 120px;
+  --penguin-size-mobile: 90px;
+
+  --z-base: 1;
+  --z-penguin: 10;
+  --z-umbrella: 11;
+  --z-speech: 20;
+  --z-hud: 50;
+  --z-runner: 9999;
+  --z-runner-hud: 10001;
+  --z-weather-overlay: 9999;
+  --z-wind: 8000;
+  --z-wind-front: 8001;
+
+  --duration-fast: 0.3s;
+  --duration-ripple: 0.6s;
+  --ease-default: ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  --penguin-size: var(--penguin-size-desktop);
+  overflow: hidden;
+  background-color: var(--color-white);
+  background-image: url("../assets/backgroung-dark.png");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  font-family: var(--font-ui);
+  cursor: auto;
+}
+
+body.fish-cursor-enabled {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="20" font-size="20">🐟</text></svg>'), auto;
+}
+
+@media (max-width: 768px) {
+  body {
+    --penguin-size: var(--penguin-size-mobile);
+  }
+}

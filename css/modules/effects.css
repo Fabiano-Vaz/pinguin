@@ -1,0 +1,247 @@
+.particle {
+  position: absolute;
+  pointer-events: none;
+  z-index: var(--z-base);
+  font-size: 20px;
+  animation-fill-mode: forwards;
+}
+
+.snowflake {
+  position: fixed;
+  pointer-events: none;
+  z-index: var(--z-base);
+  border-radius: var(--radius-round);
+  background: radial-gradient(
+    circle at 34% 34%,
+    #f4fbff,
+    #d7e9fb 70%,
+    rgba(215, 233, 251, 0.12) 100%
+  );
+  box-shadow: 0 0 3px rgba(230, 245, 255, 0.18);
+  animation: snowflakeFall linear forwards;
+  will-change: transform, opacity;
+}
+
+.snowflake.fade-early {
+  opacity: 0 !important;
+  transition: opacity 0.9s ease-out;
+}
+
+.snow-event-snowman {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+  transform-origin: 50% 100%;
+  transform: translateY(6px) scaleX(0.9) scaleY(0);
+  transition: transform 2.2s cubic-bezier(0.2, 0.75, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.snow-event-snowman.visible {
+  transform: translateY(0) scaleX(1) scaleY(1);
+}
+
+.snow-event-snowman.exiting {
+  transform: translateY(18px) scaleX(1.04) scaleY(0.015);
+  transition: transform 2.1s ease-in;
+}
+
+.snow-event-snowman.exiting-hop {
+  transition: none;
+  animation: snowmanHopAway 2.2s cubic-bezier(0.22, 0.74, 0.28, 1) forwards;
+}
+
+.clickEffect {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-round);
+  pointer-events: none;
+  animation: ripple var(--duration-ripple) ease-out;
+  z-index: 5;
+}
+
+.food-fish-drop {
+  position: absolute;
+  pointer-events: none;
+  z-index: 6;
+  font-size: 22px;
+  transform: translate(-50%, -50%);
+  transition:
+    left 0.55s ease-out,
+    top 0.55s ease-in,
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.food-fish-drop.eaten {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.2);
+}
+
+.rain-drop {
+  position: fixed;
+  pointer-events: none;
+  z-index: var(--z-base);
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(208, 236, 255, 0),
+    rgba(201, 231, 255, var(--rain-alpha, 0.7)) 38%,
+    rgba(154, 205, 255, calc(var(--rain-alpha, 0.7) + 0.12)) 100%
+  );
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 2px rgba(170, 216, 255, 0.2);
+  animation: rainFall linear forwards;
+  transform: rotate(var(--rain-angle, 12deg));
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+.rain-drop--far {
+  opacity: 0.52;
+  filter: blur(0.55px);
+}
+
+.rain-drop--heavy {
+  opacity: 0.72;
+  filter: blur(0);
+}
+
+.rain-splash {
+  position: fixed;
+  pointer-events: none;
+  z-index: var(--z-base);
+  width: 5px;
+  height: 1px;
+  border-radius: var(--radius-pill);
+  background: rgba(191, 226, 255, 0.42);
+  box-shadow: 0 0 3px rgba(166, 214, 255, 0.22);
+  transform-origin: center;
+  animation: rainSplash 0.22s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+.rain-splash--far {
+  opacity: 0.62;
+  filter: blur(0.4px);
+}
+
+.lightning-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 35%,
+    rgba(240, 250, 255, 0.95),
+    rgba(207, 234, 255, 0.6) 48%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: var(--z-weather-overlay);
+  animation: lightningFlash 0.28s steps(1, end) forwards;
+  will-change: opacity;
+}
+
+.bolt-path {
+  animation: boltDraw 0.64s ease-out forwards;
+}
+
+.bolt-branch {
+  animation: boltDraw 0.46s ease-out forwards;
+}
+
+.wind-streak {
+  position: fixed;
+  top: 0;
+  height: 2px;
+  pointer-events: none;
+  z-index: var(--z-wind);
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(200, 230, 255, 0.7),
+    transparent
+  );
+  animation: windStreak linear forwards;
+}
+
+.wind-whirl {
+  position: fixed;
+  pointer-events: none;
+  z-index: var(--z-wind-front);
+  width: 120px;
+  height: 120px;
+  transition-property: transform, opacity;
+  transition-timing-function: cubic-bezier(0.2, 0.7, 0.24, 1);
+  filter: drop-shadow(0 1px 4px rgba(160, 215, 255, 0.22));
+  opacity: 0;
+}
+
+.wind-whirl-inner {
+  position: absolute;
+  inset: 0;
+  animation: whirlSpin linear forwards;
+}
+
+.wind-ring {
+  position: absolute;
+  border-radius: var(--radius-round);
+  box-sizing: border-box;
+  background:
+    conic-gradient(
+      from var(--ring-start, 0deg),
+      rgba(220, 242, 255, 0) 0deg,
+      rgba(220, 242, 255, var(--ring-alpha, 0.7)) 42deg,
+      rgba(180, 225, 255, calc(var(--ring-alpha, 0.7) * 0.95)) 118deg,
+      rgba(180, 225, 255, 0) 178deg,
+      rgba(180, 225, 255, 0) 360deg
+    );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--ring-thickness, 3px)),
+    #000 calc(100% - var(--ring-thickness, 3px))
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--ring-thickness, 3px)),
+    #000 calc(100% - var(--ring-thickness, 3px))
+  );
+  filter: blur(var(--ring-blur, 0px)) saturate(0.95);
+}
+
+.wind-whirl-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-round);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(236, 249, 255, 0.96) 0%,
+    rgba(189, 227, 255, 0.86) 52%,
+    rgba(149, 202, 244, 0.12) 100%
+  );
+  box-shadow:
+    0 0 5px rgba(176, 224, 255, 0.32),
+    0 0 10px rgba(176, 224, 255, 0.18);
+  animation: whirlCorePulse 0.9s ease-in-out infinite;
+}
+
+.wind-whirl-dust {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: var(--radius-round);
+  background: rgba(226, 246, 255, 0.94);
+  box-shadow: 0 0 4px rgba(186, 224, 255, 0.5);
+  transform-origin: 0 0;
+  animation: whirlDustOrbit 1.05s linear infinite;
+}

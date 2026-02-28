@@ -17,6 +17,9 @@
     "onCommand:pinguin.openPet",
     "onView:pinguinPet.sidebar"
   ],
+  "scripts": {
+    "test:core": "node tests/penguin-core.test.js"
+  },
   "contributes": {
     "commands": [
       {

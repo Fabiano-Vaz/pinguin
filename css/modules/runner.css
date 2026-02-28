@@ -1,0 +1,227 @@
+body.runner-mode .penguin,
+body.runner-mode .penguin-umbrella,
+body.runner-mode .speech-bubble,
+body.runner-mode .particle,
+body.runner-mode .clickEffect,
+body.runner-mode .food-drop,
+body.runner-mode .food-fish-drop,
+body.runner-mode .snowflake,
+body.runner-mode .snow-event-snowman,
+body.runner-mode .rain-drop,
+body.runner-mode .lightning-flash,
+body.runner-mode .lightning-bolt,
+body.runner-mode .wind-gust,
+body.runner-mode .wind-streak,
+body.runner-mode .wind-whirl,
+body.runner-mode .penguin-debug-panel {
+  display: none !important;
+}
+
+body.runner-mode,
+body.runner-mode.fish-cursor-enabled {
+  cursor: auto !important;
+}
+
+body.runner-mode .fish-stock-hud {
+  top: 12px;
+  left: auto;
+  right: 12px;
+  z-index: var(--z-runner-hud);
+}
+
+@media (max-width: 700px) {
+  body.runner-mode .fish-stock-hud {
+    top: 8px;
+    right: 8px;
+  }
+}
+
+.runner-game {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-runner);
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.runner-game.active {
+  display: block;
+}
+
+.runner-hud {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-white);
+  text-shadow: 0 3px 9px var(--color-overlay-dark-45);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.runner-hint {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  font-size: 14px;
+  color: var(--color-white);
+  text-shadow: 0 2px 8px var(--color-overlay-dark-45);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .runner-hud {
+    top: 12px;
+    left: 12px;
+    font-size: 14px;
+  }
+
+  .runner-hint {
+    top: 34px;
+    left: 12px;
+    right: auto;
+    max-width: calc(100vw - 24px);
+    font-size: 12px;
+    white-space: normal;
+  }
+}
+
+.runner-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  color: var(--color-white);
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+}
+
+.runner-penguin {
+  position: fixed;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  z-index: 2;
+  transform-origin: center 80%;
+}
+
+.runner-ground {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 78vh;
+  height: 0;
+  background: transparent;
+  z-index: 1;
+}
+
+.runner-moon {
+  position: fixed;
+  top: 36px;
+  right: 88px;
+  width: 90px;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.94;
+  filter: drop-shadow(0 0 10px rgba(236, 246, 255, 0.45));
+  transform: translate3d(0, 0, 0);
+}
+
+@media (max-width: 700px) {
+  .runner-moon {
+    top: 14px;
+    right: 26px;
+    width: 64px;
+  }
+}
+
+.runner-obstacle {
+  position: fixed;
+  z-index: 2;
+  border-radius: 8px;
+  border: 2px solid rgb(255, 255, 255);
+  background: rgb(145, 200, 255);
+}
+
+.runner-debug-collision-dot {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: #ff2f2f;
+  box-shadow: 0 0 0 0 rgba(255, 47, 47, 0.75);
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+  transition:
+    transform 110ms ease-out,
+    opacity 90ms ease-out,
+    box-shadow 120ms ease-out;
+}
+
+.runner-debug-collision-dot.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  box-shadow: 0 0 0 8px rgba(255, 47, 47, 0);
+}
+
+.runner-debug-hitbox-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.runner-debug-hitbox {
+  position: fixed;
+  display: none;
+  box-sizing: border-box;
+  border: 2px solid rgba(255, 92, 92, 0.9);
+  background: rgba(255, 92, 92, 0.08);
+  border-radius: 4px;
+}
+
+.runner-debug-hitbox.is-penguin {
+  border-color: rgba(90, 255, 190, 0.95);
+  background: rgba(90, 255, 190, 0.12);
+}
+
+.runner-debug-hitbox.is-obstacle {
+  border-color: rgba(255, 92, 92, 0.92);
+  background: rgba(255, 92, 92, 0.1);
+}
+
+.runner-obstacle--airplane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28));
+}
+
+.runner-helicopter {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transform-origin: center;
+  transform: translateY(-41px) rotate(-13deg) scale(var(--heli-scale, 1));
+}
+
+.runner-obstacle--snowman {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.runner-snowman {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}

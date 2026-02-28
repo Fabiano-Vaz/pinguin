@@ -56,6 +56,7 @@
       if (!penguin) return;
       if (penguin.isFishingActive) return;
       if (penguin.isCaveirinhaMode) return;
+      if (penguin.isDragging || penguin.isWalkingAway) return;
 
       if (typeof penguin.onScreenClick === "function") {
         penguin.onScreenClick();
@@ -92,6 +93,12 @@
             window.PenguinPet && window.PenguinPet.penguin
               ? window.PenguinPet.penguin
               : null;
+          if (
+            currentPenguin &&
+            (currentPenguin.isDragging || currentPenguin.isWalkingAway)
+          ) {
+            return;
+          }
 
           const penguinCenterX =
             currentPenguin &&
@@ -124,6 +131,11 @@
             }
 
             currentPenguin.isCaveirinhaMode = true;
+            if (typeof currentPenguin.setActivityMode === "function") {
+              currentPenguin.setActivityMode("caveirinha", "weather:lightning-double-click", {
+                force: true,
+              });
+            }
             currentPenguin.aiLocked = true;
             currentPenguin.stepQueue = [];
             currentPenguin.isChasing = false;
@@ -148,6 +160,11 @@
 
             currentPenguin.caveirinhaTimeoutId = setTimeout(() => {
               currentPenguin.isCaveirinhaMode = false;
+              if (typeof currentPenguin.setActivityMode === "function") {
+                currentPenguin.setActivityMode("idle", "weather:caveirinha-finished", {
+                  force: true,
+                });
+              }
               if (typeof currentPenguin.unlockVisualSprite === "function") {
                 currentPenguin.unlockVisualSprite();
               }

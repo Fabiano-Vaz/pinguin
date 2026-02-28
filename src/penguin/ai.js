@@ -371,6 +371,9 @@
       if (this.isDragging || this.isRanting) return;
 
       this.isRanting = true;
+      if (typeof this.setActivityMode === "function") {
+        this.setActivityMode("ranting", "rant:start", { force: true });
+      }
       this.rantCooldownUntil = Date.now() + 12000;
       this.aiLocked = true;
       this.stepQueue = [];
@@ -403,6 +406,9 @@
           this.element.style.animation = "";
           if (!this.isMoving) this.setState("idle");
           this.isRanting = false;
+          if (typeof this.setActivityMode === "function") {
+            this.setActivityMode("idle", "rant:finish", { force: true });
+          }
           this.aiLocked = false;
           this.scheduleNextBehavior();
         },
@@ -428,13 +434,20 @@
         clearTimeout(this.nextBehaviorTimeoutId);
         this.nextBehaviorTimeoutId = null;
       }
+      if (typeof this.clearManagedTimer === "function") {
+        this.clearManagedTimer("behavior", "next");
+      }
       const delay =
         BEHAVIOR_DELAY_MIN_MS + Math.random() * BEHAVIOR_DELAY_VARIATION_MS;
-      this.nextBehaviorTimeoutId = setTimeout(() => {
+      const runScheduledBehavior = () => {
         this.nextBehaviorTimeoutId = null;
         if (this.enforceFoodPriority()) return;
         this.startNextBehavior();
-      }, delay);
+      };
+      this.nextBehaviorTimeoutId =
+        typeof this.setManagedTimeout === "function"
+          ? this.setManagedTimeout("behavior", "next", runScheduledBehavior, delay)
+          : setTimeout(runScheduledBehavior, delay);
     },
 
     getStepTransitionDelay() {
@@ -448,6 +461,9 @@
       if (this.nextBehaviorTimeoutId) {
         clearTimeout(this.nextBehaviorTimeoutId);
         this.nextBehaviorTimeoutId = null;
+      }
+      if (typeof this.clearManagedTimer === "function") {
+        this.clearManagedTimer("behavior", "next");
       }
       if (this.enforceFoodPriority()) return;
       if (this.aiLocked) return;
@@ -642,6 +658,12 @@
       const fishingSessionId = `${Date.now()}-${Math.random()}`;
       this.activeFishingSessionId = fishingSessionId;
       this.isFishingActive = true;
+      if (typeof this.setActivityMode === "function") {
+        this.setActivityMode("fishing", "runFishingAction:start", { force: true });
+      }
+      if (typeof this.clearManagedContext === "function") {
+        this.clearManagedContext("fishing_action");
+      }
       if (typeof this.hideUmbrella === "function") {
         this.hideUmbrella();
       }
@@ -679,7 +701,8 @@
       this.speak();
 
       for (let tick = 1; tick <= rewardTicks; tick += 1) {
-        setTimeout(() => {
+        const rewardKey = `reward_${tick}`;
+        const rewardTask = () => {
           if (
             this.activeFishingSessionId !== fishingSessionId ||
             !this.isFishingActive
@@ -689,13 +712,26 @@
           if (typeof runtime.addFishStock === "function") {
             runtime.addFishStock(fishPerTick);
           }
-        }, tick * rewardIntervalMs);
+        };
+        if (typeof this.setManagedTimeout === "function") {
+          this.setManagedTimeout(
+            "fishing_action",
+            rewardKey,
+            rewardTask,
+            tick * rewardIntervalMs,
+          );
+        } else {
+          setTimeout(rewardTask, tick * rewardIntervalMs);
+        }
       }
 
-      setTimeout(() => {
+      const finishFishingTask = () => {
         if (this.activeFishingSessionId !== fishingSessionId) return;
         this.activeFishingSessionId = null;
         this.isFishingActive = false;
+        if (typeof this.setActivityMode === "function") {
+          this.setActivityMode("idle", "runFishingAction:finish", { force: true });
+        }
         const shouldRestoreFishCursor =
           this.fishCursorEnabledBeforeFishing &&
           (typeof runtime.getFishStock !== "function" || runtime.getFishStock() > 0);
@@ -725,7 +761,17 @@
         }
         if (!this.isMoving) this.setState("idle");
         this.runNextStep();
-      }, totalDurationMs);
+      };
+      if (typeof this.setManagedTimeout === "function") {
+        this.setManagedTimeout(
+          "fishing_action",
+          "finish",
+          finishFishingTask,
+          totalDurationMs,
+        );
+      } else {
+        setTimeout(finishFishingTask, totalDurationMs);
+      }
     },
   });
 })();

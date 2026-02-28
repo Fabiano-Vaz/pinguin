@@ -92,6 +92,8 @@
       obstacleAirplaneChance: 0.2,
       obstacleSnowmanChanceAtHighLevel: 0.4,
       obstacleSnowmanChanceAtLowLevel: 0.4,
+      obstacleSnowmanChanceSnowingMultiplier: 1.75,
+      obstacleSnowmanChanceSnowingMax: 0.85,
       obstacleIcebergTallChance: 0.6,
       obstacleIcebergJaggedChance: 0.8,
       obstacleSnowmanHitboxInsetXRatio: 0.22,

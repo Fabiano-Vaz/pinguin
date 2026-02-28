@@ -5,8 +5,8 @@
             <stop offset="100%" style="stop-color:#e0f0ff" />
         </radialGradient>
     </defs>
-
-    <ellipse cx="50" cy="110" rx="35" ry="8" fill="#d0e0f0" opacity="0.5" />
+    <!-- 
+    <ellipse cx="50" cy="110" rx="35" ry="8" fill="#d0e0f0" opacity="0.5" /> -->
 
     <circle cx="50" cy="90" r="25" fill="url(#snowGrad)" stroke="#b0c4de" stroke-width="0.5" />
     <circle cx="50" cy="60" r="18" fill="url(#snowGrad)" stroke="#b0c4de" stroke-width="0.5" />

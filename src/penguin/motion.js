@@ -105,6 +105,9 @@
           this.isMoving = false;
           this.allowAirMovement = false;
           this.stopWingFlap();
+          if (typeof this.setActivityMode === "function") {
+            this.setActivityMode("idle", "drop-fall:landed", { force: true });
+          }
           this.setState("idle");
         }
         return;
@@ -112,13 +115,14 @@
 
       if (this.customMotion.type === "walkAwayExit") {
         const cfg = motion || {};
-        const motion = this.customMotion;
-        motion.elapsed += dtSeconds * 1000;
-        const t = Math.min(1, motion.elapsed / motion.duration);
+        const currentMotion = this.customMotion;
+        currentMotion.elapsed += dtSeconds * 1000;
+        const t = Math.min(1, currentMotion.elapsed / currentMotion.duration);
         const eased = t * t * (3 - 2 * t);
 
-        this.x = motion.startX + (motion.targetX - motion.startX) * eased;
-        this.y = motion.startY;
+        this.x =
+          currentMotion.startX + (currentMotion.targetX - currentMotion.startX) * eased;
+        this.y = currentMotion.startY;
         this.visualScale = Math.max(
           cfg.walkAwayExitMinVisualScale || 0.22,
           1 - eased * (cfg.walkAwayExitScaleReductionFactor || 0.78),
@@ -138,7 +142,7 @@
               Math.min(this.walkAwayReturnX, window.innerWidth - penguinSize),
             );
             const returnY = this.clampY(this.walkAwayReturnY, false);
-            const exitedToRight = motion.targetX > motion.startX;
+            const exitedToRight = currentMotion.targetX > currentMotion.startX;
             const offscreenPadding = cfg.walkAwayOffscreenPaddingPx || 12;
             this.x = exitedToRight
               ? window.innerWidth + penguinSize + offscreenPadding
@@ -169,13 +173,15 @@
 
       if (this.customMotion.type === "returnAfterWalkAway") {
         const cfg = motion || {};
-        const motion = this.customMotion;
-        motion.elapsed += dtSeconds * 1000;
-        const t = Math.min(1, motion.elapsed / motion.duration);
+        const currentMotion = this.customMotion;
+        currentMotion.elapsed += dtSeconds * 1000;
+        const t = Math.min(1, currentMotion.elapsed / currentMotion.duration);
         const eased = t * t * (3 - 2 * t);
 
-        this.x = motion.startX + (motion.targetX - motion.startX) * eased;
-        this.y = motion.startY + (motion.targetY - motion.startY) * eased;
+        this.x =
+          currentMotion.startX + (currentMotion.targetX - currentMotion.startX) * eased;
+        this.y =
+          currentMotion.startY + (currentMotion.targetY - currentMotion.startY) * eased;
         this.visualScale = (cfg.walkAwayReturnStartVisualScale || 0.55) + eased * 0.45;
         this.applyTransform(1);
 
@@ -184,6 +190,9 @@
           this.isMoving = false;
           this.allowAirMovement = false;
           this.isWalkingAway = false;
+          if (typeof this.setActivityMode === "function") {
+            this.setActivityMode("idle", "walk-away:return-finished", { force: true });
+          }
           this.dropReleaseStreak = 0;
           this.visualScale = 1;
           this.stopWaddleSteps();

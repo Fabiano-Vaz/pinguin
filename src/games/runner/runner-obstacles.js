@@ -10,12 +10,28 @@
   const chooseObstacleTemplate = () => {
     const level = runner.difficultyLevel();
     const roll = Math.random();
+    const isSnowingNow = Boolean(
+      window.PenguinPet &&
+        window.PenguinPet.effects &&
+        typeof window.PenguinPet.effects.isSnowing === "function" &&
+        window.PenguinPet.effects.isSnowing(),
+    );
 
     const airplaneMinLevel = runnerConfig.obstacleAirplaneChanceMinLevel || 1.5;
     const airplaneChance = runnerConfig.obstacleAirplaneChance || 0.2;
-    const snowmanHighLevelChance =
+    const snowingMultiplier =
+      runnerConfig.obstacleSnowmanChanceSnowingMultiplier || 1.75;
+    const snowingSnowmanMax = runnerConfig.obstacleSnowmanChanceSnowingMax || 0.85;
+    const baseSnowmanHighLevelChance =
       runnerConfig.obstacleSnowmanChanceAtHighLevel || 0.4;
-    const snowmanLowLevelChance = runnerConfig.obstacleSnowmanChanceAtLowLevel || 0.4;
+    const baseSnowmanLowLevelChance =
+      runnerConfig.obstacleSnowmanChanceAtLowLevel || 0.4;
+    const snowmanHighLevelChance = isSnowingNow
+      ? Math.min(snowingSnowmanMax, baseSnowmanHighLevelChance * snowingMultiplier)
+      : baseSnowmanHighLevelChance;
+    const snowmanLowLevelChance = isSnowingNow
+      ? Math.min(snowingSnowmanMax, baseSnowmanLowLevelChance * snowingMultiplier)
+      : baseSnowmanLowLevelChance;
     const icebergTallChance = runnerConfig.obstacleIcebergTallChance || 0.6;
     const icebergJaggedChance = runnerConfig.obstacleIcebergJaggedChance || 0.8;
 

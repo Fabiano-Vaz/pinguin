@@ -500,6 +500,21 @@
       });
     },
 
+    clearPendingDropReaction() {
+      this.dropReactionToken = (this.dropReactionToken || 0) + 1;
+      if (typeof this.clearManagedContext === "function") {
+        this.clearManagedContext("drop_reaction");
+      }
+      if (this.dropReactionIntervalId) {
+        clearInterval(this.dropReactionIntervalId);
+        this.dropReactionIntervalId = null;
+      }
+      if (this.dropReactionTimeoutId) {
+        clearTimeout(this.dropReactionTimeoutId);
+        this.dropReactionTimeoutId = null;
+      }
+    },
+
     onDragStart(e) {
       if (this.isCaveirinhaMode) return;
       if (this.isFishingActive) return;
@@ -512,6 +527,7 @@
       }
       e.preventDefault();
       this.isDragging = true;
+      this.clearPendingDropReaction();
       this.isCursorTouchEating = false;
       this.currentFoodTarget = null;
       this.isEatingFood = false;
@@ -524,6 +540,9 @@
       this.isMoving = false;
       this.customMotion = null;
       this.allowAirMovement = true;
+      if (typeof this.setActivityMode === "function") {
+        this.setActivityMode("dragging", "drag:start", { force: true });
+      }
       this.element.style.animation = "";
       this.setState("flying");
       this.startWingFlap();
@@ -571,6 +590,9 @@
 
       if (!this.dragMoved) {
         this.allowAirMovement = false;
+        if (typeof this.setActivityMode === "function") {
+          this.setActivityMode("idle", "drag:end:no-move", { force: true });
+        }
         this.setState("idle");
         this.aiLocked = false;
         this.tryStartFoodHunt();
@@ -591,10 +613,18 @@
         return;
       }
 
+      const walkMinY =
+        typeof this.getWalkMinY === "function" ? this.getWalkMinY() : this.y;
+      const thrownUp = this.y < walkMinY - 12;
+      if (thrownUp && typeof this.blowAwayUmbrella === "function") {
+        this.blowAwayUmbrella(this.facingRight ? 1 : -1);
+      }
+
       this.dropWithFlap();
     },
 
     startWalkAwayAfterDrops() {
+      this.clearPendingDropReaction();
       this.aiLocked = true;
       this.isChasing = false;
       this.stepQueue = [];
@@ -604,6 +634,9 @@
       this.customMotion = null;
       this.allowAirMovement = false;
       this.isWalkingAway = true;
+      if (typeof this.setActivityMode === "function") {
+        this.setActivityMode("walk_away", "drop:walk-away", { force: true });
+      }
       this.isMoving = true;
       this.speed = SPEED_WALK;
       this.element.style.animation = "";
@@ -617,6 +650,9 @@
 
       const midX = this.x + halfPenguinSize;
       const goRight = midX >= window.innerWidth / 2;
+      if (typeof this.blowAwayUmbrella === "function") {
+        this.blowAwayUmbrella(goRight ? 1 : -1);
+      }
       const exitPadding = penguinSize + 12;
       const targetX = goRight ? window.innerWidth + exitPadding : -exitPadding;
       this.customMotion = {
@@ -630,19 +666,28 @@
     },
 
     dropWithFlap() {
+      this.clearPendingDropReaction();
+      const reactionToken = this.dropReactionToken;
       this.aiLocked = true;
       this.isChasing = false;
       this.stepQueue = [];
       this.speed = SPEED_WALK;
       this.startDropFall();
 
-      const waitLanding = setInterval(() => {
+      const onDropPoll = () => {
+        if (reactionToken !== this.dropReactionToken) return;
+        if (this.isWalkingAway || this.isDragging) return;
         if (!this.isMoving) {
-          clearInterval(waitLanding);
+          if (typeof this.clearManagedTimer === "function") {
+            this.clearManagedTimer("drop_reaction", "poll");
+          }
+          this.dropReactionIntervalId = null;
           this.speed = SPEED_WALK;
           this.setState("angry");
           this.speak();
-          setTimeout(() => {
+          const onDropCooldownDone = () => {
+            if (reactionToken !== this.dropReactionToken) return;
+            if (this.isWalkingAway || this.isDragging) return;
             if (!this.isMoving) this.setState("idle");
             this.aiLocked = false;
             if (this.foodTargets.length > 0) {
@@ -650,9 +695,23 @@
             } else {
               this.scheduleNextBehavior();
             }
-          }, 1800);
+            this.dropReactionTimeoutId = null;
+          };
+          this.dropReactionTimeoutId =
+            typeof this.setManagedTimeout === "function"
+              ? this.setManagedTimeout(
+                  "drop_reaction",
+                  "cooldown",
+                  onDropCooldownDone,
+                  1800,
+                )
+              : setTimeout(onDropCooldownDone, 1800);
         }
-      }, 100);
+      };
+      this.dropReactionIntervalId =
+        typeof this.setManagedInterval === "function"
+          ? this.setManagedInterval("drop_reaction", "poll", onDropPoll, 100)
+          : setInterval(onDropPoll, 100);
     },
 
     onClickPenguin() {

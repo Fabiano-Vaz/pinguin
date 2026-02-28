@@ -84,6 +84,7 @@
     const state = effects.state || {};
 
     if (state.isSnowmanEncounterActive || !isSnowing()) return;
+    if (state.snowmanSpawnedThisCycle) return;
     if (isRaining()) return;
 
     const penguin = window.PenguinPet && window.PenguinPet.penguin;
@@ -134,6 +135,7 @@
 
     state.activeSnowmanEl = snowman;
     state.isSnowmanEncounterActive = true;
+    state.snowmanSpawnedThisCycle = true;
 
     if (!penguin) {
       state.snowmanDespawnTimeoutId = setTimeout(clearSnowmanEncounter, 10000);
@@ -321,6 +323,7 @@
       clearInterval(state.snowmanSpawnIntervalId);
       state.snowmanSpawnIntervalId = null;
     }
+    state.snowmanSpawnedThisCycle = false;
     clearSnowmanEncounter();
     if (clearVisuals) {
       document.querySelectorAll(".particle").forEach((el) => el.remove());
@@ -404,6 +407,7 @@
     const state = effects.state || {};
     if (state.snowSpawnIntervalId !== null) return;
     state.snowManualMode = manual;
+    state.snowmanSpawnedThisCycle = false;
     if (state.rainSpawnIntervalId !== null) stopRainCycle(true, true);
 
     state.snowSpawnIntervalId = setInterval(

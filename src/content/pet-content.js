@@ -31,6 +31,12 @@
     thinking: ["...", "*pensa*", "hmm..."],
 
     eating: ["*nom nom*", "*come*", "mmm."],
+    full: [
+      "SOCORRO...comi muitos peixinhos",
+      "Buchinho cheio",
+      "Acho que comi demais",
+    ],
+    fullSleep: ["Vou tirar um cochilinho e ja volto."],
     fishing: [
       "aff, vou ter que pescar...",
       "ninguem me da peixe, ne...",

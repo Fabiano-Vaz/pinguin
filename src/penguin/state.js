@@ -5,6 +5,21 @@
     setState(state) {
       if (Date.now() < (this.visualLockUntil || 0)) return;
       if (
+        this.currentState === "sleeping" &&
+        Date.now() < (this.sleepWakeLockUntil || 0) &&
+        state !== "sleeping"
+      ) {
+        return;
+      }
+      if (
+        this.currentState === "full" &&
+        this.isFullBellySequenceActive &&
+        state !== "full" &&
+        !this.allowFullStateTransition
+      ) {
+        return;
+      }
+      if (
         this.isWalkingAway &&
         this.customMotion &&
         this.customMotion.type === "returnAfterWalkAway" &&
@@ -18,6 +33,12 @@
       if (!stateAsset) return;
       this.currentState = state;
       this.img.src = stateAsset;
+      if (
+        (state === "sleeping" || state === "full") &&
+        typeof this.hideUmbrella === "function"
+      ) {
+        this.hideUmbrella();
+      }
     },
 
     setVisualState(state) {

@@ -108,6 +108,9 @@
       this.isCursorTouchEating = false;
       this.cursorTouchEatingUntil = 0;
       this.fishEatenCount = 0;
+      this.lastFishEatenAt = 0;
+      this.isFullBellySequenceActive = false;
+      this.allowFullStateTransition = false;
       this.fishCursorResumeTimeout = null;
       this.screenClickStreak = 0;
       this.lastScreenClickAt = 0;
@@ -122,6 +125,7 @@
       this.walkAwayReturnX = this.x;
       this.walkAwayReturnY = this.y;
       this.visualLockUntil = 0;
+      this.sleepWakeLockUntil = 0;
       this.caveirinhaTimeoutId = null;
       this.isCaveirinhaMode = false;
       this.windTilt = 0;
@@ -463,6 +467,7 @@
 
     showUmbrella() {
       if (this.isFishingActive) return;
+      if (this.currentState === "sleeping" || this.currentState === "full") return;
       if (this.umbrellaEl.classList.contains("flying-away")) return;
       if (this.umbrellaEl.classList.contains("open")) return;
       this.updateUmbrellaPosition();

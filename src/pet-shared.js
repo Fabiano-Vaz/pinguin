@@ -17,6 +17,7 @@
     laughing: "pinguin gargalhando.svg",
     thinking: "pinguin-apaixonado.svg",
     eating: "pinguin comendo peixe.svg",
+    full: "pinguim cheio.svg",
     fishing: "pinguin pescando no gelo.svg",
     flying: "pinguin voando.svg",
     turningBack: "pinguin de costas.svg",

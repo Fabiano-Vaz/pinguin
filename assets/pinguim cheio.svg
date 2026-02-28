@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- Corpo inteiro com leve oscilacao de peso -->
+    <g>
+        <animateTransform attributeName="transform" type="translate"
+            values="0 0; 0 2; 0 0; 0 1; 0 0"
+            dur="2.8s" repeatCount="indefinite" />
+
+        <!-- PES -->
+        <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+            <path
+                d="M68 223
+                     C46 229, 44 243, 63 248
+                     C84 253, 114 245, 120 236
+                     C126 227, 104 220, 68 223 Z" />
+            <path
+                d="M192 223
+                     C214 229, 216 243, 197 248
+                     C176 253, 146 245, 140 236
+                     C134 227, 156 220, 192 223 Z" />
+        </g>
+
+        <!-- CORPO MAIS CHEIO -->
+        <path
+            d="M130 92
+                 C72 94, 44 140, 52 188
+                 C60 224, 92 246, 130 252
+                 C168 246, 200 224, 208 188
+                 C216 140, 188 94, 130 92 Z"
+            fill="#0a0a0a" />
+
+        <!-- BARRIGA ESTUFADA COM RESPIRACAO PESADA -->
+        <g>
+            <animateTransform attributeName="transform" type="scale"
+                values="1 1; 1.03 1.06; 1 1; 1.02 1.04; 1 1"
+                dur="2.8s" repeatCount="indefinite" additive="sum" />
+            <animateTransform attributeName="transform" type="translate"
+                values="0 0; -4 -8; 0 0; -3 -6; 0 0"
+                dur="2.8s" repeatCount="indefinite" additive="sum" />
+            <path
+                d="M130 112
+                     C95 114, 69 144, 72 184
+                     C75 218, 99 239, 130 244
+                     C161 239, 185 218, 188 184
+                     C191 144, 165 114, 130 112 Z"
+                fill="#ffffff" />
+            <ellipse cx="130" cy="174" rx="25" ry="35" fill="#f7f7f7" opacity="0.8" />
+        </g>
+
+        <!-- ASAS ESFREGANDO A BARRIGA -->
+        <g>
+            <animateTransform attributeName="transform" type="translate"
+                values="0 0; 8 -6; 0 0; 6 -5; 0 0"
+                dur="1.3s" repeatCount="indefinite" />
+            <g>
+                <path
+                    d="M74 146
+                     C48 174, 58 212, 96 220
+                     C106 206, 105 162, 74 146 Z"
+                    fill="#0a0a0a" />
+                <animateTransform attributeName="transform" type="rotate"
+                    values="-24 100 158; 0 100 158; 0 100 158; -8 100 158; -24 100 158"
+                    dur="1.3s" repeatCount="indefinite" />
+            </g>
+        </g>
+        <g>
+            <animateTransform attributeName="transform" type="translate"
+                values="0 0; -8 -6; 0 0; -6 -5; 0 0"
+                dur="1.3s" repeatCount="indefinite" />
+            <g>
+                <path
+                    d="M186 146
+                     C212 174, 202 212, 164 220
+                     C154 206, 155 162, 186 146 Z"
+                    fill="#0a0a0a" />
+                <animateTransform attributeName="transform" type="rotate"
+                    values="24 160 158; 0 160 158; 0 160 158; 8 160 158; 24 160 158"
+                    dur="1.3s" repeatCount="indefinite" />
+            </g>
+        </g>
+
+        <!-- PESCOCO MAIS CURTO -->
+        <ellipse cx="130" cy="86" rx="18" ry="18" fill="#0a0a0a" />
+
+        <!-- CABECA MAIS BAIXA (menos pescocudo) -->
+        <g>
+            <animateTransform attributeName="transform" type="rotate"
+                values="0 130 84; -2 130 84; 0 130 84; 1 130 84; 0 130 84"
+                dur="2.8s" repeatCount="indefinite" />
+
+            <ellipse cx="130" cy="68" rx="45" ry="35" fill="#0a0a0a" />
+
+            <!-- CABELO -->
+            <g fill="#0a0a0a">
+                <ellipse cx="130" cy="33" rx="7" ry="12" transform="rotate(-5 130 33)" />
+                <ellipse cx="113" cy="38" rx="6" ry="10" transform="rotate(-20 113 38)" />
+                <ellipse cx="147" cy="38" rx="6" ry="10" transform="rotate(20 147 38)" />
+                <ellipse cx="101" cy="45" rx="5" ry="8" transform="rotate(-35 101 45)" />
+                <ellipse cx="159" cy="45" rx="5" ry="8" transform="rotate(35 159 45)" />
+            </g>
+
+            <!-- OLHOS SONOLENTOS -->
+            <g fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round">
+                <path d="M104 64 C109 58, 123 58, 128 64" />
+                <path d="M132 64 C137 58, 151 58, 156 64" />
+                <animate attributeName="opacity" values="1;1;0.15;1;1" dur="4s"
+                    repeatCount="indefinite" />
+            </g>
+
+            <!-- BICO -->
+            <path
+                d="M108 80
+                     C108 72, 120 69, 130 69
+                     C140 69, 152 72, 152 80
+                     C152 87, 140 93, 130 93
+                     C120 93, 108 87, 108 80 Z"
+                fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+
+            <!-- BOCA SATISFEITA -->
+            <path d="M118 87 C123 91, 137 91, 142 87"
+                fill="none" stroke="#bf8f00" stroke-width="1.2" stroke-linecap="round" />
+
+            <!-- BOCHECHAS PULSANDO -->
+            <g>
+                <ellipse cx="108" cy="73" rx="8" ry="5.5" fill="#e05060" opacity="0.3" />
+                <ellipse cx="152" cy="73" rx="8" ry="5.5" fill="#e05060" opacity="0.3" />
+                <animate attributeName="opacity" values="0.25;0.4;0.25" dur="2.8s"
+                    repeatCount="indefinite" />
+            </g>
+        </g>
+
+        <!-- LINHAS DE "ESTUFADO" -->
+        <g fill="none" stroke="#000" stroke-width="1" opacity="0.75">
+            <path d="M112 154 C118 148, 126 148, 132 154" />
+            <path d="M128 154 C134 148, 142 148, 148 154" />
+            <path d="M121 178 C127 172, 133 172, 139 178" />
+        </g>
+    </g>
+</svg>

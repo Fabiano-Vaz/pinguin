@@ -1,5 +1,9 @@
 (() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
+  const pickRandomLine = (lines, fallback) => {
+    if (!Array.isArray(lines) || lines.length === 0) return fallback;
+    return lines[Math.floor(Math.random() * lines.length)] || fallback;
+  };
 
   modules.ai = ({
     actionStates,
@@ -88,6 +92,7 @@
     },
 
     enforceFoodPriority() {
+      if (this.isFullBellySequenceActive) return true;
       if (this.isFishingActive) return false;
       if (!this.hasPendingFoodTargets()) return false;
 
@@ -110,6 +115,109 @@
         return;
       }
       runtime.isFishCursorEnabled = Boolean(enabled);
+    },
+
+    registerFishEaten() {
+      if (this.isFullBellySequenceActive) return;
+      const now = Date.now();
+      const streakWindowMs = 12000;
+      if (!this.lastFishEatenAt || now - this.lastFishEatenAt > streakWindowMs) {
+        this.fishEatenCount = 0;
+      }
+      this.lastFishEatenAt = now;
+      this.fishEatenCount = Number.isFinite(this.fishEatenCount)
+        ? this.fishEatenCount + 1
+        : 1;
+      if (this.fishEatenCount >= 6) {
+        this.startFullBellySequence();
+      }
+    },
+
+    startFullBellySequence() {
+      if (this.isFullBellySequenceActive) return;
+      this.isFullBellySequenceActive = true;
+      this.fishEatenCount = 0;
+      this.lastFishEatenAt = 0;
+
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.isChasing = false;
+      this.isMoving = false;
+      this.targetX = this.x;
+      this.targetY = this.y;
+      this.currentFoodTarget = null;
+      this.foodTargets = [];
+      this.isEatingFood = false;
+      this.isCursorTouchEating = false;
+      this.cursorTouchEatingUntil = 0;
+      this.allowFullStateTransition = false;
+      this.element.style.animation = "";
+
+      if (this.nextBehaviorTimeoutId) {
+        clearTimeout(this.nextBehaviorTimeoutId);
+        this.nextBehaviorTimeoutId = null;
+      }
+      if (typeof this.clearManagedTimer === "function") {
+        this.clearManagedTimer("behavior", "next");
+      }
+      if (typeof this.clearManagedContext === "function") {
+        this.clearManagedContext("overfed");
+      }
+      if (typeof this.setActivityMode === "function") {
+        this.setActivityMode("eating", "overfed:start", { force: true });
+      }
+      if (typeof this.unlockVisualSprite === "function") {
+        this.unlockVisualSprite();
+      }
+
+      const fullLine = pickRandomLine(
+        phrases && phrases.full,
+        "Acho que comi demais",
+      );
+      const sleepLine = pickRandomLine(
+        phrases && phrases.fullSleep,
+        "Vou tirar um cochilinho e ja volto.",
+      );
+
+      this.setState("full");
+      this.showSpeech(fullLine, 5000, false);
+
+      const toSleepDelayMs = 5000;
+      const sleepWakeLockMs = 10000;
+      const recoverDelayMs = 20000;
+      const moveToSleep = () => {
+        if (!this.isFullBellySequenceActive) return;
+        this.sleepWakeLockUntil = Date.now() + sleepWakeLockMs;
+        this.allowFullStateTransition = true;
+        this.setState("sleeping");
+        this.allowFullStateTransition = false;
+        this.showSpeech(sleepLine, 3200, false);
+      };
+      const recoverFromOverfed = () => {
+        if (!this.isFullBellySequenceActive) return;
+        this.isFullBellySequenceActive = false;
+        this.allowFullStateTransition = false;
+        this.sleepWakeLockUntil = 0;
+        if (typeof this.setActivityMode === "function") {
+          this.setActivityMode("idle", "overfed:finish", { force: true });
+        }
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      };
+
+      if (typeof this.setManagedTimeout === "function") {
+        this.setManagedTimeout("overfed", "sleep", moveToSleep, toSleepDelayMs);
+        this.setManagedTimeout(
+          "overfed",
+          "recover",
+          recoverFromOverfed,
+          toSleepDelayMs + recoverDelayMs,
+        );
+      } else {
+        setTimeout(moveToSleep, toSleepDelayMs);
+        setTimeout(recoverFromOverfed, toSleepDelayMs + recoverDelayMs);
+      }
     },
 
     holdFishCursorFor(ms = 5000) {
@@ -187,7 +295,22 @@
       if (!this.currentFoodTarget || this.isEatingFood) return;
 
       const target = this.currentFoodTarget;
-      this.fishEatenCount += 1;
+      if (target.element && target.element.isConnected) {
+        target.element.classList.add("eaten");
+        setTimeout(() => {
+          if (target.element && target.element.isConnected) {
+            target.element.remove();
+          }
+        }, 160);
+      }
+
+      this.registerFishEaten();
+      if (this.isFullBellySequenceActive) {
+        this.currentFoodTarget = null;
+        this.isEatingFood = false;
+        return;
+      }
+
       this.isEatingFood = true;
       this.isMoving = false;
       this.targetX = this.x;
@@ -198,15 +321,6 @@
         actionStates.runningCrouched || "assets/pinguin correndo abaixado.svg";
       if (typeof this.lockVisualSprite === "function") {
         this.lockVisualSprite(crouchedFishAsset, 260);
-      }
-
-      if (target.element && target.element.isConnected) {
-        target.element.classList.add("eaten");
-        setTimeout(() => {
-          if (target.element && target.element.isConnected) {
-            target.element.remove();
-          }
-        }, 160);
       }
 
       setTimeout(() => {
@@ -259,6 +373,7 @@
     },
 
     handleFoodHunt() {
+      if (this.isFullBellySequenceActive) return;
       if (this.isFishingActive) return;
       if (this.isDragging) return;
       this.pruneFoodTargets();
@@ -294,6 +409,7 @@
     },
 
     applyCursorEatingState() {
+      if (this.isFullBellySequenceActive) return;
       if (this.isFishingActive) {
         if (this.isCursorTouchEating) {
           this.isCursorTouchEating = false;
@@ -338,7 +454,8 @@
             return;
           }
         }
-        this.fishEatenCount += 1;
+        this.registerFishEaten();
+        if (this.isFullBellySequenceActive) return;
         this.isCursorTouchEating = true;
         this.cursorTouchEatingUntil = now + 4000;
         this.isChasing = false;

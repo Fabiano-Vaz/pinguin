@@ -493,7 +493,7 @@
       clearTimeout(game.debugCollisionHideTimeoutId);
     }
 
-    game.debugCollisionHideTimeoutId = setTimeout(() => {
+    game.debugCollisionHideTimeoutId = window.setTimeout(() => {
       debugCollisionDot.classList.remove("is-visible");
       game.debugCollisionHideTimeoutId = 0;
     }, runnerConfig.debugCollisionHideMs || 160);

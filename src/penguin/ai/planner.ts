@@ -1,3 +1,5 @@
+import { BehaviorSelectionService } from "../../services/behavior-selection-service";
+
 export const createPlannerMethods = ({
   runtime,
   behaviors,
@@ -144,106 +146,19 @@ export const createPlannerMethods = ({
     if (this.aiLocked) return;
     this.invalidateBehaviorFlow();
 
-    const pickRandomBehavior = (list, fallback) => {
-      if (!Array.isArray(list) || list.length === 0) return fallback;
-      return list[Math.floor(Math.random() * list.length)] || fallback;
-    };
-    const hasActState = (steps, state) =>
-      Array.isArray(steps) &&
-      steps.some(
-        (step) =>
-          step &&
-          step.type === "act" &&
-          typeof step.state === "string" &&
-          step.state === state,
-      );
-    const hasAnyActState = (steps, states) =>
-      Array.isArray(steps) &&
-      steps.some(
-        (step) =>
-          step &&
-          step.type === "act" &&
-          typeof step.state === "string" &&
-          states.includes(step.state),
-      );
-    const hasFlyMove = (steps) =>
-      Array.isArray(steps) && steps.some((step) => step && step.type === "flyMove");
-
-    const behaviorEntries = behaviors
-      .filter((builder) => typeof builder === "function")
-      .map((builder) => ({ builder, steps: builder() }));
-
-    const fishingBehaviorEntry = behaviorEntries.find(({ steps }) =>
-      hasActState(steps, "fishing"),
-    );
-    const fishingBehavior = fishingBehaviorEntry ? fishingBehaviorEntry.builder : null;
-    const flyBehaviors = behaviorEntries
-      .filter(({ steps }) => hasFlyMove(steps))
-      .map(({ builder }) => builder);
-    const sleepBehaviors = behaviorEntries
-      .filter(({ steps }) => hasActState(steps, "sleeping"))
-      .map(({ builder }) => builder);
-    const expressiveBehaviors = behaviorEntries
-      .filter(({ steps }) =>
-        hasAnyActState(steps, [
-          "thinking",
-          "peeking",
-          "waving",
-          "dancing",
-          "scratching",
-          "turningBack",
-        ]),
-      )
-      .map(({ builder }) => builder);
-
-    const fishStock =
-      typeof runtime.getFishStock === "function"
-        ? runtime.getFishStock()
-        : Number.isFinite(runtime.fishStock)
-          ? runtime.fishStock
-          : null;
-    const shouldPrioritizeFishing = fishStock !== null && fishStock <= 0 && Math.random() < 0.9;
-    const shouldRandomlyPickFishing =
-      !shouldPrioritizeFishing &&
-      fishingBehavior &&
-      fishStock !== null &&
-      fishStock > 0 &&
-      Math.random() < 0.24;
-    const shouldPreferSleepBehavior =
-      !shouldPrioritizeFishing &&
-      !shouldRandomlyPickFishing &&
-      sleepBehaviors.length > 0 &&
-      Math.random() < 0.34;
-    const shouldPreferExpressiveBehavior =
-      !shouldPrioritizeFishing &&
-      !shouldRandomlyPickFishing &&
-      !shouldPreferSleepBehavior &&
-      expressiveBehaviors.length > 0 &&
-      Math.random() < 0.48;
-    const shouldPreferFlyBehavior =
-      !shouldPrioritizeFishing &&
-      !shouldRandomlyPickFishing &&
-      !shouldPreferSleepBehavior &&
-      !shouldPreferExpressiveBehavior &&
-      flyBehaviors.length > 0 &&
-      Math.random() < 0.34;
-
-    const fallbackBehavior = pickRandomBehavior(
-      behaviorEntries.map(({ builder }) => builder),
-      null,
-    );
-    const selectedBehavior =
-      shouldPrioritizeFishing && fishingBehavior
-        ? fishingBehavior
-        : shouldRandomlyPickFishing && fishingBehavior
-          ? fishingBehavior
-          : shouldPreferSleepBehavior
-            ? pickRandomBehavior(sleepBehaviors, fallbackBehavior)
-            : shouldPreferExpressiveBehavior
-              ? pickRandomBehavior(expressiveBehaviors, fallbackBehavior)
-              : shouldPreferFlyBehavior
-                ? pickRandomBehavior(flyBehaviors, fallbackBehavior)
-                : fallbackBehavior;
+    if (!this.behaviorSelectionService) {
+      const getFishStock = () =>
+        typeof runtime.getFishStock === "function"
+          ? runtime.getFishStock()
+          : Number.isFinite(runtime.fishStock)
+            ? runtime.fishStock
+            : null;
+      this.behaviorSelectionService = new BehaviorSelectionService({
+        behaviors,
+        getFishStock,
+      });
+    }
+    const selectedBehavior = this.behaviorSelectionService.chooseNextBehavior();
     const seq = typeof selectedBehavior === "function" ? selectedBehavior() : [];
     const withPrelude = Math.random() < PRELUDE_CHANCE;
 

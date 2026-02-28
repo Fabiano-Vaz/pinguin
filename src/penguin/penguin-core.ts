@@ -1,5 +1,11 @@
 (() => {
   const root = typeof window !== "undefined" ? window : globalThis;
+  type TimerScheduler = {
+    setTimeoutFn?: ((cb: () => void, delay?: number) => ReturnType<typeof setTimeout>) | null;
+    clearTimeoutFn?: ((id: ReturnType<typeof setTimeout>) => void) | null;
+    setIntervalFn?: ((cb: () => void, delay?: number) => ReturnType<typeof setInterval>) | null;
+    clearIntervalFn?: ((id: ReturnType<typeof setInterval>) => void) | null;
+  };
 
   const ACTIVITY_TRANSITIONS = {
     idle: new Set(["dragging", "walk_away", "caveirinha", "fishing", "ranting", "eating"]),
@@ -42,7 +48,7 @@
     };
   };
 
-  const createTimerRegistry = (scheduler = {}) => {
+  const createTimerRegistry = (scheduler: TimerScheduler = {}) => {
     const setTimeoutFn = scheduler.setTimeoutFn || root.setTimeout?.bind(root);
     const clearTimeoutFn = scheduler.clearTimeoutFn || root.clearTimeout?.bind(root);
     const setIntervalFn = scheduler.setIntervalFn || root.setInterval?.bind(root);
@@ -104,12 +110,16 @@
     };
 
     const snapshot = () => {
+      /** @type {Record<string, number>} */
       const byContext = {};
       contexts.forEach((store, context) => {
         byContext[context] = store.size;
       });
       return {
-        total: Object.values(byContext).reduce((acc, value) => acc + value, 0),
+        total: Object.values(byContext).reduce(
+          (acc, value) => Number(acc) + Number(value),
+          0,
+        ),
         byContext,
       };
     };

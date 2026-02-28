@@ -1,3 +1,6 @@
+import { DebugPanelComponent } from "./components/debug-panel-component";
+import { PenguinStateService } from "../services/penguin-state-service";
+
 (() => {
   const pet = window.PenguinPet || {};
   const constants = pet.constants || {};
@@ -47,6 +50,8 @@
       : () => {};
 
   class Penguin {
+    [key: string]: any;
+
     constructor() {
       this.element = document.createElement("div");
       this.element.className = "penguin";
@@ -150,21 +155,22 @@
       this.lastDebugControlAt = 0;
       this.debugActivityOverrideUntil = 0;
       this.debugActionOverrideUntil = 0;
-      this.activityStateMachine =
-        typeof core.createActivityStateMachine === "function"
-          ? core.createActivityStateMachine("idle")
-          : null;
-      this.activityMode = "idle";
-      this.activityModeChangedAt = Date.now();
-      this.timerRegistry =
-        typeof core.createTimerRegistry === "function"
-          ? core.createTimerRegistry()
-          : null;
+      this.stateService = new PenguinStateService({
+        createActivityStateMachine: core.createActivityStateMachine,
+        createTimerRegistry: core.createTimerRegistry,
+        initialActivity: "idle",
+      });
+      this.bindStateLockAliases();
+      this.activityStateMachine = this.stateService.activityStateMachine;
+      this.activityMode = this.stateService.getActivityMode();
+      this.activityModeChangedAt = this.stateService.getActivityModeChangedAt();
+      this.timerRegistry = this.stateService.timerRegistry;
       this.debugEnabled = Boolean(
         (window.PENGUIN_CONFIG && window.PENGUIN_CONFIG.debugPanel) ||
           (typeof localStorage !== "undefined" &&
             localStorage.getItem("penguin.debugPanel") === "1"),
       );
+      this.debugPanelComponent = null;
       this.debugPanelEl = null;
       this.lastDebugRenderAt = 0;
 
@@ -182,17 +188,36 @@
     }
 
     setActivityMode(nextMode, reason = "", { force = false } = {}) {
-      if (typeof nextMode !== "string" || nextMode.length === 0) return false;
-      if (nextMode === this.activityMode) return true;
-
-      if (this.activityStateMachine && typeof this.activityStateMachine.transition === "function") {
-        const result = this.activityStateMachine.transition(nextMode, reason || "transition");
-        if (!result.ok && !force) return false;
+      if (!this.stateService || typeof this.stateService.setActivityMode !== "function") {
+        return false;
       }
+      const changed = this.stateService.setActivityMode(nextMode, reason, { force });
+      this.activityMode = this.stateService.getActivityMode();
+      this.activityModeChangedAt = this.stateService.getActivityModeChangedAt();
+      this.activityStateMachine = this.stateService.activityStateMachine;
+      return changed;
+    }
 
-      this.activityMode = nextMode;
-      this.activityModeChangedAt = Date.now();
-      return true;
+    bindStateLockAliases() {
+      if (!this.stateService) return;
+      const aliasKeys = [
+        "visualLockUntil",
+        "sleepWakeLockUntil",
+        "isFullBellySequenceActive",
+        "allowFullStateTransition",
+        "isJumpLocked",
+        "allowJumpStateTransition",
+      ];
+      aliasKeys.forEach((key) => {
+        Object.defineProperty(this, key, {
+          configurable: true,
+          enumerable: true,
+          get: () => this.stateService.getLockValue(key),
+          set: (value) => {
+            this.stateService.setLockValue(key, value);
+          },
+        });
+      });
     }
 
     inferActivityMode() {
@@ -208,85 +233,55 @@
     }
 
     setManagedTimeout(context, key, callback, delayMs = 0) {
-      if (this.timerRegistry && typeof this.timerRegistry.setManagedTimeout === "function") {
-        return this.timerRegistry.setManagedTimeout(context, key, callback, delayMs);
-      }
-      return setTimeout(callback, delayMs);
+      if (!this.stateService) return setTimeout(callback, delayMs);
+      return this.stateService.setManagedTimeout(context, key, callback, delayMs);
     }
 
     setManagedInterval(context, key, callback, delayMs = 0) {
-      if (this.timerRegistry && typeof this.timerRegistry.setManagedInterval === "function") {
-        return this.timerRegistry.setManagedInterval(context, key, callback, delayMs);
-      }
-      return setInterval(callback, delayMs);
+      if (!this.stateService) return setInterval(callback, delayMs);
+      return this.stateService.setManagedInterval(context, key, callback, delayMs);
     }
 
     clearManagedTimer(context, key) {
-      if (this.timerRegistry && typeof this.timerRegistry.clear === "function") {
-        return this.timerRegistry.clear(context, key);
-      }
-      return false;
+      if (!this.stateService) return false;
+      return this.stateService.clearManagedTimer(context, key);
     }
 
     clearManagedContext(context) {
-      if (this.timerRegistry && typeof this.timerRegistry.clearContext === "function") {
-        return this.timerRegistry.clearContext(context);
-      }
-      return 0;
+      if (!this.stateService) return 0;
+      return this.stateService.clearManagedContext(context);
+    }
+
+    getTimerSnapshot() {
+      if (!this.stateService) return { total: 0, byContext: {} };
+      return this.stateService.getTimerSnapshot();
+    }
+
+    getActivityHistory(limit = 3) {
+      if (!this.stateService) return [];
+      return this.stateService.getActivityHistory(limit);
     }
 
     ensureDebugPanel() {
       if (!this.debugEnabled || typeof document === "undefined") return;
-      if (this.debugPanelEl && this.debugPanelEl.isConnected) return;
-      const panel = document.createElement("div");
-      panel.className = "penguin-debug-panel";
-      panel.addEventListener("pointerdown", (event) => {
-        event.stopPropagation();
-        const rawTarget = event && event.target ? event.target : null;
-        const elementTarget =
-          rawTarget && rawTarget.nodeType === Node.TEXT_NODE
-            ? rawTarget.parentElement
-            : rawTarget;
-        const target =
-          elementTarget && typeof elementTarget.closest === "function"
-            ? elementTarget.closest("[data-debug-action]")
-            : null;
-        if (!target) return;
-        event.preventDefault();
-        const action = target.getAttribute("data-debug-action");
-        this.lastDebugControlAt = Date.now();
-        if (action === "next-action" && typeof this.debugAdvanceAction === "function") {
-          this.debugAdvanceAction();
-          return;
-        }
-        if (action === "next-activity" && typeof this.debugAdvanceActivity === "function") {
-          this.debugAdvanceActivity();
-        }
-      });
-      panel.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const rawTarget = event && event.target ? event.target : null;
-        const elementTarget =
-          rawTarget && rawTarget.nodeType === Node.TEXT_NODE
-            ? rawTarget.parentElement
-            : rawTarget;
-        const target =
-          elementTarget && typeof elementTarget.closest === "function"
-            ? elementTarget.closest("[data-debug-action]")
-            : null;
-        if (!target) return;
-        event.preventDefault();
-        const action = target.getAttribute("data-debug-action");
-        if (action === "next-action" && typeof this.debugAdvanceAction === "function") {
-          this.debugAdvanceAction();
-          return;
-        }
-        if (action === "next-activity" && typeof this.debugAdvanceActivity === "function") {
-          this.debugAdvanceActivity();
-        }
-      });
-      document.body.appendChild(panel);
-      this.debugPanelEl = panel;
+      if (!this.debugPanelComponent) {
+        this.debugPanelComponent = new DebugPanelComponent({
+          onAction: (action) => {
+            this.lastDebugControlAt = Date.now();
+            if (action === "next-action" && typeof this.debugAdvanceAction === "function") {
+              this.debugAdvanceAction();
+              return;
+            }
+            if (
+              action === "next-activity" &&
+              typeof this.debugAdvanceActivity === "function"
+            ) {
+              this.debugAdvanceActivity();
+            }
+          },
+        });
+      }
+      this.debugPanelEl = this.debugPanelComponent.ensure();
     }
 
     renderDebugPanel(now = performance.now()) {
@@ -294,7 +289,7 @@
       if (!this.debugPanelEl || !this.debugPanelEl.isConnected) {
         this.ensureDebugPanel();
       }
-      if (!this.debugPanelEl) return;
+      if (!this.debugPanelEl || !this.debugPanelComponent) return;
       if (Date.now() - (this.lastDebugControlAt || 0) < 260) return;
       if (now - (this.lastDebugRenderAt || 0) < 180) return;
       this.lastDebugRenderAt = now;
@@ -326,15 +321,7 @@
                     : this.activeStep && typeof this.activeStep.type === "string"
                       ? `step:${this.activeStep.type}`
                       : "idle";
-      const timerInfo =
-        this.timerRegistry && typeof this.timerRegistry.snapshot === "function"
-          ? this.timerRegistry.snapshot()
-          : { total: 0, byContext: {} };
-      const escapeHtml = (value) =>
-        String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
+      const timerInfo = this.getTimerSnapshot();
       const formatDebugStep = (step) => {
         if (!step || typeof step !== "object") return "none";
         const type = typeof step.type === "string" ? step.type : "unknown";
@@ -364,10 +351,6 @@
         }
         return typeof step.type === "string" ? step.type : "unknown";
       };
-      const boolBadge = (value) =>
-        value
-          ? '<span class="penguin-debug-badge on">on</span>'
-          : '<span class="penguin-debug-badge off">off</span>';
       const x = Math.round(this.x);
       const y = Math.round(this.y);
       const tx = Math.round(Number.isFinite(this.targetX) ? this.targetX : this.x);
@@ -380,20 +363,16 @@
             ? runtime.fishStock
             : "?";
       const byContextEntries = Object.entries(timerInfo.byContext || {}).sort(
-        (a, b) => b[1] - a[1],
+        (a, b) => Number(b[1]) - Number(a[1]),
       );
       const timerContextText =
         byContextEntries.length > 0
           ? byContextEntries
               .slice(0, 8)
-              .map(([context, total]) => `${escapeHtml(context)}:${total}`)
+              .map(([context, total]) => `${context}:${total}`)
               .join(" | ")
           : "none";
-      const activityHistory =
-        this.activityStateMachine &&
-        typeof this.activityStateMachine.getHistory === "function"
-          ? this.activityStateMachine.getHistory().slice(-3).reverse()
-          : [];
+      const activityHistory = this.getActivityHistory(3).reverse();
       const historyText =
         activityHistory.length > 0
           ? activityHistory
@@ -406,7 +385,7 @@
                   entry && typeof entry.state === "string" && entry.state.length > 0
                     ? entry.state
                     : "unknown";
-                return `${escapeHtml(mode)}(${escapeHtml(reason)})`;
+                return `${mode}(${reason})`;
               })
               .join(" <- ")
           : "none";
@@ -421,7 +400,7 @@
                   entry && typeof entry.key === "string" && entry.key.length > 0
                     ? entry.key
                     : "unknown";
-                return escapeHtml(key);
+                return key;
               })
               .join(" <- ")
           : "none";
@@ -443,79 +422,56 @@
         Array.isArray(this.stepQueue) && this.stepQueue.length > queuePreview.length
           ? this.stepQueue.length - queuePreview.length
           : 0;
-      const queueHtml =
-        queuePreview.length > 0
-          ? `<ol class="penguin-debug-queue-list">${queuePreview
-              .map(
-                (step) =>
-                  `<li><code>${escapeHtml(formatStepName(step))}</code><span>${escapeHtml(formatStepDuration(step))}</span></li>`,
-              )
-              .join("")}</ol>${queueOverflow > 0 ? `<div class="penguin-debug-queue-more">+${queueOverflow} steps</div>` : ""}`
-          : `<div class="penguin-debug-queue-empty">${
-              Number.isFinite(this.nextBehaviorDueAt) && this.nextBehaviorDueAt > Date.now()
-                ? `waiting next behavior: ${Math.max(0, ((this.nextBehaviorDueAt - Date.now()) / 1000)).toFixed(1)}s`
-                : "empty"
-            }</div>`;
       const currentTarget =
         this.currentFoodTarget &&
         Number.isFinite(this.currentFoodTarget.x) &&
         Number.isFinite(this.currentFoodTarget.y)
           ? `${Math.round(this.currentFoodTarget.x)}, ${Math.round(this.currentFoodTarget.y)}`
           : "none";
+      const queueEmptyText =
+        Number.isFinite(this.nextBehaviorDueAt) && this.nextBehaviorDueAt > Date.now()
+          ? `waiting next behavior: ${Math.max(
+              0,
+              (this.nextBehaviorDueAt - Date.now()) / 1000,
+            ).toFixed(1)}s`
+          : "empty";
 
-      this.debugPanelEl.innerHTML = [
-        `<div class="penguin-debug-head">`,
-        `  <div class="penguin-debug-title">Penguin Debug</div>`,
-        `  <div class="penguin-debug-meta">mode=<code>${escapeHtml(this.activityMode)}</code> state=<code>${escapeHtml(this.currentState || "none")}</code> | <code>→ next state</code></div>`,
-        `</div>`,
-        `<div class="penguin-debug-controls">`,
-        `  <button type="button" data-debug-action="next-action">Next Action</button>`,
-        `  <button type="button" data-debug-action="next-activity">Next Activity</button>`,
-        `  <span>A:${escapeHtml(debugActionLabel)} | M:${escapeHtml(debugActivityLabel)}</span>`,
-        `</div>`,
-        `<div class="penguin-debug-grid">`,
-        `  <div><span>pos</span><code>${x}, ${y}</code></div>`,
-        `  <div><span>target</span><code>${tx}, ${ty}</code></div>`,
-        `  <div><span>speed</span><code>${speed}</code></div>`,
-        `  <div><span>motion</span><code>${escapeHtml(motionType)}</code></div>`,
-        `  <div><span>flow</span><code>${this.behaviorFlowToken || 0}</code></div>`,
-        `  <div><span>fish</span><code>${fishStock}</code></div>`,
-        `</div>`,
-        `<div class="penguin-debug-flags">`,
-        `  <span>moving ${boolBadge(this.isMoving)}</span>`,
-        `  <span>aiLocked ${boolBadge(this.aiLocked)}</span>`,
-        `  <span>drag ${boolBadge(this.isDragging)}</span>`,
-        `  <span>fishing ${boolBadge(this.isFishingActive)}</span>`,
-        `  <span>eating ${boolBadge(this.isEatingFood)}</span>`,
-        `  <span>cursorEat ${boolBadge(this.isCursorTouchEating)}</span>`,
-        `  <span>sleep ${boolBadge(this.currentState === "sleeping")}</span>`,
-        `  <span>fishCursor ${boolBadge(runtime.isFishCursorEnabled !== false)}</span>`,
-        `</div>`,
-        `<div class="penguin-debug-section">`,
-        `  <div class="penguin-debug-label">Active Step</div>`,
-        `  <div class="penguin-debug-value"><code>${escapeHtml(formatDebugStep(this.activeStep))}</code></div>`,
-        `</div>`,
-        `<div class="penguin-debug-section">`,
-        `  <div class="penguin-debug-label">Queue (${Array.isArray(this.stepQueue) ? this.stepQueue.length : 0})</div>`,
-        `  <div class="penguin-debug-value">${queueHtml}</div>`,
-        `</div>`,
-        `<div class="penguin-debug-section">`,
-        `  <div class="penguin-debug-label">Food Target</div>`,
-        `  <div class="penguin-debug-value"><code>${escapeHtml(currentTarget)} | pending=${Array.isArray(this.foodTargets) ? this.foodTargets.length : 0}</code></div>`,
-        `</div>`,
-        `<div class="penguin-debug-section">`,
-        `  <div class="penguin-debug-label">Timers (${timerInfo.total})</div>`,
-        `  <div class="penguin-debug-value"><code>${timerContextText}</code></div>`,
-        `</div>`,
-        `<div class="penguin-debug-section">`,
-        `  <div class="penguin-debug-label">Activity History</div>`,
-        `  <div class="penguin-debug-value"><code>${historyText}</code></div>`,
-        `</div>`,
-        `<div class="penguin-debug-section">`,
-        `  <div class="penguin-debug-label">Action History</div>`,
-        `  <div class="penguin-debug-value"><code>${actionHistoryText}</code></div>`,
-        `</div>`,
-      ].join("");
+      this.debugPanelComponent.render({
+        activityMode: this.activityMode || "idle",
+        currentState: this.currentState || "none",
+        debugActionLabel,
+        debugActivityLabel,
+        posText: `${x}, ${y}`,
+        targetText: `${tx}, ${ty}`,
+        speedText: speed,
+        motionType,
+        flowText: String(this.behaviorFlowToken || 0),
+        fishText: String(fishStock),
+        flags: {
+          moving: this.isMoving,
+          aiLocked: this.aiLocked,
+          drag: this.isDragging,
+          fishing: this.isFishingActive,
+          eating: this.isEatingFood,
+          cursorEat: this.isCursorTouchEating,
+          sleep: this.currentState === "sleeping",
+          fishCursor: runtime.isFishCursorEnabled !== false,
+        },
+        activeStepText: formatDebugStep(this.activeStep),
+        queueTotal: Array.isArray(this.stepQueue) ? this.stepQueue.length : 0,
+        queueItems: queuePreview.map((step) => ({
+          name: formatStepName(step),
+          duration: formatStepDuration(step),
+        })),
+        queueOverflow,
+        queueEmptyText,
+        foodTargetText: currentTarget,
+        pendingFoodText: Array.isArray(this.foodTargets) ? this.foodTargets.length : 0,
+        timersTotal: timerInfo.total,
+        timerContextText,
+        activityHistoryText: historyText,
+        actionHistoryText,
+      });
     }
 
     debugAdvanceActivity() {

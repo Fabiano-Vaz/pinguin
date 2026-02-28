@@ -21,7 +21,7 @@ import { createActAction } from "./ai/actions/act";
       createWalkAction(deps),
       createJumpMoveAction(deps),
       createFlyMoveAction(deps),
-      createSequenceAction(deps),
-      createActAction(deps),
+      createSequenceAction(),
+      createActAction(),
     );
 })();

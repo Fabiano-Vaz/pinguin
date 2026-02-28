@@ -108,8 +108,8 @@
     halo.setAttribute("stroke-linecap", "round");
     halo.setAttribute("stroke-linejoin", "round");
     halo.setAttribute("stroke-opacity", "0.34");
-    halo.style.strokeDasharray = PATH_LEN;
-    halo.style.strokeDashoffset = PATH_LEN;
+    halo.style.strokeDasharray = String(PATH_LEN);
+    halo.style.strokeDashoffset = String(PATH_LEN);
     halo.classList.add("bolt-path");
     svg.appendChild(halo);
 
@@ -120,8 +120,8 @@
     core.setAttribute("stroke-width", "3.2");
     core.setAttribute("stroke-linecap", "round");
     core.setAttribute("stroke-linejoin", "round");
-    core.style.strokeDasharray = PATH_LEN;
-    core.style.strokeDashoffset = PATH_LEN;
+    core.style.strokeDasharray = String(PATH_LEN);
+    core.style.strokeDashoffset = String(PATH_LEN);
     core.classList.add("bolt-path");
     svg.appendChild(core);
 

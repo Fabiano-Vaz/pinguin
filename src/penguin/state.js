@@ -20,6 +20,13 @@
         return;
       }
       if (
+        this.isJumpLocked &&
+        state !== "jumping" &&
+        !this.allowJumpStateTransition
+      ) {
+        return;
+      }
+      if (
         this.isWalkingAway &&
         this.customMotion &&
         this.customMotion.type === "returnAfterWalkAway" &&

@@ -79,6 +79,12 @@
         effects.startRainCycle();
       }
     }, Math.max(0, rainStartDelayMs));
+
+    setTimeout(() => {
+      if (typeof effects.startShootingStarCycle === "function") {
+        effects.startShootingStarCycle();
+      }
+    }, Math.max(0, weatherStartDelayMs));
   };
 
   window.PenguinPetModules = {

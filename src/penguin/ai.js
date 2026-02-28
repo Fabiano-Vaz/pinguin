@@ -606,12 +606,26 @@
             : null;
       const shouldPrioritizeFishing =
         fishStock !== null && fishStock <= 0 && Math.random() < 0.9;
+      const flyBehaviors = behaviors.filter((builder) => {
+        if (typeof builder !== "function") return false;
+        const steps = builder();
+        return (
+          Array.isArray(steps) &&
+          steps.some((step) => step && step.type === "flyMove")
+        );
+      });
+      const shouldPreferFlyBehavior =
+        !shouldPrioritizeFishing &&
+        flyBehaviors.length > 0 &&
+        Math.random() < 0.32;
       const fallbackBehavior =
         behaviors[Math.floor(Math.random() * behaviors.length)];
       const selectedBehavior =
         shouldPrioritizeFishing && fishingBehavior
           ? fishingBehavior
-          : fallbackBehavior;
+          : shouldPreferFlyBehavior
+            ? flyBehaviors[Math.floor(Math.random() * flyBehaviors.length)]
+            : fallbackBehavior;
       const seq =
         typeof selectedBehavior === "function" ? selectedBehavior() : [];
       const withPrelude = Math.random() < PRELUDE_CHANCE;
@@ -668,11 +682,13 @@
           }
         }, 100);
       } else if (step.type === "jumpMove") {
-        const jumpDirection = Math.random() < 0.5 ? -1 : 1;
-        const jumpDistance = 30 + Math.random() * 40;
+        const baseY =
+          typeof this.getGroundTopY === "function"
+            ? this.getGroundTopY()
+            : this.y;
         const target = {
-          x: this.x + jumpDirection * jumpDistance,
-          y: this.randomWalkY(),
+          x: this.x,
+          y: baseY,
         };
         this.speed = SPEED_WALK_FAST;
         this.speak();

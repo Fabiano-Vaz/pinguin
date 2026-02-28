@@ -111,6 +111,8 @@
       this.lastFishEatenAt = 0;
       this.isFullBellySequenceActive = false;
       this.allowFullStateTransition = false;
+      this.isJumpLocked = false;
+      this.allowJumpStateTransition = false;
       this.fishCursorResumeTimeout = null;
       this.screenClickStreak = 0;
       this.lastScreenClickAt = 0;

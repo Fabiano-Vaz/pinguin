@@ -284,6 +284,9 @@
     event.key === " " ||
     event.key === "Spacebar";
 
+  const isStartKey = (event) =>
+    event.code === "Space" || event.key === " " || event.key === "Spacebar";
+
   const isCrouchKey = (code) => code === "ArrowDown" || code === "KeyS";
 
   document.addEventListener("keydown", (event) => {
@@ -293,13 +296,16 @@
       return;
     }
 
+    if (!game.active) {
+      if (isStartKey(event)) {
+        event.preventDefault();
+        startGame();
+      }
+      return;
+    }
+
     if (isJumpKey(event)) {
       event.preventDefault();
-
-      if (!game.active) {
-        startGame();
-        return;
-      }
 
       if (game.isGameOver) {
         resetRound();

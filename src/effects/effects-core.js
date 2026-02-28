@@ -22,6 +22,8 @@
     rainManualMode: false,
     rainLightningTimeoutId: null,
     lastLightningScareAt: 0,
+    shootingStarTimeoutId: null,
+    shootingStarReactionTimeoutId: null,
   };
 
   window.PenguinPetEffects = effects;

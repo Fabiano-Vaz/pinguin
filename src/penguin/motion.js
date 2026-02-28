@@ -9,48 +9,63 @@
     motion,
   }) => ({
     startJumpArc(targetX, targetY) {
+      if (this.isJumpLocked) return;
       const cfg = motion || {};
-      const clampedX = Math.max(
-        0,
-        Math.min(targetX, window.innerWidth - penguinSize),
-      );
       const clampedY = this.clampY(targetY);
-      const horizontalDistance = Math.abs(clampedX - this.x);
-      const realisticDistance = Math.min(
-        cfg.jumpArcDistanceCapPx || 70,
-        horizontalDistance,
-      );
-      const apex = Math.max(
-        cfg.jumpArcApexMinPx || 10,
+      const gravity = Math.max(1200, cfg.fallGravityPxPerSec2 || 1900);
+      const jumpHeight = Math.max(
+        (cfg.jumpArcApexMinPx || 10) + 8,
         Math.min(
-          cfg.jumpArcApexMaxPx || 28,
-          (cfg.jumpArcApexBasePx || 12) +
-            realisticDistance * (cfg.jumpArcApexDistanceFactor || 0.12),
+          (cfg.jumpArcApexMaxPx || 28) + 22,
+          (cfg.jumpArcApexBasePx || 12) * 2.2,
         ),
       );
-      const duration = Math.max(
-        cfg.jumpArcDurationMinMs || 380,
-        Math.min(
-          cfg.jumpArcDurationMaxMs || 620,
-          (cfg.jumpArcDurationBaseMs || 420) +
-            realisticDistance * (cfg.jumpArcDurationDistanceFactor || 2.1),
-        ),
-      );
+      const initialVy = -Math.sqrt(2 * gravity * jumpHeight);
 
       this.customMotion = {
-        type: "jumpArc",
+        type: "jumpVertical",
         startX: this.x,
-        startY: this.y,
-        targetX: clampedX,
         targetY: clampedY,
-        duration,
-        elapsed: 0,
-        apex,
+        vy: initialVy,
+        gravity,
+        jumpHeight,
       };
 
       this.isMoving = true;
       this.allowAirMovement = true;
+      this.targetX = this.x;
+      this.targetY = this.y;
+      this.isJumpLocked = true;
+      this.allowJumpStateTransition = false;
       this.setState("jumping");
+    },
+
+    boostJumpArc() {
+      if (!this.customMotion || this.customMotion.type !== "jumpVertical") {
+        return false;
+      }
+
+      const cfg = motion || {};
+      const boostVelocity = Math.max(
+        40,
+        cfg.jumpFlapBoostVelocityPxPerSec || 180,
+      );
+      const minUpwardVelocity = Math.max(
+        60,
+        cfg.jumpFlapMinUpwardVelocityPxPerSec || 240,
+      );
+      const maxUpwardVelocity = Math.max(
+        minUpwardVelocity,
+        cfg.jumpFlapMaxUpwardVelocityPxPerSec || 980,
+      );
+
+      const boostedVy = this.customMotion.vy - boostVelocity;
+      this.customMotion.vy = Math.max(
+        -maxUpwardVelocity,
+        Math.min(boostedVy, -minUpwardVelocity),
+      );
+      this.setState("jumping");
+      return true;
     },
 
     startDropFall() {
@@ -71,22 +86,21 @@
     updateCustomMotion(dtSeconds) {
       if (!this.customMotion) return;
 
-      if (this.customMotion.type === "jumpArc") {
+      if (this.customMotion.type === "jumpVertical") {
         const motion = this.customMotion;
-        motion.elapsed += dtSeconds * 1000;
-        const t = Math.min(1, motion.elapsed / motion.duration);
-        const arc = 4 * motion.apex * t * (1 - t);
+        this.x = motion.startX;
+        motion.vy += motion.gravity * dtSeconds;
+        this.y += motion.vy * dtSeconds;
 
-        this.x = motion.startX + (motion.targetX - motion.startX) * t;
-        this.y = motion.startY + (motion.targetY - motion.startY) * t - arc;
-
-        if (t >= 1) {
-          this.x = motion.targetX;
+        if (this.y >= motion.targetY && motion.vy > 0) {
           this.y = motion.targetY;
           this.customMotion = null;
           this.isMoving = false;
           this.allowAirMovement = false;
+          this.isJumpLocked = false;
+          this.allowJumpStateTransition = true;
           this.setState("idle");
+          this.allowJumpStateTransition = false;
         }
         return;
       }

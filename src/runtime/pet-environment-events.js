@@ -24,7 +24,9 @@
 
       const now = Date.now();
       shakeSamples.push({ x, y, t: now });
-      shakeSamples = shakeSamples.filter((sample) => now - sample.t <= shakeWindowMs);
+      shakeSamples = shakeSamples.filter(
+        (sample) => now - sample.t <= shakeWindowMs,
+      );
 
       if (shakeSamples.length < 3) return;
       if (now - lastWindAt < shakeCooldownMs) return;
@@ -63,6 +65,34 @@
       }
 
       if (typeof effects.isSnowing === "function" && effects.isSnowing()) {
+        if (typeof penguin.setVisualState === "function") {
+          penguin.setVisualState("default");
+        } else if (typeof penguin.setState === "function") {
+          penguin.setState("idle");
+        }
+        if (penguin.element && penguin.element.style) {
+          penguin.element.style.animation = "shiver 0.12s linear infinite";
+        }
+        if (typeof penguin.showSpeech === "function") {
+          penguin.showSpeech("que friooooo", 1400, false);
+        }
+        setTimeout(() => {
+          if (!penguin || penguin.isDragging || penguin.isWalkingAway) return;
+          if (penguin.element && penguin.element.style) {
+            penguin.element.style.animation = "";
+          }
+          if (
+            (typeof penguin.setVisualState === "function" ||
+              typeof penguin.setState === "function") &&
+            !penguin.isMoving
+          ) {
+            if (typeof penguin.setVisualState === "function") {
+              penguin.setVisualState("default");
+            } else {
+              penguin.setState("idle");
+            }
+          }
+        }, 900);
         return;
       }
 
@@ -132,9 +162,13 @@
 
             currentPenguin.isCaveirinhaMode = true;
             if (typeof currentPenguin.setActivityMode === "function") {
-              currentPenguin.setActivityMode("caveirinha", "weather:lightning-double-click", {
-                force: true,
-              });
+              currentPenguin.setActivityMode(
+                "caveirinha",
+                "weather:lightning-double-click",
+                {
+                  force: true,
+                },
+              );
             }
             currentPenguin.aiLocked = true;
             currentPenguin.stepQueue = [];
@@ -161,9 +195,13 @@
             currentPenguin.caveirinhaTimeoutId = setTimeout(() => {
               currentPenguin.isCaveirinhaMode = false;
               if (typeof currentPenguin.setActivityMode === "function") {
-                currentPenguin.setActivityMode("idle", "weather:caveirinha-finished", {
-                  force: true,
-                });
+                currentPenguin.setActivityMode(
+                  "idle",
+                  "weather:caveirinha-finished",
+                  {
+                    force: true,
+                  },
+                );
               }
               if (typeof currentPenguin.unlockVisualSprite === "function") {
                 currentPenguin.unlockVisualSprite();
@@ -233,14 +271,50 @@
         const target = event.target;
         const isTypingTarget =
           target &&
-          ((target.tagName === "INPUT" ||
+          (target.tagName === "INPUT" ||
             target.tagName === "TEXTAREA" ||
-            target.isContentEditable) ||
+            target.isContentEditable ||
             (typeof target.closest === "function" &&
               target.closest("[contenteditable='true']")));
         if (isTypingTarget) return;
 
-        const key = typeof event.key === "string" ? event.key.toLowerCase() : "";
+        const key =
+          typeof event.key === "string" ? event.key.toLowerCase() : "";
+
+        if (key === "v") {
+          const runnerGame =
+            window.PenguinRunnerGame && window.PenguinRunnerGame.game
+              ? window.PenguinRunnerGame.game
+              : null;
+          if (runnerGame && runnerGame.active) return;
+
+          const currentPenguin =
+            window.PenguinPet && window.PenguinPet.penguin
+              ? window.PenguinPet.penguin
+              : penguin;
+          if (!currentPenguin) return;
+          if (currentPenguin.isFishingActive || currentPenguin.isCaveirinhaMode)
+            return;
+          if (currentPenguin.isDragging || currentPenguin.isWalkingAway) return;
+          if (
+            typeof currentPenguin.startJumpArc !== "function" ||
+            typeof currentPenguin.getWalkMinY !== "function"
+          ) {
+            return;
+          }
+
+          event.preventDefault();
+          if (typeof currentPenguin.boostJumpArc === "function") {
+            const boosted = currentPenguin.boostJumpArc();
+            if (boosted) return;
+          }
+          if (currentPenguin.isJumpLocked) return;
+          currentPenguin.startJumpArc(
+            currentPenguin.x,
+            currentPenguin.getWalkMinY(),
+          );
+          return;
+        }
 
         if (key === "n") {
           event.preventDefault();
@@ -272,6 +346,16 @@
 
           if (typeof effects.startRainCycle === "function") {
             effects.startRainCycle(true);
+          }
+          return;
+        }
+
+        if (key === "e") {
+          event.preventDefault();
+          if (typeof effects.triggerShootingStarEvent === "function") {
+            effects.triggerShootingStarEvent();
+          } else if (typeof effects.createShootingStar === "function") {
+            effects.createShootingStar();
           }
         }
       },

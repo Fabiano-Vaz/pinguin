@@ -145,6 +145,28 @@
   will-change: opacity;
 }
 
+.shooting-star {
+  position: fixed;
+  width: var(--star-length, 96px);
+  height: 1.5px;
+  pointer-events: none;
+  z-index: var(--z-base);
+  border-radius: var(--radius-pill);
+  transform-origin: left center;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(216, 240, 255, 0.72) 22%,
+    rgba(160, 206, 238, 0.45) 52%,
+    rgba(170, 218, 255, 0) 100%
+  );
+  box-shadow:
+    0 0 4px rgba(212, 240, 255, 0.42),
+    0 0 9px rgba(150, 210, 255, 0.22);
+  animation: shootingStarTravel var(--star-duration, 1.4s) linear forwards;
+  will-change: transform, opacity;
+}
+
 .bolt-path {
   animation: boltDraw 0.64s ease-out forwards;
 }

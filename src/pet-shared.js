@@ -4,7 +4,7 @@
     default: "pinguin.svg",
     running: "pinguin correndo.svg",
     runningCrouched: "pinguin correndo abaixado.svg",
-    jumping: "pinguin pulando feliz.svg",
+    jumping: "pinguin voando.svg",
     dancing: "pinguin dançando.svg",
     sleeping: "pinguin dormindo.svg",
     scared: "pinguin assustado.svg",

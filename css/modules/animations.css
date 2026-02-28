@@ -74,6 +74,47 @@
   }
 }
 
+@keyframes shiver {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
+
+  75% {
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes shootingStarTravel {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(var(--star-angle, -24deg)) scaleY(0.85);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: translate3d(var(--star-travel-x, 380px), var(--star-travel-y, 150px), 0)
+      rotate(var(--star-angle, -24deg))
+      scaleY(1);
+    opacity: 0;
+  }
+}
+
 @keyframes dance {
   0% {
     transform: translateX(0) translateY(0) rotate(0deg) scale(1);

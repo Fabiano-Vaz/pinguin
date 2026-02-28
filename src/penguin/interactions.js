@@ -16,6 +16,7 @@
   }) => ({
     onMouseMove(mouseX, mouseY) {
       if (!Number.isFinite(mouseX) || !Number.isFinite(mouseY)) return;
+      if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway || this.isDragging || this.isRanting) return;
       if (
@@ -241,6 +242,7 @@
     },
 
     handleMouseProximity() {
+      if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
       if (!runtime.isMouseInsideViewport) return;
@@ -516,6 +518,7 @@
     },
 
     onDragStart(e) {
+      if (this.isJumpLocked) return;
       if (this.isCaveirinhaMode) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
@@ -549,6 +552,7 @@
     },
 
     onDragMove(e) {
+      if (this.isJumpLocked) return;
       if (!this.isDragging) return;
 
       if (
@@ -584,6 +588,7 @@
     },
 
     onDragEnd() {
+      if (this.isJumpLocked) return;
       if (!this.isDragging) return;
       this.isDragging = false;
       this.stopWingFlap();
@@ -715,6 +720,7 @@
     },
 
     onClickPenguin() {
+      if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway) return;
       if (
@@ -785,6 +791,7 @@
     },
 
     onDoubleClickPenguin() {
+      if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway || this.isDragging) return;
 

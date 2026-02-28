@@ -80,10 +80,66 @@
     }
   }
 
+  function createShootingStar() {
+    const star = document.createElement("div");
+    star.className = "shooting-star";
+
+    const fromLeft = Math.random() < 0.5;
+    const skyLimitY = Math.max(60, window.innerHeight * 0.4);
+    const startX = fromLeft
+      ? -140 - Math.random() * 60
+      : window.innerWidth + 20 + Math.random() * 80;
+    const startYMax = Math.max(40, skyLimitY - 90);
+    const startY = 26 + Math.random() * Math.max(1, startYMax - 26);
+
+    const travelX = fromLeft
+      ? 280 + Math.random() * 260
+      : -(280 + Math.random() * 260);
+    const maxTravelY = Math.max(28, Math.min(95, skyLimitY - startY - 16));
+    const minTravelY = Math.min(28, maxTravelY);
+    const travelY = minTravelY + Math.random() * Math.max(1, maxTravelY - minTravelY);
+    const angle = (Math.atan2(travelY, travelX) * 180) / Math.PI;
+    const durationMs = 950 + Math.random() * 520;
+    const length = 78 + Math.random() * 46;
+
+    star.style.left = `${startX}px`;
+    star.style.top = `${startY}px`;
+    star.style.setProperty("--star-travel-x", `${Math.round(travelX)}px`);
+    star.style.setProperty("--star-travel-y", `${Math.round(travelY)}px`);
+    star.style.setProperty("--star-angle", `${angle.toFixed(1)}deg`);
+    star.style.setProperty("--star-duration", `${durationMs.toFixed(0)}ms`);
+    star.style.setProperty("--star-length", `${length.toFixed(0)}px`);
+    if (fromLeft) {
+      // Indo da esquerda para a direita: cabeça no lado direito.
+      star.style.background = `linear-gradient(
+        to left,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(216, 240, 255, 0.72) 22%,
+        rgba(160, 206, 238, 0.45) 52%,
+        rgba(170, 218, 255, 0) 100%
+      )`;
+    } else {
+      // Indo da direita para a esquerda: também precisa ficar com a cabeça no lado direito.
+      star.style.background = `linear-gradient(
+        to left,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(216, 240, 255, 0.72) 22%,
+        rgba(160, 206, 238, 0.45) 52%,
+        rgba(170, 218, 255, 0) 100%
+      )`;
+    }
+
+    document.body.appendChild(star);
+    setTimeout(() => {
+      if (star.isConnected) star.remove();
+    }, durationMs + 220);
+  }
+
   Object.assign(effects, {
     createParticle,
     createClickEffect,
     createBackgroundParticles,
     spawnExtraSnow,
+    createShootingStar,
   });
 })();

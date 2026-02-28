@@ -71,7 +71,8 @@ Um pinguim interativo no painel **Explorer** do VS Code, com IA de comportamento
 
 ## 🎮 Controles do Runner
 
-- `Space`, `↑` ou `W`: iniciar / reiniciar / pular
+- `Space`: iniciar
+- `Space`, `↑` ou `W`: pular / reiniciar
 - `↓` ou `S`: abaixar
 - Segurar pulo: salto mais alto
 - Soltar cedo: salto curto
@@ -94,21 +95,40 @@ Estrutura atual organizada por domínio e responsabilidade:
 
 ```text
 src/
+├─ extension.ts                    # entrypoint da extensão (TypeScript)
+├─ webview-entry.ts                # entrypoint único do webview (Vite)
+├─ manifest.ts                     # manifesto de assets/config compartilhada
+├─ effects-registry.ts             # registry de efeitos no objeto global do pet
 ├─ app/
-│  └─ pet-bootstrap.js              # composição da app (wire-up dos módulos)
+│  └─ pet-bootstrap.ts              # composição da app (wire-up dos módulos)
 ├─ runtime/
-│  ├─ pet-fish-economy.js           # estoque de peixe, HUD e regras de consumo/reposição
-│  └─ pet-environment-events.js     # eventos globais (mouse, clique, clima)
+│  ├─ pet-fish-economy.ts           # estoque de peixe, HUD e regras de consumo/reposição
+│  └─ pet-environment-events.ts     # eventos globais (mouse, clique, clima)
 ├─ games/
 │  └─ runner/
-│     ├─ runner-context.js          # estado base, cena e utilitários do runner
-│     ├─ runner-obstacles.js        # geração de obstáculos e colisão
-│     └─ penguin-runner-game.js     # runtime do runner (loop, input, física)
-├─ pet-*.js                         # núcleo do pet (estado, IA, movimento, etc.)
-└─ main.js                        # entrypoint leve (delegação para bootstrap)
+│     ├─ runner-context.ts          # estado base, cena e utilitários do runner
+│     ├─ runner-obstacles.ts        # geração de obstáculos e colisão
+│     └─ penguin-runner-game.ts     # runtime do runner (loop, input, física)
+└─ main.ts                          # inicialização do pet no webview
 ```
 
 Essa organização já facilita migração futura para framework porque separa:
 - `app`: camada de inicialização/composição.
 - `runtime`: regras de domínio e eventos do mundo.
 - `games`: features independentes (podem virar módulo/lazy feature depois).
+
+## 🛠️ Build
+
+- `npm run build`: compila extensão em TypeScript e gera bundle do webview com Vite
+- `npm run dev`: sobe ambiente de desenvolvimento web local (Vite)
+- `npm run test`: executa suíte unitária completa
+- `npm run lint`: valida typecheck da extensão + suíte de testes
+
+## 🌱 Variáveis de ambiente
+
+Arquivo [`.env`](/opt/pinguin/.env) (com exemplo em [`.env.example`](/opt/pinguin/.env.example)):
+
+- `PINGUIN_DEBUG_PANEL`: ativa painel de debug no webview da extensão (`0`/`1`)
+- `PINGUIN_RUNNER_DEBUG`: ativa debug do runner na extensão (`0`/`1`)
+- `VITE_PINGUIN_DEBUG_PANEL`: ativa painel de debug no modo `npm run dev`
+- `VITE_PINGUIN_RUNNER_DEBUG`: ativa debug do runner no modo `npm run dev`

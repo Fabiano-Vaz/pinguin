@@ -9,39 +9,33 @@
 </head>
 
 <body>
-    <script>
+    <script type="module">
+        const parseBooleanEnv = (value, fallback = false) => {
+            if (typeof value !== "string") return fallback;
+            const normalized = value.trim().toLowerCase();
+            if (["1", "true", "yes", "on"].includes(normalized)) return true;
+            if (["0", "false", "no", "off"].includes(normalized)) return false;
+            return fallback;
+        };
+
+        const debugPanel = parseBooleanEnv(import.meta.env.VITE_PINGUIN_DEBUG_PANEL, false);
+        const runnerDebug = parseBooleanEnv(import.meta.env.VITE_PINGUIN_RUNNER_DEBUG, false);
+
         window.PENGUIN_CONFIG = {
             size: 120,
             groundRatio: 0.86,
             backgroundImage: "assets/backgroung-dark.png",
+            debugPanel,
+            constants: {
+                game: {
+                    runner: {
+                        debug: runnerDebug,
+                    },
+                },
+            },
         };
     </script>
-    <script src="src/manifest.js"></script>
-    <script src="src/config/pet-config.js"></script>
-    <script src="src/config/game-config.js"></script>
-    <script src="src/content/pet-content.js"></script>
-    <script src="src/effects/effects-core.js"></script>
-    <script src="src/effects/particle-effects.js"></script>
-    <script src="src/effects/food-effects.js"></script>
-    <script src="src/effects/lightning-effects.js"></script>
-    <script src="src/effects/rain-effects.js"></script>
-    <script src="src/effects/wind-effects.js"></script>
-    <script src="src/effects/weather-cycles.js"></script>
-    <script src="src/effects-registry.js"></script>
-    <script src="src/penguin/penguin-core.js"></script>
-    <script src="src/penguin/state.js"></script>
-    <script src="src/penguin/speech.js"></script>
-    <script src="src/penguin/motion.js"></script>
-    <script src="src/penguin/ai.js"></script>
-    <script src="src/penguin/interactions.js"></script>
-    <script src="src/penguin/penguin.js"></script>
-    <script src="src/runtime/pet-fish-economy.js"></script>
-    <script src="src/runtime/pet-environment-events.js"></script>
-    <script src="src/app/pet-bootstrap.js"></script>
-    <script src="src/main.js"></script>
-    <script src="src/games/runner/runner-context.js"></script>
-    <script src="src/games/runner/runner-obstacles.js"></script>
-    <script src="src/games/runner/penguin-runner-game.js"></script>
+    <script type="module" src="/src/webview-entry.ts"></script>
 </body>
 
 </html>

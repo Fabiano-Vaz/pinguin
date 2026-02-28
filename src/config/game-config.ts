@@ -18,7 +18,7 @@
 
   const runnerConfig = mergeConfigSection(
     {
-      debug: true,
+      debug: false,
       storageBestScoreKey: "pinguinRunnerBestScore",
       penguinVisualOffsetYPx: 10,
       backgroundScrollSpeedPxPerSec: 8,
@@ -117,8 +117,7 @@
           maxHeight: 60,
           topOffset: 9,
           requiresCrouch: false,
-          color:
-            "linear-gradient(180deg, rgb(244,252,255), rgb(145,214,236))",
+          color: "linear-gradient(180deg, rgb(244,252,255), rgb(145,214,236))",
         },
         snowman: {
           id: "snowman",
@@ -128,8 +127,7 @@
           maxHeight: 94,
           topOffset: 9,
           requiresCrouch: false,
-          color:
-            "linear-gradient(180deg, rgb(255,255,255), rgb(231,241,252))",
+          color: "linear-gradient(180deg, rgb(255,255,255), rgb(231,241,252))",
         },
         icebergJagged: {
           id: "icebergJagged",
@@ -139,8 +137,7 @@
           maxHeight: 50,
           topOffset: 9,
           requiresCrouch: false,
-          color:
-            "linear-gradient(180deg, rgb(248,253,255), rgb(132,205,230))",
+          color: "linear-gradient(180deg, rgb(248,253,255), rgb(132,205,230))",
         },
         icebergSpire: {
           id: "icebergSpire",
@@ -150,8 +147,7 @@
           maxHeight: 68,
           topOffset: 9,
           requiresCrouch: false,
-          color:
-            "linear-gradient(180deg, rgb(244,252,255), rgb(125,196,224))",
+          color: "linear-gradient(180deg, rgb(244,252,255), rgb(125,196,224))",
         },
         airplane: {
           id: "airplane",

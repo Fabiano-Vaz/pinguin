@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const {
   createActivityStateMachine,
   createTimerRegistry,
-} = require('../src/penguin/penguin-core.js');
+} = require('../src/penguin/penguin-core.ts');
 
 (() => {
   const sm = createActivityStateMachine('idle');

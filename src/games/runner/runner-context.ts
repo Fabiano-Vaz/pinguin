@@ -1,62 +1,46 @@
+import "./runner-debug-tools";
+import "./runner-assets";
 (() => {
   const pet = window.PenguinPet || {};
+  const runnerModules = window.PenguinRunnerModules || {};
   const constants = pet.constants || {};
   const runnerConfig =
     (constants.game && constants.game.runner) || constants.runner || {};
   const actionStates = pet.actionStates || window.PENGUIN_ASSETS || {};
-
-  const resolveSprite = (assetKey, fallbackPath) => {
-    const byKey = actionStates[assetKey];
-    if (typeof byKey === "string" && byKey.length > 0) return byKey;
-    return fallbackPath;
+  const assetsFactory =
+    typeof runnerModules.createRunnerAssets === "function"
+      ? runnerModules.createRunnerAssets({ actionStates })
+      : {};
+  const sprites = assetsFactory.sprites || {
+    running: "assets/pinguin correndo.svg",
+    crouching: "assets/pinguin correndo abaixado.svg",
+    jumping: "assets/trace.svg",
+    front: "assets/pinguin.svg",
+    crying: "assets/pinguin chorando.svg",
+    angry: "assets/pinguin com raiva.svg",
+    flying: "assets/pinguin voando.svg",
+    caveirinha: "assets/pinguin caveirinha.svg",
   };
-
-  const sprites = {
-    running: resolveSprite("running", "assets/pinguin correndo.svg"),
-    crouching: resolveSprite(
-      "runningCrouched",
-      "assets/pinguin correndo abaixado.svg",
-    ),
-    jumping: resolveSprite("trace", "assets/trace.svg"),
-    front: resolveSprite("default", "assets/pinguin.svg"),
-    crying: resolveSprite("crying", "assets/pinguin chorando.svg"),
-    angry: resolveSprite("angry", "assets/pinguin com raiva.svg"),
-    flying: resolveSprite("flying", "assets/pinguin voando.svg"),
-    caveirinha: resolveSprite("caveirinha", "assets/pinguin caveirinha.svg"),
-  };
-
-  const runnerBackgroundDarkBImage = resolveSprite(
-    "runnerBackgroundDarkB",
-    "assets/backgroung-darkB.png",
-  );
-  const runnerMoonImage = resolveSprite("moon", "assets/lua.png");
-  const snowmanObstacleImage = resolveSprite("snowman", "assets/snowman.svg");
-
-  const helicopterVariants = [
-    {
-      key: "A",
-      src: resolveSprite("helicopterA", "assets/helicopterA.gif"),
-      scale: 4,
-      hitboxInsetRatios: {
-        left: 0.37,
-        right: 0.39,
-        top: 0.34,
-        bottom: 0.34,
-      },
-    },
-    {
-      key: "B",
-      src: resolveSprite("helicopterB", "assets/helicopterB.gif"),
-      scale: 8,
-      hitboxInsetRatios: {
-        left: 0.4,
-        right: 0.42,
-        top: 0.37,
-        bottom: 0.35,
-      },
-    },
-  ];
-
+  const runnerBackgroundDarkBImage =
+    assetsFactory.runnerBackgroundDarkBImage || "assets/backgroung-darkB.png";
+  const runnerMoonImage = assetsFactory.runnerMoonImage || "assets/lua.png";
+  const snowmanObstacleImage = assetsFactory.snowmanObstacleImage || "assets/snowman.svg";
+  const helicopterVariants = Array.isArray(assetsFactory.helicopterVariants)
+    ? assetsFactory.helicopterVariants
+    : [
+        {
+          key: "A",
+          src: "assets/helicopterA.gif",
+          scale: 4,
+          hitboxInsetRatios: { left: 0.37, right: 0.39, top: 0.34, bottom: 0.34 },
+        },
+        {
+          key: "B",
+          src: "assets/helicopterB.gif",
+          scale: 8,
+          hitboxInsetRatios: { left: 0.4, right: 0.42, top: 0.37, bottom: 0.35 },
+        },
+      ];
   const RUNNER_PENGUIN_VISUAL_OFFSET_Y = runnerConfig.penguinVisualOffsetYPx || 10;
   const DEBUG = Boolean(runnerConfig.debug);
   const RUNNER_BACKGROUND_SCROLL_SPEED_PX_PER_SEC =
@@ -69,12 +53,9 @@
   const RUNNER_MOON_RESPAWN_PADDING_PX = runnerConfig.moonRespawnPaddingPx || 180;
   const RUNNER_GROUND_DECOR_SCROLL_SPEED_PX_PER_SEC =
     runnerConfig.groundDecorScrollSpeedPxPerSec || 180;
-
   const STORAGE_KEY_BEST_SCORE =
     runnerConfig.storageBestScoreKey || "pinguinRunnerBestScore";
-
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-
   const tryLoadBestScore = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY_BEST_SCORE);
@@ -84,7 +65,6 @@
       return 0;
     }
   };
-
   const trySaveBestScore = (value) => {
     try {
       localStorage.setItem(STORAGE_KEY_BEST_SCORE, String(Math.floor(value)));
@@ -92,7 +72,6 @@
       // Ignore storage failures (private modes or restricted environments).
     }
   };
-
   const game = {
     active: false,
     isGameOver: false,
@@ -142,29 +121,22 @@
       isJumpPressed: false,
     },
   };
-
   const stage = document.createElement("div");
   stage.className = "runner-game";
-
   const hud = document.createElement("div");
   hud.className = "runner-hud";
-
   const hint = document.createElement("div");
   hint.className = "runner-hint";
   hint.textContent = "Space/↑/W pular | ↓/S abaixar | Esc sair";
-
   const message = document.createElement("div");
   message.className = "runner-message";
-
   const penguinEl = document.createElement("img");
   penguinEl.className = "runner-penguin";
   penguinEl.src = sprites.running;
   penguinEl.draggable = false;
   let currentPenguinSpriteState = "running";
-
   const ground = document.createElement("div");
   ground.className = "runner-ground";
-
   const moon = document.createElement("img");
   moon.className = "runner-moon";
   moon.src = runnerMoonImage;
@@ -173,7 +145,6 @@
   moon.style.top = `${RUNNER_MOON_TOP_PX}px`;
   moon.style.right = `${RUNNER_MOON_RIGHT_PX}px`;
   moon.style.width = `${RUNNER_MOON_SIZE_PX}px`;
-
   const runnerAnimationStyle = document.createElement("style");
   runnerAnimationStyle.textContent = `
     @keyframes runnerGameShake {
@@ -188,7 +159,6 @@
     }
   `;
   document.head.appendChild(runnerAnimationStyle);
-
   const transitionOverlay = document.createElement("div");
   transitionOverlay.style.position = "fixed";
   transitionOverlay.style.inset = "0";
@@ -196,14 +166,10 @@
   transitionOverlay.style.pointerEvents = "none";
   transitionOverlay.style.background = "#000000";
   transitionOverlay.style.opacity = "0";
-
   const debugCollisionDot = document.createElement("div");
   debugCollisionDot.className = "runner-debug-collision-dot";
-
   const debugHitboxLayer = document.createElement("div");
   debugHitboxLayer.className = "runner-debug-hitbox-layer";
-  const debugHitboxPool = [];
-
   stage.appendChild(moon);
   stage.appendChild(debugHitboxLayer);
   stage.appendChild(hud);
@@ -214,7 +180,28 @@
   stage.appendChild(transitionOverlay);
   stage.appendChild(debugCollisionDot);
   document.body.appendChild(stage);
-
+  const debugTools =
+    typeof runnerModules.createDebugTools === "function"
+      ? runnerModules.createDebugTools({
+          DEBUG,
+          game,
+          runnerConfig,
+          debugCollisionDot,
+          debugHitboxLayer,
+        })
+      : {};
+  const showDebugCollisionDot =
+    typeof debugTools.showDebugCollisionDot === "function"
+      ? debugTools.showDebugCollisionDot
+      : () => {};
+  const renderDebugHitboxes =
+    typeof debugTools.renderDebugHitboxes === "function"
+      ? debugTools.renderDebugHitboxes
+      : () => {};
+  const clearDebugHitboxes =
+    typeof debugTools.clearDebugHitboxes === "function"
+      ? debugTools.clearDebugHitboxes
+      : () => {};
   const getPlayfieldHeight = () =>
     Math.floor(window.innerHeight * (runnerConfig.playfieldHeightRatio || 0.78));
   const getGroundY = () =>
@@ -225,21 +212,17 @@
         (runnerConfig.groundOffsetYPx || 8),
     );
   const getGroundLineY = () => getGroundY() + game.penguin.standingHeight;
-
   const LOSS_REACTION_STATES = ["crying", "angry", "flying", "caveirinha"];
-
   const setPenguinSprite = (state) => {
     const nextState = sprites[state] ? state : "running";
     if (currentPenguinSpriteState === nextState) return;
     penguinEl.src = sprites[nextState];
     currentPenguinSpriteState = nextState;
   };
-
   const getPenguinHeight = () =>
     game.penguin.isCrouching && !game.penguin.isJumping
       ? game.penguin.crouchingHeight
       : game.penguin.standingHeight;
-
   const getPenguinTopY = () => {
     const currentHeight = getPenguinHeight();
     return (
@@ -248,34 +231,28 @@
       RUNNER_PENGUIN_VISUAL_OFFSET_Y
     );
   };
-
   const applyPenguinPosition = () => {
     const drawHeight = getPenguinHeight();
     const drawTop = getPenguinTopY();
-
     penguinEl.style.left = `${game.penguin.x}px`;
     penguinEl.style.top = `${drawTop}px`;
     penguinEl.style.width = `${game.penguin.width}px`;
     penguinEl.style.height = `${drawHeight}px`;
   };
-
   const applyPenguinMotionVisual = () => {
     // Keep transform animation disabled so the SVG internal animation stays smooth.
     penguinEl.style.animation = "";
     penguinEl.style.transform = "none";
   };
-
   const centerPenguin = () => {
     game.penguin.x = Math.round(window.innerWidth * (runnerConfig.penguinCenterXRatio || 0.23));
     game.penguin.y = getGroundY();
     applyPenguinPosition();
   };
-
   const setRunnerMode = (enabled) => {
     game.active = enabled;
     const runtime =
       pet.runtime || (window.PenguinPet && window.PenguinPet.runtime);
-
     if (enabled) {
       game.fishCursorWasEnabledClass = document.body.classList.contains(
         "fish-cursor-enabled",
@@ -302,11 +279,9 @@
         }
       }
     }
-
     document.body.classList.toggle("runner-mode", enabled);
     stage.classList.toggle("active", enabled);
   };
-
   const playEnterTransition = () => {
     transitionOverlay.style.transition = "none";
     transitionOverlay.style.opacity = "0";
@@ -319,7 +294,6 @@
       }, runnerConfig.transitionHoldMs || 190);
     });
   };
-
   const shakeStage = () => {
     stage.style.animation = "none";
     void stage.offsetWidth;
@@ -328,17 +302,14 @@
       stage.style.animation = "";
     }, runnerConfig.shakeResetMs || 390);
   };
-
   const clearObstacles = () => {
     game.obstacles.forEach((obstacle) => obstacle.el.remove());
     game.obstacles = [];
   };
-
   const clearGroundDecor = () => {
     game.groundDecor.forEach((piece) => piece.el.remove());
     game.groundDecor = [];
   };
-
   const updateRunnerBackgroundMotion = (deltaMs = 0) => {
     if (deltaMs > 0 && !game.isGameOver) {
       game.backgroundScrollX +=
@@ -346,24 +317,20 @@
       game.moonScrollX += RUNNER_MOON_SCROLL_SPEED_PX_PER_SEC * (deltaMs / 1000);
     }
     stage.style.backgroundPosition = `${(-game.backgroundScrollX).toFixed(1)}px bottom`;
-
     const moonTravelWidth =
       window.innerWidth + RUNNER_MOON_SIZE_PX + RUNNER_MOON_RESPAWN_PADDING_PX;
     const moonOffset = game.moonScrollX % Math.max(1, moonTravelWidth);
     moon.style.transform = `translate3d(${(-moonOffset).toFixed(1)}px, 0, 0)`;
   };
-
   const updateGroundPresentation = () => {
     const groundLineY = getGroundLineY();
     ground.style.top = `${groundLineY}px`;
-
     stage.style.backgroundImage = `url("${runnerBackgroundDarkBImage}")`;
     stage.style.backgroundColor = "#1c2b56";
     stage.style.backgroundSize = "auto 100%";
     updateRunnerBackgroundMotion();
     stage.style.backgroundRepeat = "repeat-x";
   };
-
   const createGroundDecor = () => {
     clearGroundDecor();
     const baseline = getGroundLineY();
@@ -373,7 +340,6 @@
       runnerConfig.groundDecorCountMin || 8,
       runnerConfig.groundDecorCountMax || 28,
     );
-
     for (let i = 0; i < count; i += 1) {
       const piece = document.createElement("div");
       piece.className = "runner-obstacle";
@@ -402,23 +368,18 @@
       game.groundDecor.push({ el: piece, x, y, width: w });
     }
   };
-
   const updateGroundDecorMotion = (deltaMs) => {
     if (game.isGameOver || !game.groundDecor.length) return;
     const dt = deltaMs / 1000;
     const width = window.innerWidth;
-
     game.groundDecor.forEach((piece) => {
       piece.x -= RUNNER_GROUND_DECOR_SCROLL_SPEED_PX_PER_SEC * dt;
-
       if (piece.x + piece.width < -8) {
         piece.x = width + Math.random() * 80;
       }
-
       piece.el.style.left = `${Math.round(piece.x)}px`;
     });
   };
-
   const difficultyLevel = () => {
     const byScore = game.score / (runnerConfig.difficultyScoreDivisor || 250);
     const byTime = game.worldTimeMs / (runnerConfig.difficultyTimeDivisorMs || 16000);
@@ -427,7 +388,6 @@
       : Number.POSITIVE_INFINITY;
     return clamp(1 + Math.min(byScore, byTime), 1, difficultyMaxLevel);
   };
-
   const getPenguinBox = () => {
     const crouched = game.penguin.isCrouching && !game.penguin.isJumping;
     const widthInset = Math.round(
@@ -438,7 +398,6 @@
     );
     const currentHeight = getPenguinHeight();
     const top = getPenguinTopY();
-
     const topInset = Math.round(
       currentHeight *
         (crouched
@@ -451,7 +410,6 @@
           ? runnerConfig.penguinHitboxCrouchedBottomInsetRatio || 0.12
           : runnerConfig.penguinHitboxBottomInsetRatio || 0.1),
     );
-
     return {
       x: game.penguin.x + widthInset,
       y: top + topInset,
@@ -459,7 +417,6 @@
       height: currentHeight - topInset - bottomInset,
     };
   };
-
   const hasCollision = (a, b) => {
     return (
       a.x < b.x + b.width &&
@@ -468,86 +425,10 @@
       a.y + a.height > b.y
     );
   };
-
-  const showDebugCollisionDot = (a, b) => {
-    if (!DEBUG) return;
-
-    const overlapLeft = Math.max(a.x, b.x);
-    const overlapTop = Math.max(a.y, b.y);
-    const overlapRight = Math.min(a.x + a.width, b.x + b.width);
-    const overlapBottom = Math.min(a.y + a.height, b.y + b.height);
-    const hasOverlap = overlapRight > overlapLeft && overlapBottom > overlapTop;
-
-    const centerX = hasOverlap
-      ? overlapLeft + (overlapRight - overlapLeft) / 2
-      : b.x + b.width / 2;
-    const centerY = hasOverlap
-      ? overlapTop + (overlapBottom - overlapTop) / 2
-      : b.y + b.height / 2;
-
-    debugCollisionDot.style.left = `${Math.round(centerX)}px`;
-    debugCollisionDot.style.top = `${Math.round(centerY)}px`;
-    debugCollisionDot.classList.add("is-visible");
-
-    if (game.debugCollisionHideTimeoutId) {
-      clearTimeout(game.debugCollisionHideTimeoutId);
-    }
-
-    game.debugCollisionHideTimeoutId = window.setTimeout(() => {
-      debugCollisionDot.classList.remove("is-visible");
-      game.debugCollisionHideTimeoutId = 0;
-    }, runnerConfig.debugCollisionHideMs || 160);
-  };
-
-  const clearDebugHitboxes = () => {
-    debugHitboxPool.forEach((boxEl) => {
-      boxEl.style.display = "none";
-    });
-  };
-
-  const ensureDebugHitboxPool = (count) => {
-    while (debugHitboxPool.length < count) {
-      const boxEl = document.createElement("div");
-      boxEl.className = "runner-debug-hitbox";
-      debugHitboxLayer.appendChild(boxEl);
-      debugHitboxPool.push(boxEl);
-    }
-  };
-
-  const renderDebugHitboxes = (penguinBox, obstacleBoxes = []) => {
-    if (!DEBUG) return;
-
-    const boxes = [];
-    if (penguinBox) {
-      boxes.push({ ...penguinBox, role: "penguin" });
-    }
-    obstacleBoxes.forEach((box) => {
-      if (box) boxes.push({ ...box, role: "obstacle" });
-    });
-
-    ensureDebugHitboxPool(boxes.length);
-
-    boxes.forEach((box, index) => {
-      const boxEl = debugHitboxPool[index];
-      boxEl.classList.toggle("is-penguin", box.role === "penguin");
-      boxEl.classList.toggle("is-obstacle", box.role === "obstacle");
-      boxEl.style.display = "block";
-      boxEl.style.left = `${Math.round(box.x)}px`;
-      boxEl.style.top = `${Math.round(box.y)}px`;
-      boxEl.style.width = `${Math.max(1, Math.round(box.width))}px`;
-      boxEl.style.height = `${Math.max(1, Math.round(box.height))}px`;
-    });
-
-    for (let i = boxes.length; i < debugHitboxPool.length; i += 1) {
-      debugHitboxPool[i].style.display = "none";
-    }
-  };
-
   const renderHud = () => {
     const scoreInt = Math.floor(game.score);
     hud.textContent = `Pontos: ${scoreInt}   Recorde: ${game.bestScore}`;
   };
-
   window.PenguinRunnerGame = {
     pet,
     runnerConfig,

@@ -48,7 +48,10 @@ export const createFlyMoveAction = ({ SPEED_WALK }) => ({
           this.speed = SPEED_WALK;
           if (!this.isMoving) this.setState("idle");
           const baseFlyDelay = step.duration || this.getStepTransitionDelay();
-          const flyNextDelayMs = Math.max(260, Math.round(baseFlyDelay * 0.45));
+          const flyNextDelayMs =
+            step && step.debugPinned
+              ? Math.max(1400, Math.round(baseFlyDelay))
+              : Math.max(260, Math.round(baseFlyDelay * 0.45));
           setStepTimeout(
             "fly_next_step",
             () => {

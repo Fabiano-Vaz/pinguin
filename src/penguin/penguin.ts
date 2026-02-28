@@ -149,6 +149,7 @@
       this.lastDebugActivityLabel = "";
       this.lastDebugControlAt = 0;
       this.debugActivityOverrideUntil = 0;
+      this.debugActionOverrideUntil = 0;
       this.activityStateMachine =
         typeof core.createActivityStateMachine === "function"
           ? core.createActivityStateMachine("idle")
@@ -543,7 +544,7 @@
       } else {
         this.activityMode = nextActivity;
       }
-      this.debugActivityOverrideUntil = Date.now() + 6000;
+      this.debugActivityOverrideUntil = Date.now() + 15000;
       const representativeStateByActivity = {
         idle: "idle",
         eating: "eating",

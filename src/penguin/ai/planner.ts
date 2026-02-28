@@ -41,13 +41,58 @@ export const createPlannerMethods = ({
     const selected = templates[this.debugActionCycleIndex];
     if (!selected || !selected.step) return false;
     const clonedStep = JSON.parse(JSON.stringify(selected.step));
+    const prepareDebugStep = (step) => {
+      if (!step || typeof step !== "object") return step;
+      const prepared = { ...step, debugPinned: true };
+      if (prepared.type === "act" && prepared.state !== "fishing") {
+        prepared.duration = Math.max(
+          5000,
+          Number.isFinite(prepared.duration) ? prepared.duration : 0,
+        );
+      } else if (prepared.type === "jumpMove") {
+        prepared.duration = Math.max(
+          2600,
+          Number.isFinite(prepared.duration) ? prepared.duration : 0,
+        );
+      } else if (prepared.type === "flyMove") {
+        prepared.duration = Math.max(
+          2800,
+          Number.isFinite(prepared.duration) ? prepared.duration : 0,
+        );
+      } else if (
+        prepared.type === "walk" ||
+        prepared.type === "walkFast" ||
+        prepared.type === "walkEdge" ||
+        prepared.type === "walkShort"
+      ) {
+        prepared.holdAfterMs = Math.max(
+          2200,
+          Number.isFinite(prepared.holdAfterMs) ? prepared.holdAfterMs : 0,
+        );
+        prepared.minDistancePx = Math.max(
+          180,
+          Number.isFinite(prepared.minDistancePx) ? prepared.minDistancePx : 0,
+        );
+      } else if (prepared.type === "sequence" && Array.isArray(prepared.steps)) {
+        prepared.steps = prepared.steps.map((frame) => {
+          if (!frame || typeof frame !== "object") return frame;
+          return {
+            ...frame,
+            duration: Math.max(1400, Number.isFinite(frame.duration) ? frame.duration : 0),
+          };
+        });
+      }
+      return prepared;
+    };
+    const debugStep = prepareDebugStep(clonedStep);
     this.lastDebugActionLabel =
       typeof selected.label === "string" ? selected.label : this.getActionKey(clonedStep);
 
     if (typeof this.invalidateBehaviorFlow === "function") {
       this.invalidateBehaviorFlow("debug:advance-action");
     }
-    this.stepQueue = [clonedStep];
+    this.debugActionOverrideUntil = Date.now() + 12000;
+    this.stepQueue = [debugStep];
     this.aiLocked = false;
     this.activeStep = null;
     this.runNextStep();
@@ -64,7 +109,13 @@ export const createPlannerMethods = ({
     if (typeof this.clearManagedTimer === "function") {
       this.clearManagedTimer("behavior", "next");
     }
-    const delay = BEHAVIOR_DELAY_MIN_MS + Math.random() * BEHAVIOR_DELAY_VARIATION_MS;
+    const baseDelay = BEHAVIOR_DELAY_MIN_MS + Math.random() * BEHAVIOR_DELAY_VARIATION_MS;
+    const debugHoldRemaining = Math.max(
+      0,
+      (Number.isFinite(this.debugActionOverrideUntil) ? this.debugActionOverrideUntil : 0) -
+        Date.now(),
+    );
+    const delay = Math.max(baseDelay, debugHoldRemaining);
     this.nextBehaviorDueAt = Date.now() + delay;
     const runScheduledBehavior = () => {
       this.nextBehaviorTimeoutId = null;

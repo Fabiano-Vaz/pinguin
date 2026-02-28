@@ -1,134 +1,79 @@
 # 🐧 Pinguim Pet
 
-Um pinguim interativo no painel **Explorer** do VS Code, com IA de comportamento, clima dinâmico, reações ao usuário e minigame runner.
+Leve um pinguim cheio de personalidade para dentro do VS Code.  
+Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida, conversa, joga com você e transforma o editor em um cantinho mais divertido.
 
-## ✨ Funcionalidades
+## ✨ Por que instalar
 
-### 🎭 Estados visuais do pinguim
+- Dá vida ao seu VS Code sem atrapalhar seu fluxo.
+- Tem comportamento dinâmico e imprevisível (não fica repetitivo).
+- Recompensa interação com minigame e sistema de peixes.
+- Funciona como um “companheiro de mesa” enquanto você programa.
 
-- Idle (sentado)
-- Pescando no gelo
-- Correndo
-- Correndo abaixado (durante caça de peixe no chão)
-- Pulando
-- Dançando
-- Dormindo
-- Assustado
-- Chorando
-- Bravo
-- Coçando a cabeça
-- Dando tchau
-- Envergonhado
-- Espiando
-- Gargalhando
-- Pensando / apaixonado
-- Comendo peixe
-- Voando
-- De costas
-- Caveirinha
-- Animações refinadas de pesca (vara, linha, boia, batida de pé e olhos semicerrados)
-- Animação de comer peixe com consumo visual único (não reaparece no mesmo ciclo)
+## 💙 Tudo que ele faz
 
-### 🧠 Comportamento e interações
+### Personalidade viva
 
-- Caminhada autônoma com variação de direção e profundidade visual
-- Reações ao mouse (curiosidade, fuga, perseguição e aproximação)
-- Balões de fala com frases contextuais
-- Interações por clique e double-click
-- Arrastar e soltar com reação própria
-- Modo de reclamação após spam de cliques
-- Queda de peixe e prioridade automática para caça/comida
-- Cursor de peixe com lógica de “comer cursor”
-- Estoque de peixe com HUD, consumo e reposição em runtime
-- Frases de fome/contexto sem peixe (inclui convite para jogar e ganhar peixe)
-- Ação de pesca com duração de 30s e ganho progressivo (+1 peixe a cada 10s)
-- Sem peixe: 90% de chance de priorizar pesca no próximo comportamento
-- Sem peixe: auto-início de pesca após 10s
-- Guarda-chuva animado com posicionamento e inclinação dinâmica
-- Guarda-chuva com cúpula superior mais achatada (visual atualizado)
-- Com chuva ativa, o pinguim não tenta executar voo automático
+- Anda sozinho pela tela com movimentação natural.
+- Reage ao mouse (curiosidade, aproximação, fuga, perseguição).
+- Fala com balões contextuais.
+- Responde a clique, double-click e arrastar/soltar.
+- Pode ficar bravo se você exagerar nos cliques.
+- Tem momentos especiais e reações surpresa.
 
-### 🌦️ Ambiente e efeitos
+### Visual rico (muitos estados)
 
-- Efeitos visuais de neve
-- Efeitos de chuva
-- Flash/relâmpago e vento
-- Partículas e feedbacks de clique
+- Sentado, correndo, correndo abaixado, pulando, voando.
+- Dançando, dormindo, assustado, chorando, bravo.
+- Coçando a cabeça, dando tchau, envergonhado, espiando.
+- Gargalhando, pensando/apaixonado, de costas, caveirinha.
+- Pescando no gelo com animações detalhadas.
+- Comendo peixe com feedback visual de consumo real.
 
-### 🕹️ Runner Game (integrado)
+### Clima e efeitos no cenário
 
-- Minigame runner em tela cheia dentro da própria view
-- Física aprimorada de pulo:
-  - `jump buffer`
-  - `coyote time`
-  - gravidade de subida/queda ajustada
-  - salto curto ao soltar o botão cedo
-- Dificuldade progressiva com aumento gradual de velocidade
-- Geração de obstáculos variados (chão e aéreos)
-- Spawns com espaçamento mínimo para reduzir situações injustas
-- HUD com pontuação e recorde
-- Recorde persistido em `localStorage`
+- Neve, chuva, vento e relâmpagos.
+- Partículas e efeitos de clique.
+- Eventos climáticos que mudam o humor e o comportamento do pinguim.
+- Guarda-chuva dinâmico com animações e reações físicas.
 
-## 🎮 Controles do Runner
+### Sistema de peixe e rotina inteligente
 
-- `Space`: iniciar
-- `Space`, `↑` ou `W`: pular / reiniciar
-- `↓` ou `S`: abaixar
-- Segurar pulo: salto mais alto
-- Soltar cedo: salto curto
+- HUD de estoque de peixes.
+- Queda de peixe no cenário para coleta.
+- Prioridade automática para caça/comida quando necessário.
+- Sessão de pesca com ganho progressivo de peixes.
+- Frases de fome e convite para jogar quando está sem peixe.
 
-## 🚀 Uso no VS Code
+### Minigame Runner integrado
+
+- Jogo de corrida em tela cheia dentro da própria extensão.
+- Obstáculos variados e dificuldade progressiva.
+- Pulo responsivo e movimentação fluida.
+- Pontuação + recorde salvos.
+- Você ganha peixes ao evoluir no jogo.
+
+## 🎮 Controles principais
+
+### Fora do jogo
+
+- `V`: pulo especial (toques repetidos aumentam o impulso, como tentativa de voo).
+
+### No Runner
+
+- `Space`: iniciar.
+- `Space`, `↑` ou `W`: pular/reiniciar.
+- `↓` ou `S`: abaixar.
+- `Esc`: sair do runner.
+
+## 🚀 Como usar
 
 1. Instale a extensão.
 2. Abra o VS Code.
-3. Para abrir manualmente: `Ctrl+Shift+P` -> `Pinguim: Mostrar no Explorador`.
+3. Use o comando `Pinguim: Mostrar no Explorador`.
 
-## ⚙️ Configuração
+## ⚙️ Configuração disponível
 
-| Propriedade | Tipo | Padrão | Descrição |
-| --- | --- | --- | --- |
-| `pinguin.autoOpenOnStartup` | `boolean` | `true` | Abre automaticamente o painel do pinguim ao iniciar o VS Code |
-
-## 🧱 Estrutura do projeto
-
-Estrutura atual organizada por domínio e responsabilidade:
-
-```text
-src/
-├─ extension.ts                    # entrypoint da extensão (TypeScript)
-├─ webview-entry.ts                # entrypoint único do webview (Vite)
-├─ manifest.ts                     # manifesto de assets/config compartilhada
-├─ effects-registry.ts             # registry de efeitos no objeto global do pet
-├─ app/
-│  └─ pet-bootstrap.ts              # composição da app (wire-up dos módulos)
-├─ runtime/
-│  ├─ pet-fish-economy.ts           # estoque de peixe, HUD e regras de consumo/reposição
-│  └─ pet-environment-events.ts     # eventos globais (mouse, clique, clima)
-├─ games/
-│  └─ runner/
-│     ├─ runner-context.ts          # estado base, cena e utilitários do runner
-│     ├─ runner-obstacles.ts        # geração de obstáculos e colisão
-│     └─ penguin-runner-game.ts     # runtime do runner (loop, input, física)
-└─ main.ts                          # inicialização do pet no webview
-```
-
-Essa organização já facilita migração futura para framework porque separa:
-- `app`: camada de inicialização/composição.
-- `runtime`: regras de domínio e eventos do mundo.
-- `games`: features independentes (podem virar módulo/lazy feature depois).
-
-## 🛠️ Build
-
-- `npm run build`: compila extensão em TypeScript e gera bundle do webview com Vite
-- `npm run dev`: sobe ambiente de desenvolvimento web local (Vite)
-- `npm run test`: executa suíte unitária completa
-- `npm run lint`: valida typecheck da extensão + suíte de testes
-
-## 🌱 Variáveis de ambiente
-
-Arquivo [`.env`](/opt/pinguin/.env) (com exemplo em [`.env.example`](/opt/pinguin/.env.example)):
-
-- `PINGUIN_DEBUG_PANEL`: ativa painel de debug no webview da extensão (`0`/`1`)
-- `PINGUIN_RUNNER_DEBUG`: ativa debug do runner na extensão (`0`/`1`)
-- `VITE_PINGUIN_DEBUG_PANEL`: ativa painel de debug no modo `npm run dev`
-- `VITE_PINGUIN_RUNNER_DEBUG`: ativa debug do runner no modo `npm run dev`
+| Propriedade | Padrão | O que faz |
+| --- | --- | --- |
+| `pinguin.autoOpenOnStartup` | `true` | Abre o painel do pinguim automaticamente ao iniciar o VS Code |

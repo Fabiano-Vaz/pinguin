@@ -480,26 +480,6 @@
         this.onDragEnd();
       });
 
-      this.element.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (Date.now() < this.suppressClickUntil) return;
-        if (this.pendingPenguinClickTimeoutId) return;
-        this.pendingPenguinClickTimeoutId = setTimeout(() => {
-          this.pendingPenguinClickTimeoutId = null;
-          this.onClickPenguin();
-        }, PENGUIN_DOUBLE_CLICK_MS);
-      });
-
-      this.element.addEventListener("dblclick", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (Date.now() < this.suppressClickUntil) return;
-        if (this.pendingPenguinClickTimeoutId) {
-          clearTimeout(this.pendingPenguinClickTimeoutId);
-          this.pendingPenguinClickTimeoutId = null;
-        }
-        this.onDoubleClickPenguin();
-      });
     },
 
     clearPendingDropReaction() {

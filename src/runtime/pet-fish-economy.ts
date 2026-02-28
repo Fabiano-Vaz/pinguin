@@ -121,6 +121,7 @@
           penguin.isDragging ||
           penguin.isWalkingAway ||
           penguin.isRanting ||
+          penguin.currentState === "sleeping" ||
           penguin.isFishingActive ||
           penguin.currentState === "fishing" ||
           penguin.isEatingFood ||
@@ -177,6 +178,9 @@
           penguin.isDragging ||
           penguin.isWalkingAway ||
           penguin.isRanting ||
+          penguin.currentState === "sleeping" ||
+          penguin.isFishingActive ||
+          penguin.currentState === "fishing" ||
           penguin.isEatingFood ||
           penguin.currentFoodTarget
         ) {
@@ -216,6 +220,7 @@
           penguin.isDragging ||
           penguin.isWalkingAway ||
           penguin.isRanting ||
+          penguin.currentState === "sleeping" ||
           penguin.isFishingActive ||
           penguin.currentState === "fishing" ||
           penguin.isEatingFood ||
@@ -287,7 +292,11 @@
         if (!penguin) return;
 
         if (typeof penguin.showSpeech === "function") {
-          penguin.showSpeech("Ta me mandando ir pescar éh!?", 2600, false);
+          penguin.showSpeech(
+            pickRandomLine(getPhraseList(phrases, "fishHudFishingPrompt", "fishEmpty")),
+            2600,
+            false,
+          );
         }
 
         if (penguin.isDragging || penguin.isWalkingAway || penguin.isRanting) {
@@ -373,6 +382,7 @@
       if (hasUneatenFishOnGround()) return;
       const penguin = getCurrentPenguin();
       if (!penguin || typeof penguin.showSpeech !== "function") return;
+      if (penguin.currentState === "sleeping") return;
 
       penguin.showSpeech(
         pickRandomLine(getPhraseList(phrases, "fishRage", "angry")),

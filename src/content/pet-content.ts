@@ -85,6 +85,12 @@
       "SEM PEIXE DE NOVO NAO! QUERO PEIXEEE!!!!",
     ],
 
+    fishHudFishingPrompt: [
+      "Ta me mandando ir pescar éh!?",
+      "Quer peixe? Entao vou pescar!",
+      "Blz... la vou eu pescar.",
+    ],
+
     loveSymbol: ["♥"],
 
     snowmanFlirt: [
@@ -93,6 +99,12 @@
       "Com voce ate nevasca vira romance.",
       "Posso ficar aqui te admirando pra sempre?",
       "Voce caiu do ceu junto com esses floquinhos?",
+    ],
+
+    shootingStarWish: [
+      "Vamos fazer um pedido!",
+      "Olha uma estrela cadente!",
+      "Pede um desejo comigo!",
     ],
   };
 

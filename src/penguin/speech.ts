@@ -67,13 +67,26 @@
         Number.isFinite(durationMs) && durationMs > 0
           ? durationMs
           : cfg.bubbleDefaultDurationMs || 3000;
-      if (this.bubble) this.bubble.remove();
-      if (this.bubbleTimeout) clearTimeout(this.bubbleTimeout);
-
       if (!text) {
         if (shouldReschedule) this.scheduleNextBubble();
         return;
       }
+      if (this.currentState === "sleeping") {
+        const sleepingLines = Array.isArray(phrases && phrases.sleeping)
+          ? phrases.sleeping
+          : [];
+        const fullSleepLines = Array.isArray(phrases && phrases.fullSleep)
+          ? phrases.fullSleep
+          : [];
+        const allowedWhileSleeping = new Set([...sleepingLines, ...fullSleepLines]);
+        if (!allowedWhileSleeping.has(text)) {
+          if (shouldReschedule) this.scheduleNextBubble();
+          return;
+        }
+      }
+
+      if (this.bubble) this.bubble.remove();
+      if (this.bubbleTimeout) clearTimeout(this.bubbleTimeout);
 
       this.bubble = document.createElement("div");
       this.bubble.className = "speech-bubble";

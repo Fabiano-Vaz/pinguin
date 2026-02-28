@@ -199,10 +199,15 @@
       const flirtList =
         Array.isArray(phrases.snowmanFlirt) && phrases.snowmanFlirt.length > 0
           ? phrases.snowmanFlirt
-          : ["Que boneco lindo..."];
+          : Array.isArray(phrases.idle)
+            ? phrases.idle
+            : [];
 
       const phraseCount = Math.random() < 0.5 ? 1 : 2;
       let phraseIndex = 0;
+      const flirtSpeechDurationMs = 7000;
+      const flirtIntervalMs = 10500;
+      const snowmanEncounterDurationMs = 19000;
       const speakFlirt = () => {
         if (!penguin.snowmanEncounterActive) return;
         if (phraseIndex >= phraseCount) return;
@@ -211,7 +216,7 @@
         if (typeof penguin.showSpeech === "function") {
           penguin.showSpeech(
             flirtList[Math.floor(Math.random() * flirtList.length)],
-            4000,
+            flirtSpeechDurationMs,
             false,
           );
         }
@@ -228,9 +233,12 @@
           return;
         }
         speakFlirt();
-      }, 8000);
+      }, flirtIntervalMs);
 
-      state.snowmanDespawnTimeoutId = setTimeout(clearSnowmanEncounter, 12500);
+      state.snowmanDespawnTimeoutId = setTimeout(
+        clearSnowmanEncounter,
+        snowmanEncounterDurationMs,
+      );
     };
 
     state.snowmanApproachPollIntervalId = setInterval(engageWhenClose, 120);
@@ -259,6 +267,7 @@
 
   function triggerShootingStarEvent() {
     const state = effects.state || {};
+    const phrases = effects.getPhrases ? effects.getPhrases() : {};
     if (typeof effects.createShootingStar === "function") {
       effects.createShootingStar();
     }
@@ -294,7 +303,16 @@
       penguin.lockVisualSprite(turningBackSrc, 2000);
     }
     if (typeof penguin.showSpeech === "function") {
-      penguin.showSpeech("Vamos fazer um pedido!", 2200, false);
+      const starWishLines =
+        Array.isArray(phrases.shootingStarWish) && phrases.shootingStarWish.length > 0
+          ? phrases.shootingStarWish
+          : Array.isArray(phrases.idle)
+            ? phrases.idle
+            : [];
+      const starWish =
+        starWishLines[Math.floor(Math.random() * Math.max(1, starWishLines.length))] ||
+        "";
+      penguin.showSpeech(starWish, 2200, false);
     }
     if (state.shootingStarReactionTimeoutId !== null) {
       clearTimeout(state.shootingStarReactionTimeoutId);

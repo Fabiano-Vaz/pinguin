@@ -105,7 +105,7 @@ src/
 │     ├─ runner-obstacles.js        # geração de obstáculos e colisão
 │     └─ penguin-runner-game.js     # runtime do runner (loop, input, física)
 ├─ pet-*.js                         # núcleo do pet (estado, IA, movimento, etc.)
-└─ script.js                        # entrypoint leve (delegação para bootstrap)
+└─ main.js                        # entrypoint leve (delegação para bootstrap)
 ```
 
 Essa organização já facilita migração futura para framework porque separa:

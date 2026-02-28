@@ -10,6 +10,9 @@
   }) => ({
     startJumpArc(targetX, targetY) {
       if (this.isJumpLocked) return;
+      if (typeof this.blowAwayUmbrella === "function") {
+        this.blowAwayUmbrella(this.facingRight ? 1 : -1);
+      }
       const cfg = motion || {};
       const clampedY = this.clampY(targetY);
       const gravity = Math.max(1200, cfg.fallGravityPxPerSec2 || 1900);

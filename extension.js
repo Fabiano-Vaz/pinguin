@@ -1,5 +1,5 @@
 const vscode = require("vscode");
-const penguinShared = require("./src/pet-shared");
+const penguinShared = require("./src/manifest");
 
 const SIDEBAR_VIEW_ID = "pinguinPet.sidebar";
 
@@ -61,7 +61,7 @@ function getWebviewContent(webview, extensionUri) {
   );
   const nonce = createNonce();
   const scriptEntries = [
-    "pet-shared.js",
+    "manifest.js",
     "config/pet-config.js",
     "config/game-config.js",
     "content/pet-content.js",
@@ -72,7 +72,7 @@ function getWebviewContent(webview, extensionUri) {
     "effects/rain-effects.js",
     "effects/wind-effects.js",
     "effects/weather-cycles.js",
-    "pet-effects.js",
+    "effects-registry.js",
     "penguin/penguin-core.js",
     "penguin/state.js",
     "penguin/speech.js",
@@ -83,7 +83,7 @@ function getWebviewContent(webview, extensionUri) {
     "runtime/pet-fish-economy.js",
     "runtime/pet-environment-events.js",
     "app/pet-bootstrap.js",
-    "script.js",
+    "main.js",
     "games/runner/runner-context.js",
     "games/runner/runner-obstacles.js",
     "games/runner/penguin-runner-game.js",

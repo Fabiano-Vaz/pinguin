@@ -2,109 +2,183 @@
   window.PenguinPet = window.PenguinPet || {};
 
   window.PenguinPet.phrases = {
-    idle: ["...", "hmm.", "*olha ao redor*", "tô por aqui."],
+    idle: [
+      "…… zzzzs",
+      "tô vivão… mais ou menos",
+      "*bocejo gigante*",
+      "alguém me ama hoje ou é só mais um dia ruim?",
+    ],
 
-    running: ["*trotando*", "...", "*corre um pouco*"],
+    running: [
+      "*trotando com preguiça*",
+      "tô indo… mas sem pressa",
+      "*suspiro enquanto corre*",
+    ],
 
-    jumping: ["*hop*", "...", "*saltinho*"],
+    jumping: [
+      "*pulinho sem vontade*",
+      "aff… por que eu faço isso?",
+      "*hop meia-boca*",
+    ],
 
-    dancing: ["*balança levemente*", "♪ ♩ ♪", "..."],
+    dancing: [
+      "*balança devagar tipo 'tô nem aí'*",
+      "♪ só porque você tá olhando ♪",
+      "tá… dançando um pouquinho… feliz agora?",
+    ],
 
-    sleeping: ["zzz...", "zz...", "...zzz"],
+    sleeping: [
+      "ZzzZZzZ… me deixa…",
+      "ronc ronccc",
+      "…… apagado até segunda ordem",
+    ],
 
-    scared: ["!"],
+    scared: ["AI MEU DEUS NÃO FAZ ISSO!!", "!!!", "*se joga no chão de susto*"],
 
-    crying: ["...", "*soluço*", "sniff."],
+    crying: ["…… sniff…", "*fungando dramaticamente*", "ninguém gosta de mim…"],
 
-    angry: ["humph.", "*resmunga baixinho*", "..."],
+    beaten: [
+      "PARA DE ME BATER, CARA!!",
+      "Ô MÃO PESADA! PARA COM ISSO AGORA!",
+      "EI! CHEGA DE PORRADA, TÁ MALUCO?!",
+      "SE CONTINUAR ME BATENDO EU VOU SURTAR!",
+      "ME RESPEITA! PARA DE ME BATER!",
+    ],
 
-    scratching: ["*coça a cabeça*", "hmm...", "...", "*pensativo*"],
+    angry: [
+      "Tá me irritando de propósito né?",
+      "*resmunga alto*",
+      "TÔ DE SACO CHEIO!!!",
+    ],
 
-    waving: ["*acena*", "o/", "..."],
+    scratching: [
+      "*coça a cabeça com força*",
+      "tô tentando entender minha vida…",
+      "…… por que eu existo mesmo?",
+    ],
 
-    shy: ["*esconde o rosto*", "...", "*tímido*"],
+    waving: [
+      "*aceno preguiçoso*",
+      "… oi… tô aqui ainda…",
+      "o/ (mas sem ânimo)",
+    ],
 
-    peeking: ["*espia*", "...", "*curioso*"],
+    shy: [
+      "*esconde a cara com as nadadeiras*",
+      "…… não olha pra mim assim",
+      "*vermelho de vergonha*",
+    ],
 
-    laughing: ["heh.", "*risinho*", "heh heh."],
+    peeking: [
+      "*espia de canto*",
+      "tô só olhando… não tô curioso não",
+      "*curiosidade level 9000*",
+    ],
 
-    thinking: ["...", "*pensa*", "hmm..."],
+    laughing: [
+      "heheheh…",
+      "*risadinha contida*",
+      "tá… foi engraçado… pode parar agora",
+    ],
 
-    eating: ["*nom nom*", "*come*", "mmm."],
+    thinking: ["…… pensando na vida", "hmm……", "*olhar perdido no vazio*"],
+
+    eating: [
+      "*nom nom nom com vontade*",
+      "peixe é vida",
+      "mmmh… melhor coisa do mundo",
+    ],
+
     full: [
-      "SOCORRO...comi muitos peixinhos",
-      "Buchinho cheio",
-      "Acho que comi demais",
+      "SOCORRO EU VOU EXPLODIR DE PEIXE",
+      "bucho lotado… não cabe nem ar",
+      "comi demais e agora tô arrependido… mas faria de novo",
     ],
-    fullSleep: ["Vou tirar um cochilinho e ja volto."],
+
+    fullSleep: ["Tô entrando em coma alimentar… até mais"],
+
     fishing: [
-      "aff, vou ter que pescar...",
-      "ninguem me da peixe, ne...",
-      "la vou eu pescar de novo.",
-      "tomara que venha um peixao.",
+      "aff… lá vou eu de novo ser explorador de gelo",
+      "ninguém me dá peixe de graça nessa vida né…",
+      "pescar é sofrimento disfarçado de hobby",
+      "se vier filé mignon eu perdoo o universo",
     ],
 
-    flying: ["*bate as asinhas*", "...", "*flap flap*"],
+    flying: [
+      "*bate asinha com esforço*",
+      "sou um pinguim voador… por 3 segundos",
+      "*flap flap cansado*",
+    ],
 
-    turningBack: ["*olha pra trás*", "...", "*espreita*"],
+    turningBack: [
+      "*olha desconfiado pra trás*",
+      "tô sentindo que vão me clicar de novo…",
+      "*olhar de quem já sofreu*",
+    ],
 
-    // Frases especiais (eventos específicos)
+    // Frases especiais
     dropped: [
-      "Se me jogar novamente eu não volto",
-      "Isso doeu...",
-      "*olhar de julgamento*",
+      "Tá me jogando de novo? Sério isso?",
+      "Dói, sabia? … emocionalmente também",
+      "*olhar de profunda decepção e julgamento*",
+      "Mais uma vez e eu deleto minha existência",
     ],
 
-    love: ["Te amo!", "♥", "*cora*"],
+    love: [
+      "…… te amo, tá? Não conta pra ninguém",
+      "♥♥♥ (mas finge que não viu)",
+      "*abraço imaginário desajeitado*",
+      "você é meu peixe favorito da vida",
+    ],
 
     rant: [
-      "PARA P#!@ !!!!",
-      "PARAAA!!!",
-      "NÃO QUERO MAAAAIISS",
-      "PARA DE CLICAR NESSA M#$%@!",
+      "PARA DE CLICAR EM MIM CAR**LHO!!!",
+      "EU NÃO SOU BRINQUEDO NÃO!!!",
+      "TÁ ACHANDO QUE EU GOSTO DISSO???",
+      "VAI CLICAR NA TUA MÃE!!!",
     ],
 
     fishLow: [
-      "Meus peixinhos estao acabando...",
-      "Sobram poucos peixinhos!",
-      "Ja esta quase no fim dos peixinhos.",
+      "meus peixinhos… tão indo embora…",
+      "só mais uns 3… não me abandona assim",
+      "tá acabando o estoque… socorro",
     ],
 
-    fishLast: ["Ultimo peixinho!"],
+    fishLast: ["ÚLTIMO PEIXINHO DO APOCALIPSE!!!"],
 
     fishEmpty: [
-      "Estou com fome... quero mais peixinhos!",
-      "Acabaram os peixinhos. Quero mais!",
-      "Sem peixe...",
-      "Vamos jogar para ganhar peixe?",
+      "…… sem peixe = pinguim morto por dentro",
+      "Tô morrendo de fome e você aí de boa?",
+      "Cadê meu amor em forma de peixe???",
+      "Vamos jogar ou eu entro em greve?",
     ],
 
     fishRage: [
-      "QUERO PEIXEEE!!!!",
-      "CADE MEU PEIXE?! QUERO AGORA!",
-      "SEM PEIXE DE NOVO NAO! QUERO PEIXEEE!!!!",
+      "QUERO PEIXE AGORA OU EU GRITO",
+      "PEIXEEEEEEEEEEEE!!!!!!",
+      "VOCÊ TÁ ME MATANDO DEVAGAR SEM PEIXE",
+      "É SÓ UM PEIXINHO… NÃO Custa NADA",
     ],
 
     fishHudFishingPrompt: [
-      "Ta me mandando ir pescar éh!?",
-      "Quer peixe? Entao vou pescar!",
-      "Blz... la vou eu pescar.",
+      "Tá me mandando trabalhar né, seu preguiçoso?",
+      "Beleza… vou pescar… mas só por você <3",
+      "Se eu voltar sem peixe a culpa é sua",
     ],
 
-    loveSymbol: ["♥"],
+    loveSymbol: ["♥", "♡", "<3 (mas de verdade)"],
 
     snowmanFlirt: [
-      "Oi, boneca... seu sorriso derrete meu gelo.",
-      "Se eu for de gelo, voce e meu verao.",
-      "Com voce ate nevasca vira romance.",
-      "Posso ficar aqui te admirando pra sempre?",
-      "Voce caiu do ceu junto com esses floquinhos?",
+      "você é frio… mas derrete meu coraçãozinho",
+      "se eu te abraçar eu viro água… vale o risco?",
+      "posso te admirar até virar estátua de gelo?",
+      "você caiu do céu ou é só mais um floco perfeito?",
     ],
 
     shootingStarWish: [
-      "Vamos fazer um pedido!",
-      "Olha uma estrela cadente!",
-      "Pede um desejo comigo!",
+      "faz um pedido comigo… mas pede peixe pra mim tá?",
+      "estrela cadente! Pede pra eu nunca ficar sem peixe",
+      "vamos desejar juntos… eu começo: PEIXE ETERNO",
     ],
   };
 

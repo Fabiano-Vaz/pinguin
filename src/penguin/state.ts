@@ -4,6 +4,7 @@
   modules.state = ({ actionStates }) => ({
     setState(state) {
       if (Date.now() < (this.visualLockUntil || 0)) return;
+      if (this.isTemporaryDead && state !== "deadLying") return;
       if (
         this.currentState === "sleeping" &&
         Date.now() < (this.sleepWakeLockUntil || 0) &&
@@ -41,7 +42,7 @@
       this.currentState = state;
       this.img.src = stateAsset;
       if (
-        (state === "sleeping" || state === "full") &&
+        (state === "sleeping" || state === "full" || state === "deadLying") &&
         typeof this.hideUmbrella === "function"
       ) {
         this.hideUmbrella();
@@ -149,7 +150,12 @@
             ? 1
             : -1;
       const depth = this.getDepthScale();
-      const stateScale = this.currentState === "fishing" ? 1.32 : 1;
+      const stateScale =
+        this.currentState === "deadLying"
+          ? 1.45
+          : this.currentState === "fishing"
+            ? 1.12
+            : 1;
       const windTilt = Number.isFinite(this.windTilt) ? this.windTilt : 0;
       this.element.style.transform = `scaleX(${flip}) scale(${this.visualScale * depth * stateScale}) rotate(${windTilt}deg)`;
       // Ajusta z-index: mais ao fundo = menor z-index (atrás), mais à frente = maior

@@ -23,6 +23,23 @@
           return;
         }
 
+        if (this.isTemporaryDead) {
+          this.customMotion = null;
+          this.isMoving = false;
+          this.isChasing = false;
+          this.allowAirMovement = false;
+          this.targetX = this.x;
+          this.targetY = this.y;
+          this.element.style.left = this.x + "px";
+          this.element.style.top = this.y + "px";
+          this.applyTransform();
+          this.updateBubblePosition();
+          this.updateUmbrellaPosition();
+          this.renderDebugPanel(now);
+          requestAnimationFrame((ts) => this.update(ts));
+          return;
+        }
+
         if (this.isDragging) {
           this.renderDebugPanel(now);
           requestAnimationFrame((ts) => this.update(ts));
@@ -236,6 +253,8 @@
     },
 
     showUmbrella() {
+      if (this.blockUmbrellaUntilNextRain) return;
+      if (this.isTemporaryDead || this.currentState === "deadLying") return;
       if (this.isFishingActive) return;
       if (this.currentState === "sleeping" || this.currentState === "full") return;
       if (this.umbrellaEl.classList.contains("flying-away")) return;

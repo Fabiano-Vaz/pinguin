@@ -52,9 +52,39 @@
 
     const onClick = (event) => {
       if (!penguin) return;
+      if (penguin.isTemporaryDead) return;
       if (penguin.isFishingActive) return;
       if (penguin.isCaveirinhaMode) return;
       if (penguin.isDragging || penguin.isWalkingAway) return;
+      const recentPenguinInteraction =
+        Number.isFinite(runtime.lastPenguinInteractionAt) &&
+        Date.now() - runtime.lastPenguinInteractionAt <= 500;
+      if (recentPenguinInteraction) return;
+      const penguinEl = penguin && penguin.element ? penguin.element : null;
+      const clickedInsidePenguinRect =
+        penguinEl &&
+        typeof penguinEl.getBoundingClientRect === "function" &&
+        Number.isFinite(event?.clientX) &&
+        Number.isFinite(event?.clientY)
+          ? (() => {
+              const rect = penguinEl.getBoundingClientRect();
+              return (
+                event.clientX >= rect.left &&
+                event.clientX <= rect.right &&
+                event.clientY >= rect.top &&
+                event.clientY <= rect.bottom
+              );
+            })()
+          : false;
+      if (
+        event &&
+        event.target &&
+        typeof event.target.closest === "function" &&
+        event.target.closest(".penguin")
+      ) {
+        return;
+      }
+      if (clickedInsidePenguinRect) return;
 
       if (typeof effects.createFoodDrops !== "function") return;
       if (typeof penguin.enqueueFoodTargets !== "function") return;
@@ -121,6 +151,7 @@
           window.PenguinPet && window.PenguinPet.penguin
             ? window.PenguinPet.penguin
             : penguin;
+        if (currentPenguin && currentPenguin.isTemporaryDead) return;
 
         if (key === "arrowright") {
           if (!currentPenguin || !currentPenguin.debugEnabled) return;

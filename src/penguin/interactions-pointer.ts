@@ -1,8 +1,31 @@
 (() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
-  modules.interactionsPointer = ({ SPEED_WALK, halfPenguinSize, penguinSize }) => ({
+  modules.interactionsPointer = ({
+    runtime,
+    SPEED_WALK,
+    halfPenguinSize,
+    penguinSize,
+  }) => ({
     setupEventListeners() {
+      this.element.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        runtime.lastPenguinInteractionAt = Date.now();
+        if (typeof this.queuePenguinClick === "function") {
+          this.queuePenguinClick();
+        }
+      });
+
+      this.element.addEventListener("dblclick", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        runtime.lastPenguinInteractionAt = Date.now();
+        if (typeof this.onDoubleClickPenguin === "function") {
+          this.onDoubleClickPenguin();
+        }
+      });
+
       this.element.addEventListener("pointerdown", (e) => {
         this.onDragStart(e);
       });
@@ -38,6 +61,7 @@
     },
 
     onDragStart(e) {
+      if (this.isTemporaryDead) return;
       if (this.isJumpLocked) return;
       if (this.isCaveirinhaMode) return;
       if (this.isFishingActive) return;
@@ -49,12 +73,14 @@
         return;
       }
       e.preventDefault();
+      runtime.lastPenguinInteractionAt = Date.now();
       this.isDragging = true;
       this.clearPendingDropReaction();
       this.isCursorTouchEating = false;
       this.currentFoodTarget = null;
       this.isEatingFood = false;
       this.dragMoved = false;
+      this.dragStartY = this.y;
       this.dragOffsetX = e.clientX - this.x;
       this.dragOffsetY = e.clientY - this.y;
       this.isChasing = false;
@@ -72,6 +98,7 @@
     },
 
     onDragMove(e) {
+      if (this.isTemporaryDead) return;
       if (this.isJumpLocked) return;
       if (!this.isDragging) return;
 
@@ -105,12 +132,14 @@
     },
 
     onDragEnd() {
+      if (this.isTemporaryDead) return;
       if (this.isJumpLocked) return;
       if (!this.isDragging) return;
       this.isDragging = false;
       this.stopWingFlap();
 
       if (!this.dragMoved) {
+        runtime.lastPenguinInteractionAt = Date.now();
         this.allowAirMovement = false;
         if (typeof this.setActivityMode === "function") {
           this.setActivityMode("idle", "drag:end:no-move", { force: true });
@@ -118,10 +147,24 @@
         this.setState("idle");
         this.aiLocked = false;
         this.tryStartFoodHunt();
+        // Pointer down cancels native click in some environments, so treat no-move drop as click.
+        if (typeof this.queuePenguinClick === "function") {
+          this.queuePenguinClick();
+        }
         return;
       }
 
       this.suppressClickUntil = Date.now() + 250;
+      const walkMinY =
+        typeof this.getWalkMinY === "function" ? this.getWalkMinY() : this.y;
+      const highDropMinHeightPx = Math.max(90, Math.round(penguinSize * 1.1));
+      const startedY = Number.isFinite(this.dragStartY) ? this.dragStartY : this.y;
+      const highestY = Math.min(startedY, this.y);
+      const releasedFromHigh = highestY < walkMinY - highDropMinHeightPx;
+      this.dragStartY = 0;
+      this.pendingMortinhoAfterDrop = releasedFromHigh;
+      this.pendingWalkAwayAfterMortinho = false;
+
       const now = Date.now();
       const streakWindowMs = 1800;
       this.dropReleaseStreak =
@@ -131,12 +174,14 @@
       this.lastDropReleaseAt = now;
 
       if (this.dropReleaseStreak >= 2) {
-        this.startWalkAwayAfterDrops();
-        return;
+        if (releasedFromHigh) {
+          this.pendingWalkAwayAfterMortinho = true;
+        } else {
+          this.startWalkAwayAfterDrops();
+          return;
+        }
       }
 
-      const walkMinY =
-        typeof this.getWalkMinY === "function" ? this.getWalkMinY() : this.y;
       const thrownUp = this.y < walkMinY - 12;
       if (thrownUp && typeof this.blowAwayUmbrella === "function") {
         this.blowAwayUmbrella(this.facingRight ? 1 : -1);
@@ -169,6 +214,7 @@
 
       const midX = this.x + halfPenguinSize;
       const goRight = midX >= window.innerWidth / 2;
+      this.blockUmbrellaUntilNextRain = true;
       if (typeof this.blowAwayUmbrella === "function") {
         this.blowAwayUmbrella(goRight ? 1 : -1);
       }
@@ -201,6 +247,15 @@
             this.clearManagedTimer("drop_reaction", "poll");
           }
           this.dropReactionIntervalId = null;
+          if (
+            this.pendingMortinhoAfterDrop &&
+            typeof this.triggerTemporaryMortinho === "function"
+          ) {
+            this.pendingMortinhoAfterDrop = false;
+            this.triggerTemporaryMortinho(3000, { forceGround: true });
+            return;
+          }
+          this.pendingMortinhoAfterDrop = false;
           this.speed = SPEED_WALK;
           this.setState("angry");
           this.speak();

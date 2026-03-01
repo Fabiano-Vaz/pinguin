@@ -120,6 +120,7 @@
         if (
           penguin.isDragging ||
           penguin.isWalkingAway ||
+          penguin.isTemporaryDead ||
           penguin.isRanting ||
           penguin.currentState === "sleeping" ||
           penguin.isFishingActive ||
@@ -177,6 +178,7 @@
           typeof penguin.runNextStep !== "function" ||
           penguin.isDragging ||
           penguin.isWalkingAway ||
+          penguin.isTemporaryDead ||
           penguin.isRanting ||
           penguin.currentState === "sleeping" ||
           penguin.isFishingActive ||
@@ -219,6 +221,7 @@
           !penguin ||
           penguin.isDragging ||
           penguin.isWalkingAway ||
+          penguin.isTemporaryDead ||
           penguin.isRanting ||
           penguin.currentState === "sleeping" ||
           penguin.isFishingActive ||
@@ -290,6 +293,7 @@
 
         const penguin = getCurrentPenguin();
         if (!penguin) return;
+        if (penguin.isTemporaryDead) return;
 
         if (typeof penguin.showSpeech === "function") {
           penguin.showSpeech(

@@ -335,6 +335,9 @@ import "./weather-space-events";
     if (state.snowSpawnIntervalId !== null) stopSnowCycle(true, true);
 
     const penguin = window.PenguinPet && window.PenguinPet.penguin;
+    if (penguin) {
+      penguin.blockUmbrellaUntilNextRain = false;
+    }
     if (penguin && typeof penguin.showUmbrella === "function") {
       penguin.showUmbrella();
     }

@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260" viewBox="0 0 260 260">
+    <rect width="260" height="260" fill="transparent" />
+
+    <!-- Main body shake after impact -->
+    <g>
+        <animateTransform attributeName="transform" type="translate"
+            values="0 0; 0 0; -9 2; 6 -2; -4 1; 2 0; 0 0"
+            keyTimes="0; 0.22; 0.3; 0.37; 0.48; 0.62; 1"
+            dur="1.8s" repeatCount="1" />
+
+        <!-- Feet -->
+        <g fill="#f2c400" stroke="#e1b600" stroke-width="1.5">
+            <path
+                d="M70 215 C50 220, 45 235, 62 240 C80 245, 105 238, 112 230 C118 223, 100 215, 70 215 Z" />
+            <path
+                d="M190 215 C210 220, 215 235, 198 240 C180 245, 155 238, 148 230 C142 223, 160 215, 190 215 Z" />
+        </g>
+
+        <!-- Body -->
+        <path
+            d="M130 100 C85 100, 60 135, 60 165 C60 190, 85 220, 130 240 C175 220, 200 190, 200 165 C200 135, 175 100, 130 100 Z"
+            fill="#0a0a0a" />
+
+        <!-- Belly -->
+        <path
+            d="M130 110 C105 110, 85 135, 85 175 C85 205, 105 225, 130 230 C155 225, 175 205, 175 175 C175 135, 155 110, 130 110 Z"
+            fill="#ffffff" />
+
+        <!-- Left wing pulled back -->
+        <path d="M70 140 C45 165, 60 200, 90 210 C95 200, 95 160, 70 140 Z" fill="#0a0a0a" />
+
+        <!-- Right wing raised in defense -->
+        <g>
+            <animateTransform attributeName="transform" type="rotate"
+                values="4 190 140; 4 190 140; 40 190 140; 32 190 140; 38 190 140; 8 190 140; 4 190 140"
+                keyTimes="0; 0.22; 0.3; 0.37; 0.48; 0.62; 1"
+                dur="1.8s" repeatCount="1" />
+            <path d="M190 140 C215 165, 200 200, 170 210 C165 200, 165 160, 190 140 Z"
+                fill="#0a0a0a" />
+        </g>
+
+        <!-- Neck and head knocked sideways -->
+        <g transform="translate(0, 10)">
+            <animateTransform attributeName="transform" additive="sum" type="translate"
+                values="0 0; 0 0; -13 4; 8 -3; -5 1; 2 0; 0 0"
+                keyTimes="0; 0.22; 0.3; 0.37; 0.48; 0.62; 1"
+                dur="1.8s" repeatCount="1" />
+            <animateTransform attributeName="transform" additive="sum" type="rotate"
+                values="0 130 95; 0 130 95; -16 130 95; 10 130 95; -6 130 95; 2 130 95; 0 130 95"
+                keyTimes="0; 0.22; 0.3; 0.37; 0.48; 0.62; 1"
+                dur="1.8s" repeatCount="1" />
+
+            <ellipse cx="130" cy="65" rx="20" ry="28" fill="#0a0a0a" />
+            <ellipse cx="130" cy="55" rx="45" ry="35" fill="#0a0a0a" />
+
+            <g fill="#0a0a0a">
+                <ellipse cx="130" cy="20" rx="7" ry="12" transform="rotate(-5 130 20)" />
+                <ellipse cx="113" cy="25" rx="6" ry="10" transform="rotate(-20 113 25)" />
+                <ellipse cx="147" cy="25" rx="6" ry="10" transform="rotate(20 147 25)" />
+                <ellipse cx="101" cy="32" rx="5" ry="8" transform="rotate(-35 101 32)" />
+                <ellipse cx="159" cy="32" rx="5" ry="8" transform="rotate(35 159 32)" />
+            </g>
+
+            <!-- Eyes: X shape -->
+            <ellipse cx="114" cy="52" rx="12" ry="10" fill="#ffffff" />
+            <ellipse cx="144" cy="52" rx="12" ry="10" fill="#ffffff" />
+            <g stroke="#0a0a0a" stroke-width="3.2" stroke-linecap="round">
+                <line x1="108" y1="46" x2="120" y2="58" />
+                <line x1="120" y1="46" x2="108" y2="58" />
+                <line x1="138" y1="46" x2="150" y2="58" />
+                <line x1="150" y1="46" x2="138" y2="58" />
+            </g>
+
+            <!-- Bruise -->
+            <ellipse cx="140" cy="77" rx="8" ry="10" fill="#bb0000" opacity="5" />
+
+            <!-- Beak bent by impact -->
+            <path
+                d="M108 66 C108 59, 120 56, 130 56 C140 56, 151 59, 151 66 C151 73, 139 79, 129 79 C120 79, 108 73, 108 66 Z"
+                fill="#f2c400" stroke="#e1b600" stroke-width="1.5" />
+        </g>
+
+        <!-- Punch impact burst -->
+        <!-- <g opacity="0" stroke="#f8b400" stroke-width="3" stroke-linecap="round">
+            <animate attributeName="opacity"
+                values="0; 0; 1; 0.85; 0; 0; 0"
+                keyTimes="0; 0.2; 0.3; 0.36; 0.5; 0.62; 1"
+                dur="1.8s" repeatCount="1" />
+            <animateTransform attributeName="transform" type="scale"
+                values="0.7 0.7; 0.7 0.7; 1.15 1.15; 1 1; 0.85 0.85; 0.85 0.85; 0.85 0.85"
+                keyTimes="0; 0.2; 0.3; 0.36; 0.5; 0.62; 1"
+                dur="1.8s" repeatCount="1" />
+            <line x1="185" y1="83" x2="165" y2="77" />
+            <line x1="186" y1="96" x2="165" y2="96" />
+            <line x1="184" y1="108" x2="165" y2="115" />
+            <line x1="172" y1="73" x2="160" y2="58" />
+            <line x1="172" y1="120" x2="160" y2="132" />
+            <polygon
+                points="152 86 155 94 164 94 157 100 160 108 152 103 144 108 147 100 140 94 149 94"
+                fill="#ffd95a" stroke="#f8b400" stroke-width="2" stroke-linejoin="round" />
+        </g>
+
+        <g opacity="0" stroke="#8f8f8f" stroke-width="2.2" stroke-linecap="round">
+            <animate attributeName="opacity"
+                values="0; 0; 1; 0.4; 0; 0; 0"
+                keyTimes="0; 0.18; 0.3; 0.42; 0.55; 0.7; 1"
+                dur="1.8s" repeatCount="1" />
+            <line x1="230" y1="90" x2="194" y2="90" />
+            <line x1="236" y1="101" x2="196" y2="102" />
+            <line x1="226" y1="113" x2="194" y2="116" />
+        </g> -->
+    </g>
+</svg>

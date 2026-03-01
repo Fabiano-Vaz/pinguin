@@ -13,6 +13,7 @@
     MOUSE_IDLE_MOVEMENT_THRESHOLD_PX,
   }) => ({
     onMouseMove(mouseX, mouseY) {
+      if (this.isTemporaryDead) return;
       if (!Number.isFinite(mouseX) || !Number.isFinite(mouseY)) return;
       if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
@@ -229,6 +230,7 @@
     },
 
     handleMouseProximity() {
+      if (this.isTemporaryDead) return;
       if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
       if (this.isWalkingAway) return;

@@ -2,8 +2,19 @@ import { pickRandomLine } from "./shared";
 
 export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phrases, SPEED_WALK }) => ({
   syncFoodTargetsFromGround() {
+    const now = Date.now();
+    const scanIntervalMs = 180;
+    if (
+      Number.isFinite(this.lastFoodGroundScanAt) &&
+      now - this.lastFoodGroundScanAt < scanIntervalMs
+    ) {
+      return;
+    }
+    this.lastFoodGroundScanAt = now;
+
     const fishOnGround = document.querySelectorAll(".food-fish-drop:not(.eaten)");
     if (!fishOnGround.length) return;
+    const maxQueuedTargets = 120;
 
     const tracked = new Set();
     if (
@@ -21,19 +32,25 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
       });
     }
 
-    fishOnGround.forEach((fishEl) => {
-      if (tracked.has(fishEl)) return;
+    for (const fishEl of fishOnGround) {
+      if (tracked.has(fishEl)) continue;
+      if (this.foodTargets.length >= maxQueuedTargets) break;
       const rect = fishEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const clampedCenterX = Math.max(
+        halfPenguinSize,
+        Math.min(centerX, window.innerWidth - halfPenguinSize),
+      );
       const targetY =
         typeof this.getWalkMinY === "function"
           ? this.getWalkMinY() + halfPenguinSize
           : rect.top + rect.height / 2;
       this.foodTargets.push({
         element: fishEl,
-        x: rect.left + rect.width / 2,
+        x: clampedCenterX,
         y: targetY,
       });
-    });
+    }
   },
 
   pruneFoodTargets() {
@@ -190,6 +207,12 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
 
   enqueueFoodTargets(targets) {
     if (!Array.isArray(targets) || targets.length === 0) return;
+    const maxQueuedTargets = 120;
+    if (!Array.isArray(this.foodTargets)) {
+      this.foodTargets = [];
+    }
+    const availableSlots = Math.max(0, maxQueuedTargets - this.foodTargets.length);
+    if (availableSlots === 0) return;
 
     const validTargets = targets.filter(
       (target) =>
@@ -200,7 +223,19 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
     );
 
     if (validTargets.length === 0) return;
-    this.foodTargets.push(...validTargets);
+    const normalizedTargets = validTargets.slice(0, availableSlots).map((target) => {
+      const clampedX = Math.max(
+        halfPenguinSize,
+        Math.min(target.x, window.innerWidth - halfPenguinSize),
+      );
+      const clampedY = this.clampY(target.y - halfPenguinSize) + halfPenguinSize;
+      return {
+        ...target,
+        x: clampedX,
+        y: clampedY,
+      };
+    });
+    this.foodTargets.push(...normalizedTargets);
     this.enforceFoodPriority();
   },
 
@@ -309,12 +344,17 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
       return;
     }
 
-    this.targetX = target.x - halfPenguinSize;
-    this.targetY = this.clampY(target.y - halfPenguinSize);
+    const clampedTargetX = Math.max(
+      halfPenguinSize,
+      Math.min(target.x, window.innerWidth - halfPenguinSize),
+    );
+    const clampedTargetY = this.clampY(target.y - halfPenguinSize) + halfPenguinSize;
+    this.targetX = clampedTargetX - halfPenguinSize;
+    this.targetY = this.clampY(clampedTargetY - halfPenguinSize);
     this.isMoving = true;
 
-    const dx = target.x - (this.x + halfPenguinSize);
-    const dy = target.y - (this.y + halfPenguinSize);
+    const dx = clampedTargetX - (this.x + halfPenguinSize);
+    const dy = clampedTargetY - (this.y + halfPenguinSize);
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance <= 22) {
       this.consumeCurrentFoodTarget();

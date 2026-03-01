@@ -13,20 +13,17 @@
         event.stopPropagation();
         runtime.lastPenguinInteractionAt = Date.now();
         if (typeof this.queuePenguinClick === "function") {
-          this.queuePenguinClick();
+          this.queuePenguinClick(event);
         }
       });
 
       this.element.addEventListener("dblclick", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        runtime.lastPenguinInteractionAt = Date.now();
-        if (typeof this.onDoubleClickPenguin === "function") {
-          this.onDoubleClickPenguin();
-        }
       });
 
       this.element.addEventListener("pointerdown", (e) => {
+        runtime.lastPenguinInteractionAt = Date.now();
         this.onDragStart(e);
       });
 
@@ -147,10 +144,6 @@
         this.setState("idle");
         this.aiLocked = false;
         this.tryStartFoodHunt();
-        // Pointer down cancels native click in some environments, so treat no-move drop as click.
-        if (typeof this.queuePenguinClick === "function") {
-          this.queuePenguinClick();
-        }
         return;
       }
 

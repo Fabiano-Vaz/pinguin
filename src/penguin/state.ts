@@ -3,6 +3,12 @@
 
   modules.state = ({ actionStates }) => ({
     setState(state) {
+      if (
+        state === "beaten" &&
+        Date.now() > (Number(this.beatenStateAllowedUntil) || 0)
+      ) {
+        return;
+      }
       if (Date.now() < (this.visualLockUntil || 0)) return;
       if (this.isTemporaryDead && state !== "deadLying") return;
       if (
@@ -37,7 +43,8 @@
       }
       if (this.isDragging && state !== "flying") return;
       if (this.currentState === state) return;
-      const stateAsset = actionStates[state] || actionStates.default || actionStates.idle;
+      const stateAsset =
+        actionStates[state] || actionStates.default || actionStates.idle;
       if (!stateAsset) return;
       this.currentState = state;
       this.img.src = stateAsset;
@@ -64,7 +71,9 @@
 
     lockVisualSprite(src, durationMs = 0) {
       if (typeof src !== "string" || src.trim().length === 0) return;
-      const duration = Number.isFinite(durationMs) ? Math.max(0, durationMs) : 0;
+      const duration = Number.isFinite(durationMs)
+        ? Math.max(0, durationMs)
+        : 0;
       this.visualLockUntil = Date.now() + duration;
       this.img.src = src;
     },

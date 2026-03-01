@@ -73,12 +73,15 @@
 
     startDropFall() {
       const cfg = motion || {};
+      const walkMinY = this.getWalkMinY();
+      const walkMaxY = this.getWalkMaxY();
+      const dropLandingY = Math.min(walkMaxY, walkMinY + 14);
       this.customMotion = {
         type: "fall",
         vy: 0,
         gravity: cfg.fallGravityPxPerSec2 || 1900,
         maxVy: cfg.fallMaxVelocityPxPerSec || 1400,
-        targetY: this.getWalkMinY(),
+        targetY: dropLandingY,
       };
       this.isMoving = true;
       this.allowAirMovement = true;

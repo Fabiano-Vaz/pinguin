@@ -2,6 +2,45 @@
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.interactionsClick = ({ phrases, PENGUIN_DOUBLE_CLICK_MS }) => ({
+    triggerBeatenReaction() {
+      this.isChasing = false;
+      this.aiLocked = true;
+      this.stepQueue = [];
+      this.beatenStateAllowedUntil = Date.now() + 1200;
+      this.setState("beaten");
+      this.visualLockUntil = Math.max(
+        Number(this.visualLockUntil) || 0,
+        Date.now() + 500,
+      );
+      const beatenLines =
+        Array.isArray(phrases && phrases.beaten) && phrases.beaten.length > 0
+          ? phrases.beaten
+          : Array.isArray(phrases && phrases.rant)
+            ? phrases.rant
+            : [];
+      if (beatenLines.length > 0) {
+        this.showSpeech(
+          beatenLines[Math.floor(Math.random() * beatenLines.length)],
+          2200,
+          false,
+        );
+      }
+      this.element.style.animation = "shake 0.5s ease";
+
+      setTimeout(() => {
+        if (
+          typeof this.enforceFoodPriority === "function" &&
+          this.enforceFoodPriority()
+        ) {
+          return;
+        }
+        this.element.style.animation = "";
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, this.scaleEmotionDuration(2000));
+    },
+
     triggerTemporaryMortinho(durationMs = 2000, { forceGround = false } = {}) {
       const duration = Number.isFinite(durationMs) ? Math.max(0, durationMs) : 2000;
       if (this.tempMortinhoTimeoutId) {
@@ -11,8 +50,11 @@
 
       if (forceGround && typeof this.getWalkMinY === "function") {
         const groundY = this.getWalkMinY();
-        this.y = groundY;
-        this.targetY = groundY;
+        const maxY =
+          typeof this.getWalkMaxY === "function" ? this.getWalkMaxY() : groundY + 26;
+        const landedY = Math.min(maxY, groundY + 26);
+        this.y = landedY;
+        this.targetY = landedY;
       }
 
       this.aiLocked = true;
@@ -67,9 +109,24 @@
       }, duration);
     },
 
-    queuePenguinClick() {
+    queuePenguinClick(event) {
       if (this.isTemporaryDead) return;
       if (Date.now() < (this.suppressClickUntil || 0)) return;
+      const clickDetail =
+        event && Number.isFinite(event.detail) ? Number(event.detail) : null;
+      if (clickDetail === 2) {
+        if (this.pendingPenguinClickTimeoutId) {
+          clearTimeout(this.pendingPenguinClickTimeoutId);
+          this.pendingPenguinClickTimeoutId = null;
+        }
+        if (typeof this.onDoubleClickPenguin === "function") {
+          this.onDoubleClickPenguin();
+        }
+        return;
+      }
+      if (clickDetail !== null && clickDetail !== 1) {
+        return;
+      }
       if (this.pendingPenguinClickTimeoutId) {
         clearTimeout(this.pendingPenguinClickTimeoutId);
         this.pendingPenguinClickTimeoutId = null;
@@ -116,45 +173,10 @@
       this.isChasing = false;
       this.aiLocked = true;
       this.stepQueue = [];
-      const reaction = "beaten";
-
-      if (reaction === "laughing") {
-        this.playLaughThenIdleThenLaugh(2200, () => {
-          this.aiLocked = false;
-          this.scheduleNextBehavior();
-        });
-        return;
+      if (this.currentState === "beaten") {
+        this.setState("idle");
       }
-
-      this.setState(reaction);
-      if (reaction === "beaten") {
-        this.visualLockUntil = Math.max(
-          Number(this.visualLockUntil) || 0,
-          Date.now() + 500,
-        );
-      }
-      const beatenLines =
-        Array.isArray(phrases && phrases.beaten) && phrases.beaten.length > 0
-          ? phrases.beaten
-          : Array.isArray(phrases && phrases.rant)
-            ? phrases.rant
-            : [];
-      if (beatenLines.length > 0) {
-        this.showSpeech(
-          beatenLines[Math.floor(Math.random() * beatenLines.length)],
-          2200,
-          false,
-        );
-      }
-
-      const anims = {
-        beaten: "shake 0.5s ease",
-        jumping: "hop 0.52s ease-out 2",
-        dancing: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
-        shy: "shake 0.6s ease",
-        scared: "shake 0.4s ease",
-      };
-      if (anims[reaction]) this.element.style.animation = anims[reaction];
+      this.element.style.animation = "shake 0.45s ease";
 
       setTimeout(() => {
         if (
@@ -210,7 +232,9 @@
         return;
       }
 
-      this.onClickPenguin();
+      if (typeof this.triggerBeatenReaction === "function") {
+        this.triggerBeatenReaction();
+      }
     },
   });
 })();

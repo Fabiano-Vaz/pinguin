@@ -26,7 +26,7 @@
             Number.isFinite(window.PENGUIN_CONFIG.size) &&
             window.PENGUIN_CONFIG.size > 0
               ? window.PENGUIN_CONFIG.size
-              : 68,
+              : 60,
           groundRatio:
             window.PENGUIN_CONFIG &&
             Number.isFinite(window.PENGUIN_CONFIG.groundRatio) &&

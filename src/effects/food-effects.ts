@@ -48,6 +48,15 @@
         x: landedX,
         y: targetCenterY,
       });
+
+      setTimeout(() => {
+        if (!fish.isConnected) return;
+        if (fish.classList.contains("eaten")) return;
+        fish.classList.add("eaten");
+        setTimeout(() => {
+          if (fish.isConnected) fish.remove();
+        }, 240);
+      }, 40000);
     }
 
     return targets;

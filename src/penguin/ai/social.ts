@@ -4,17 +4,17 @@ export const createSocialMethods = ({ phrases }) => ({
     this.stepQueue = [];
     this.isChasing = false;
     this.element.style.animation = "";
-    this.setState("beaten");
-    const beatenList =
-      Array.isArray(phrases && phrases.beaten) && phrases.beaten.length > 0
-        ? phrases.beaten
+    this.setState("shy");
+    const loveList =
+      Array.isArray(phrases && phrases.shy) && phrases.shy.length > 0
+        ? phrases.shy
         : Array.isArray(phrases && phrases.dropped) && phrases.dropped.length > 0
           ? phrases.dropped
         : Array.isArray(phrases && phrases.angry)
           ? phrases.angry
           : [];
-    if (beatenList.length > 0) {
-      this.showSpeech(beatenList[Math.floor(Math.random() * beatenList.length)]);
+    if (loveList.length > 0) {
+      this.showSpeech(loveList[Math.floor(Math.random() * loveList.length)]);
     }
 
     setTimeout(() => {

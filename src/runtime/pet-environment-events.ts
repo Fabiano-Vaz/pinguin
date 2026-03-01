@@ -58,8 +58,29 @@
       if (penguin.isDragging || penguin.isWalkingAway) return;
       const recentPenguinInteraction =
         Number.isFinite(runtime.lastPenguinInteractionAt) &&
-        Date.now() - runtime.lastPenguinInteractionAt <= 500;
+        Date.now() - runtime.lastPenguinInteractionAt <= 900;
       if (recentPenguinInteraction) return;
+      const clickTarget =
+        event && event.target && typeof event.target.closest === "function"
+          ? event.target
+          : null;
+      if (clickTarget && (clickTarget.closest(".penguin") || clickTarget.closest(".penguin-umbrella"))) {
+        return;
+      }
+      const eventPath =
+        event && typeof event.composedPath === "function" ? event.composedPath() : [];
+      if (
+        Array.isArray(eventPath) &&
+        eventPath.some((node) => {
+          if (!node || !node.classList) return false;
+          return (
+            node.classList.contains("penguin") ||
+            node.classList.contains("penguin-umbrella")
+          );
+        })
+      ) {
+        return;
+      }
       const penguinEl = penguin && penguin.element ? penguin.element : null;
       const clickedInsidePenguinRect =
         penguinEl &&
@@ -76,14 +97,6 @@
               );
             })()
           : false;
-      if (
-        event &&
-        event.target &&
-        typeof event.target.closest === "function" &&
-        event.target.closest(".penguin")
-      ) {
-        return;
-      }
       if (clickedInsidePenguinRect) return;
 
       if (typeof effects.createFoodDrops !== "function") return;

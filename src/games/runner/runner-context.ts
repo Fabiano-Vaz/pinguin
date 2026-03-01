@@ -1,13 +1,15 @@
 import "./runner-debug-tools";
 import "./runner-assets";
-(() => {
-  const pet = window.PenguinPet || {};
-  const runnerModules = window.PenguinRunnerModules || {};
-  const constants = pet.constants || {};
-  const runnerConfig =
+import { getPenguinPet, getPenguinRunnerModules, setPenguinRunnerGame } from "../../runtime/webview-globals.ts";
+import type { PenguinRunnerGameGlobal, RunnerAssetsFactory, RunnerDebugTools, RunnerGameState, UnknownRecord } from "../../types/webview-runtime.ts";
+
+const pet = getPenguinPet();
+const runnerModules = getPenguinRunnerModules();
+const constants = (pet.constants || {}) as Record<string, any>;
+  const runnerConfig: Record<string, any> =
     (constants.game && constants.game.runner) || constants.runner || {};
-  const actionStates = pet.actionStates || window.PENGUIN_ASSETS || {};
-  const assetsFactory =
+  const actionStates = (pet.actionStates || window.PENGUIN_ASSETS || {}) as Record<string, string>;
+  const assetsFactory: RunnerAssetsFactory =
     typeof runnerModules.createRunnerAssets === "function"
       ? runnerModules.createRunnerAssets({ actionStates })
       : {};
@@ -72,7 +74,7 @@ import "./runner-assets";
       // Ignore storage failures (private modes or restricted environments).
     }
   };
-  const game = {
+  const game: RunnerGameState = {
     active: false,
     isGameOver: false,
     score: 0,
@@ -180,7 +182,7 @@ import "./runner-assets";
   stage.appendChild(transitionOverlay);
   stage.appendChild(debugCollisionDot);
   document.body.appendChild(stage);
-  const debugTools =
+  const debugTools: RunnerDebugTools =
     typeof runnerModules.createDebugTools === "function"
       ? runnerModules.createDebugTools({
           DEBUG,
@@ -429,7 +431,7 @@ import "./runner-assets";
     const scoreInt = Math.floor(game.score);
     hud.textContent = `Pontos: ${scoreInt}   Recorde: ${game.bestScore}`;
   };
-  window.PenguinRunnerGame = {
+  const runnerGame: PenguinRunnerGameGlobal = {
     pet,
     runnerConfig,
     game,
@@ -480,4 +482,5 @@ import "./runner-assets";
     clearDebugHitboxes,
     renderHud,
   };
-})();
+
+  setPenguinRunnerGame(runnerGame);

@@ -1,4 +1,3 @@
-(() => {
   const bootstrapPetApp = () => {
     const pet = window.PenguinPet || {};
     const constants = pet.constants || {};
@@ -91,4 +90,3 @@
     ...(window.PenguinPetModules || {}),
     bootstrapPetApp,
   };
-})();

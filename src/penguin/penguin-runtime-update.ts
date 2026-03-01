@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
@@ -335,4 +336,3 @@
       );
     },
   });
-})();

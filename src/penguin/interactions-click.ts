@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.interactionsClick = ({ phrases, PENGUIN_DOUBLE_CLICK_MS }) => ({
@@ -102,6 +103,65 @@
             this.startWalkAwayAfterDrops();
             return;
           }
+        }
+        if (!this.isMoving) this.setState("idle");
+        this.aiLocked = false;
+        this.scheduleNextBehavior();
+      }, duration);
+    },
+
+    triggerLightningCaveirinha(durationMs = 2200) {
+      const duration = Number.isFinite(durationMs) ? Math.max(0, durationMs) : 2200;
+
+      if (this.caveirinhaTimeoutId) {
+        clearTimeout(this.caveirinhaTimeoutId);
+        this.caveirinhaTimeoutId = null;
+      }
+
+      this.aiLocked = true;
+      this.isCaveirinhaMode = true;
+      this.isChasing = false;
+      this.stepQueue = [];
+      this.currentFoodTarget = null;
+      this.isEatingFood = false;
+      this.foodTargets = [];
+      this.customMotion = null;
+      this.allowAirMovement = false;
+      this.isMoving = false;
+      this.isDragging = false;
+      this.stopWingFlap();
+      this.stopWaddleSteps();
+      this.element.style.animation = "";
+      if (this.nextBehaviorTimeoutId) {
+        clearTimeout(this.nextBehaviorTimeoutId);
+        this.nextBehaviorTimeoutId = null;
+      }
+      this.nextBehaviorDueAt = 0;
+      if (typeof this.clearManagedContext === "function") {
+        this.clearManagedContext("drop_reaction");
+        this.clearManagedContext("fishing_action");
+      }
+      if (typeof this.hideUmbrella === "function") {
+        this.hideUmbrella();
+      }
+      if (this.umbrellaEl && this.umbrellaEl.classList) {
+        this.umbrellaEl.classList.remove("open", "closing", "flying-away");
+      }
+      if (typeof this.setActivityMode === "function") {
+        this.setActivityMode("caveirinha", "lightning:double-click", { force: true });
+      }
+
+      this.setState("caveirinha");
+      this.visualLockUntil = Date.now() + duration + 40;
+      this.applyTransform();
+      this.updateBubblePosition();
+
+      this.caveirinhaTimeoutId = setTimeout(() => {
+        this.caveirinhaTimeoutId = null;
+        this.visualLockUntil = 0;
+        this.isCaveirinhaMode = false;
+        if (typeof this.setActivityMode === "function") {
+          this.setActivityMode("idle", "lightning:recover", { force: true });
         }
         if (!this.isMoving) this.setState("idle");
         this.aiLocked = false;
@@ -237,4 +297,3 @@
       }
     },
   });
-})();

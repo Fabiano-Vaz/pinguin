@@ -1,20 +1,24 @@
-(() => {
-  const runner = window.PenguinRunnerGame;
-  if (!runner) return;
+export {};
 
-  const runnerConfig = runner.runnerConfig || {};
+import { getPenguinPet, getPenguinRunnerGame } from "../../runtime/webview-globals.ts";
+import type { RunnerObstacle, RunnerObstacleTemplate } from "../../types/webview-runtime.ts";
+
+const runner = getPenguinRunnerGame();
+if (runner) {
+
+  const runnerConfig = (runner.runnerConfig || {}) as Record<string, any>;
   const { game, helicopterVariants, snowmanObstacleImage, elements } = runner;
   const { stage } = elements;
-  const obstacleTemplates = runnerConfig.obstacleTemplates || {};
+  const obstacleTemplates = (runnerConfig.obstacleTemplates || {}) as Record<string, RunnerObstacleTemplate>;
 
   const chooseObstacleTemplate = () => {
     const level = runner.difficultyLevel();
     const roll = Math.random();
+    const pet = getPenguinPet();
     const isSnowingNow = Boolean(
-      window.PenguinPet &&
-        window.PenguinPet.effects &&
-        typeof window.PenguinPet.effects.isSnowing === "function" &&
-        window.PenguinPet.effects.isSnowing(),
+      pet.effects &&
+        typeof pet.effects.isSnowing === "function" &&
+        pet.effects.isSnowing(),
     );
 
     const airplaneMinLevel = runnerConfig.obstacleAirplaneChanceMinLevel || 1.5;
@@ -57,7 +61,7 @@
     );
   };
 
-  const createObstacleVisual = (el, template) => {
+  const createObstacleVisual = (el: HTMLDivElement, template: RunnerObstacleTemplate): void => {
     el.style.border = "none";
     el.style.boxShadow = "0 7px 14px rgba(0,0,0,0.2)";
     el.style.background = template.color;
@@ -88,7 +92,7 @@
       heliImg.className = "runner-helicopter";
       heliImg.alt = "helicopter";
       heliImg.draggable = false;
-      heliImg.style.setProperty("--heli-scale", selectedVariant.scale);
+      heliImg.style.setProperty("--heli-scale", String(selectedVariant.scale));
 
       heliImg.addEventListener("error", () => {
         if (heliImg.dataset.fallbackTried === "1") {
@@ -103,7 +107,7 @@
         el.dataset.heliHitboxTop = String(fallbackVariant.hitboxInsetRatios.top);
         el.dataset.heliHitboxBottom = String(fallbackVariant.hitboxInsetRatios.bottom);
         heliImg.src = fallbackVariant.src;
-        heliImg.style.setProperty("--heli-scale", fallbackVariant.scale);
+        heliImg.style.setProperty("--heli-scale", String(fallbackVariant.scale));
       });
 
       el.appendChild(heliImg);
@@ -188,7 +192,7 @@
     });
   };
 
-  const getObstacleHitbox = (obstacle) => {
+  const getObstacleHitbox = (obstacle: RunnerObstacle) => {
     if (obstacle.id === "airplane") {
       const helicopterEl = obstacle.el.querySelector(".runner-helicopter");
       if (helicopterEl) {
@@ -262,12 +266,12 @@
     return last.x < window.innerWidth - minimumGapPx;
   };
 
-  const updateObstacles = (deltaMs) => {
+  const updateObstacles = (deltaMs: number) => {
     const dt = deltaMs / 1000;
     const penguinBox = runner.getPenguinBox();
 
     for (let i = game.obstacles.length - 1; i >= 0; i -= 1) {
-      const obstacle = game.obstacles[i];
+      const obstacle = game.obstacles[i] as RunnerObstacle;
       obstacle.x -= game.worldSpeed * dt;
       obstacle.el.style.left = `${Math.round(obstacle.x)}px`;
 
@@ -319,4 +323,4 @@
   runner.ensureSafeSpawnGap = ensureSafeSpawnGap;
   runner.updateObstacles = updateObstacles;
   runner.realignObstacleY = realignObstacleY;
-})();
+  }

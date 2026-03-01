@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const shared =
     typeof window !== "undefined" && window.PenguinPetShared
       ? window.PenguinPetShared
@@ -203,4 +204,3 @@
       isFishCursorEnabled: true,
     },
   };
-})();

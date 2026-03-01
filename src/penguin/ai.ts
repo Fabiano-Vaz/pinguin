@@ -8,7 +8,6 @@ import { createFlyMoveAction } from "./ai/actions/fly-move";
 import { createSequenceAction } from "./ai/actions/sequence";
 import { createActAction } from "./ai/actions/act";
 
-(() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.ai = (deps) =>
@@ -24,4 +23,3 @@ import { createActAction } from "./ai/actions/act";
       createSequenceAction(),
       createActAction(),
     );
-})();

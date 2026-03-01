@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.state = ({ actionStates }) => ({
@@ -183,4 +184,3 @@
       return 0.65 + ratio * 0.35;
     },
   });
-})();

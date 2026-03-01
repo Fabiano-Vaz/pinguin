@@ -1,6 +1,5 @@
 import "./weather-space-events";
 
-(() => {
   const effects = (window.PenguinPetEffects = window.PenguinPetEffects || {});
   const effectModules = window.PenguinPetEffectModules || {};
 
@@ -39,6 +38,43 @@ import "./weather-space-events";
     typeof weatherSpaceEvents.stopShootingStarCycle === "function"
       ? weatherSpaceEvents.stopShootingStarCycle.bind(weatherSpaceEvents)
       : () => {};
+
+  function syncFishCursorForWeather() {
+    const state = effects.state || {};
+    const pet = window.PenguinPet || {};
+    const runtime = pet.runtime || {};
+    const weatherActive = isRaining() || isSnowing();
+
+    if (weatherActive) {
+      if (!state.weatherForcedFishCursorOff) {
+        state.weatherForcedFishCursorPrevEnabled =
+          runtime.isFishCursorEnabled !== false;
+      }
+      state.weatherForcedFishCursorOff = true;
+      if (typeof runtime.setFishCursorEnabled === "function") {
+        runtime.setFishCursorEnabled(false);
+      } else {
+        runtime.isFishCursorEnabled = false;
+        if (document.body) {
+          document.body.classList.remove("fish-cursor-enabled");
+        }
+      }
+      return;
+    }
+
+    if (!state.weatherForcedFishCursorOff) return;
+    const shouldEnable = state.weatherForcedFishCursorPrevEnabled !== false;
+    state.weatherForcedFishCursorOff = false;
+    state.weatherForcedFishCursorPrevEnabled = null;
+    if (typeof runtime.setFishCursorEnabled === "function") {
+      runtime.setFishCursorEnabled(shouldEnable);
+    } else {
+      runtime.isFishCursorEnabled = shouldEnable;
+      if (document.body) {
+        document.body.classList.toggle("fish-cursor-enabled", shouldEnable);
+      }
+    }
+  }
 
   function clearSnowmanEncounter() {
     const state = effects.state || {};
@@ -300,6 +336,7 @@ import "./weather-space-events";
       document.querySelectorAll(".snow-event-snowman").forEach((el) => el.remove());
     }
     if (!preserveManualMode) state.snowManualMode = false;
+    syncFishCursorForWeather();
   }
 
   function stopRainCycle(clearVisuals = false, preserveManualMode = false) {
@@ -325,6 +362,7 @@ import "./weather-space-events";
       penguin.hideUmbrella();
     }
     if (!preserveManualMode) state.rainManualMode = false;
+    syncFishCursorForWeather();
   }
 
   function startRainCycle(manual = false) {
@@ -352,6 +390,7 @@ import "./weather-space-events";
         }
       }
     }, constants.RAIN_SPAWN_INTERVAL_MS);
+    syncFishCursorForWeather();
     scheduleRainLightningCycle();
 
     state.rainActiveTimeoutId = setTimeout(() => {
@@ -365,6 +404,7 @@ import "./weather-space-events";
       if (currentPenguin && typeof currentPenguin.hideUmbrella === "function") {
         currentPenguin.hideUmbrella();
       }
+      syncFishCursorForWeather();
       if (state.rainManualMode) return;
       if (state.rainCooldownTimeoutId !== null) clearTimeout(state.rainCooldownTimeoutId);
       state.rainCooldownTimeoutId = setTimeout(
@@ -390,6 +430,7 @@ import "./weather-space-events";
       },
       constants.SNOW_SPAWN_INTERVAL_MS,
     );
+    syncFishCursorForWeather();
 
     state.snowmanSpawnIntervalId = setInterval(() => {
       if (!isSnowing() || state.isSnowmanEncounterActive) return;
@@ -408,6 +449,7 @@ import "./weather-space-events";
         clearInterval(state.snowmanSpawnIntervalId);
         state.snowmanSpawnIntervalId = null;
       }
+      syncFishCursorForWeather();
 
       if (state.snowManualMode) return;
       if (state.snowCooldownTimeoutId !== null) clearTimeout(state.snowCooldownTimeoutId);
@@ -433,4 +475,3 @@ import "./weather-space-events";
     isSnowing,
     isRaining,
   });
-})();

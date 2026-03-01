@@ -1,8 +1,11 @@
-(() => {
-  const runner = window.PenguinRunnerGame;
-  if (!runner) return;
+export {};
 
-  const runnerConfig = runner.runnerConfig || {};
+import { getPenguinPet, getPenguinRunnerGame } from "../../runtime/webview-globals.ts";
+
+const runner = getPenguinRunnerGame();
+if (runner) {
+
+  const runnerConfig = (runner.runnerConfig || {}) as Record<string, any>;
   const { pet, game, elements } = runner;
   const { stage, hint, message, penguinEl, debugCollisionDot } = elements;
 
@@ -85,7 +88,7 @@
     game.penguin.jumpQueuedMs = 0;
   };
 
-  const updatePenguin = (deltaMs) => {
+  const updatePenguin = (deltaMs: number): void => {
     const dt = Math.max(0.001, deltaMs / 1000);
     const penguin = game.penguin;
     const groundY = runner.getGroundY();
@@ -148,13 +151,13 @@
     runner.applyPenguinPosition();
   };
 
-  const updateDifficultyAndSpawns = (deltaMs) => {
+  const updateDifficultyAndSpawns = (deltaMs: number): void => {
     game.worldTimeMs += deltaMs;
     game.score += (deltaMs / 1000) * (runnerConfig.scorePerSecond || 10);
 
     while (game.score >= game.nextFishDropScore) {
       spawnScoreFishDrop();
-      const runtime = (window.PenguinPet && window.PenguinPet.runtime) || pet.runtime;
+      const runtime = getPenguinPet().runtime || pet.runtime;
       if (runtime && typeof runtime.addFishStock === "function") {
         runtime.addFishStock(1);
       }
@@ -183,7 +186,7 @@
     }
   };
 
-  const frame = (now) => {
+  const frame = (now: number): void => {
     if (!game.active) return;
 
     if (!game.lastFrameAt) game.lastFrameAt = now;
@@ -277,17 +280,17 @@
     requestAnimationFrame(frame);
   };
 
-  const isJumpKey = (event) =>
+  const isJumpKey = (event: KeyboardEvent): boolean =>
     event.code === "ArrowUp" ||
     event.code === "KeyW" ||
     event.code === "Space" ||
     event.key === " " ||
     event.key === "Spacebar";
 
-  const isStartKey = (event) =>
+  const isStartKey = (event: KeyboardEvent): boolean =>
     event.code === "Space" || event.key === " " || event.key === "Spacebar";
 
-  const isCrouchKey = (code) => code === "ArrowDown" || code === "KeyS";
+  const isCrouchKey = (code: string): boolean => code === "ArrowDown" || code === "KeyS";
 
   document.addEventListener("keydown", (event) => {
     if (event.code === "Escape" && game.active) {
@@ -348,4 +351,4 @@
     runner.createGroundDecor();
     runner.realignObstacleY();
   });
-})();
+  }

@@ -2,7 +2,6 @@ import "./penguin-runtime-state";
 import "./penguin-runtime-update";
 import { PenguinStateService } from "../services/penguin-state-service";
 
-(() => {
   const pet = window.PenguinPet || {};
   const constants = pet.constants || {};
   const effects = pet.effects || {};
@@ -243,4 +242,3 @@ import { PenguinStateService } from "../services/penguin-state-service";
     ...pet,
     Penguin,
   };
-})();

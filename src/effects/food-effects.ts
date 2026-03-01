@@ -1,8 +1,12 @@
-(() => {
+export {};
+
   const effects = (window.PenguinPetEffects = window.PenguinPetEffects || {});
 
   function createFoodDrops(x, y, count = 6) {
     const constants = effects.getConstants ? effects.getConstants() : {};
+    if (typeof effects.isRaining === "function" && effects.isRaining()) {
+      return [];
+    }
     const safeCount = Math.max(1, Math.min(12, Math.round(count)));
     const groundTopY = Math.max(
       0,
@@ -63,4 +67,3 @@
   }
 
   effects.createFoodDrops = createFoodDrops;
-})();

@@ -1,4 +1,3 @@
-(() => {
   window.PenguinPet = window.PenguinPet || {};
 
   window.PenguinPet.phrases = {
@@ -272,4 +271,3 @@
       { type: "walkShort" },
     ],
   ];
-})();

@@ -1,4 +1,3 @@
-(() => {
   const root = typeof window !== "undefined" ? window : globalThis;
   type TimerScheduler = {
     setTimeoutFn?: ((cb: () => void, delay?: number) => ReturnType<typeof setTimeout>) | null;
@@ -148,4 +147,3 @@
       createTimerRegistry,
     };
   }
-})();

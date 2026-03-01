@@ -1,4 +1,3 @@
-(() => {
   const createEnvironmentEvents = (deps) => {
     const penguin = deps && deps.penguin ? deps.penguin : null;
     const effects = deps && deps.effects ? deps.effects : {};
@@ -8,8 +7,10 @@
     const shakeWindowMs = 200;
     const shakeSpeedThreshold = 4000;
     const shakeCooldownMs = 1200;
+    const rainClickDelayMs = 220;
     let shakeSamples = [];
     let lastWindAt = 0;
+    let pendingRainFlashTimeoutId = null;
 
     const detectMouseShake = (x, y) => {
       const currentPenguin =
@@ -99,6 +100,28 @@
           : false;
       if (clickedInsidePenguinRect) return;
 
+      const isRaining =
+        typeof effects.isRaining === "function" && effects.isRaining();
+      if (isRaining) {
+        if (pendingRainFlashTimeoutId !== null) {
+          clearTimeout(pendingRainFlashTimeoutId);
+          pendingRainFlashTimeoutId = null;
+        }
+
+        if (typeof effects.createLightningFlash === "function") {
+          pendingRainFlashTimeoutId = setTimeout(() => {
+            pendingRainFlashTimeoutId = null;
+            effects.createLightningFlash();
+          }, rainClickDelayMs);
+        }
+        return;
+      }
+      const isSnowing =
+        typeof effects.isSnowing === "function" && effects.isSnowing();
+      if (isSnowing) {
+        return;
+      }
+
       if (typeof effects.createFoodDrops !== "function") return;
       if (typeof penguin.enqueueFoodTargets !== "function") return;
       if (
@@ -121,6 +144,45 @@
     const handlers = {
       dblclick: (event) => {
         event.preventDefault();
+        const isRaining =
+          typeof effects.isRaining === "function" && effects.isRaining();
+        if (!isRaining) return;
+
+        if (pendingRainFlashTimeoutId !== null) {
+          clearTimeout(pendingRainFlashTimeoutId);
+          pendingRainFlashTimeoutId = null;
+        }
+
+        if (typeof effects.createLightningFlash === "function") {
+          effects.createLightningFlash();
+        }
+        const currentPenguin =
+          window.PenguinPet && window.PenguinPet.penguin
+            ? window.PenguinPet.penguin
+            : penguin;
+        const halfSize = Number.isFinite(
+          window.PenguinPet &&
+            window.PenguinPet.constants &&
+            window.PenguinPet.constants.halfPenguinSize,
+        )
+          ? window.PenguinPet.constants.halfPenguinSize
+          : 43;
+        const strikeX =
+          currentPenguin && Number.isFinite(currentPenguin.x)
+            ? currentPenguin.x + halfSize
+            : Number.isFinite(event?.clientX)
+              ? event.clientX
+              : window.innerWidth / 2;
+        if (typeof effects.createLightningBolt === "function") {
+          effects.createLightningBolt(strikeX);
+        }
+        if (
+          currentPenguin &&
+          !currentPenguin.isTemporaryDead &&
+          typeof currentPenguin.triggerLightningCaveirinha === "function"
+        ) {
+          currentPenguin.triggerLightningCaveirinha(2200);
+        }
       },
       mousemove: (event) => {
         runtime.isMouseInsideViewport = true;
@@ -260,6 +322,10 @@
     };
 
     const detach = () => {
+      if (pendingRainFlashTimeoutId !== null) {
+        clearTimeout(pendingRainFlashTimeoutId);
+        pendingRainFlashTimeoutId = null;
+      }
       document.removeEventListener("dblclick", handlers.dblclick);
       document.removeEventListener("mousemove", handlers.mousemove);
       document.removeEventListener("mouseenter", handlers.mouseenter);
@@ -278,4 +344,3 @@
     ...(window.PenguinPetModules || {}),
     createEnvironmentEvents,
   };
-})();

@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.motion = ({
@@ -354,4 +355,3 @@
       };
     },
   });
-})();

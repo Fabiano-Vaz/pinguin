@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const effects = window.PenguinPetEffects || {};
 
   effects.getPet = () => window.PenguinPet || {};
@@ -27,4 +28,3 @@
   };
 
   window.PenguinPetEffects = effects;
-})();

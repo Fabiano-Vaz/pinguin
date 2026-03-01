@@ -1,6 +1,5 @@
 import { DebugPanelComponent } from "./components/debug-panel-component";
 
-(() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.penguinRuntimeState = ({ actionStates, runtime }) => ({
@@ -367,4 +366,3 @@ import { DebugPanelComponent } from "./components/debug-panel-component";
       return true;
     },
   });
-})();

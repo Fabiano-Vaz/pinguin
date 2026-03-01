@@ -5,7 +5,7 @@ const clearModule = (modulePath) => {
   delete require.cache[resolved];
 };
 
-(() => {
+{
   let callCount = 0;
   global.window = {
     PenguinPetModules: {
@@ -18,9 +18,9 @@ const clearModule = (modulePath) => {
   clearModule("../src/main.ts");
   require("../src/main.ts");
   assert.equal(callCount, 1);
-})();
+}
 
-(() => {
+{
   global.window = {
     PenguinPetModules: {},
   };
@@ -29,6 +29,6 @@ const clearModule = (modulePath) => {
   assert.doesNotThrow(() => {
     require("../src/main.ts");
   });
-})();
+}
 
 console.log("main entry tests passed");

@@ -4,7 +4,7 @@ const {
   createTimerRegistry,
 } = require('../src/penguin/penguin-core.ts');
 
-(() => {
+{
   const sm = createActivityStateMachine('idle');
   assert.equal(sm.getCurrent(), 'idle');
 
@@ -23,9 +23,9 @@ const {
   const okIdle = sm.transition('idle', 'returned');
   assert.equal(okIdle.ok, true);
   assert.equal(sm.getCurrent(), 'idle');
-})();
+}
 
-(() => {
+{
   const timeouts = new Map();
   const intervals = new Map();
   let idCounter = 0;
@@ -76,6 +76,6 @@ const {
   const cleared = registry.clearContext('behavior');
   assert.equal(cleared, 1);
   assert.equal(registry.snapshot().total, 0);
-})();
+}
 
 console.log('penguin-core tests passed');

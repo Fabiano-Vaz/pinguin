@@ -2,7 +2,6 @@ import "./interactions-mouse";
 import "./interactions-pointer";
 import "./interactions-click";
 
-(() => {
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
   const PENGUIN_DOUBLE_CLICK_MS = 450;
   const MOUSE_IDLE_MOVEMENT_THRESHOLD_PX = 10;
@@ -38,4 +37,3 @@ import "./interactions-click";
       ...(modules.interactionsClick ? modules.interactionsClick(deps) : {}),
     };
   };
-})();

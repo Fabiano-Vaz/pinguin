@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const effects = (window.PenguinPetEffects = window.PenguinPetEffects || {});
 
   function createWindGust(direction) {
@@ -143,4 +144,3 @@
   }
 
   effects.createWindGust = createWindGust;
-})();

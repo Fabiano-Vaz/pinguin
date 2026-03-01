@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const effects = (window.PenguinPetEffects = window.PenguinPetEffects || {});
 
   function createParticle(x, y) {
@@ -28,13 +29,23 @@
   }
 
   function createBackgroundParticles() {
+    const constants = effects.getConstants ? effects.getConstants() : {};
+    const baseAngleDeg = Number.isFinite(constants.rainAngleDeg)
+      ? constants.rainAngleDeg
+      : 8;
+    const driftDirection = baseAngleDeg < 0 ? -1 : 1;
+
     const flake = document.createElement("div");
     flake.className = "snowflake";
     const size = Math.random() * 4 + 2;
     const durationSec = Math.random() * 6 + 6;
     const startX = Math.random() * (window.innerWidth + 80) - 40;
-    const driftMid = (Math.random() * 110 - 55).toFixed(1);
-    const driftEnd = (Math.random() * 190 - 95).toFixed(1);
+    const driftMid = (
+      driftDirection * (Math.random() * 45 + 12)
+    ).toFixed(1);
+    const driftEnd = (
+      driftDirection * (Math.random() * 80 + 24)
+    ).toFixed(1);
     const blur = Math.random() < 0.2 ? 1.2 : 0;
 
     flake.style.left = `${startX}px`;
@@ -142,4 +153,3 @@
     spawnExtraSnow,
     createShootingStar,
   });
-})();

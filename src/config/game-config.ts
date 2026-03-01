@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const pet = window.PenguinPet || {};
   const constants = pet.constants || {};
   const configuredConstants =
@@ -175,4 +176,3 @@
       runner: runnerConfig,
     },
   };
-})();

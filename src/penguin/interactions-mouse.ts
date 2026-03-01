@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.interactionsMouse = ({
@@ -440,4 +441,3 @@
       }, this.scaleEmotionDuration(2000));
     },
   });
-})();

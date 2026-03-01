@@ -1,4 +1,3 @@
-(() => {
   const DEFAULTS = {
     initialFishStock: 5,
     noFishTantrumMinMs: 8000,
@@ -339,7 +338,17 @@
 
     const setFishCursorEnabled = (enabled) => {
       const wantsEnabled = Boolean(enabled);
-      runtime.isFishCursorEnabled = wantsEnabled && remainingFish > 0;
+      const effects =
+        window.PenguinPet && window.PenguinPet.effects
+          ? window.PenguinPet.effects
+          : null;
+      const weatherBlocksCursor = Boolean(
+        effects &&
+          ((typeof effects.isRaining === "function" && effects.isRaining()) ||
+            (typeof effects.isSnowing === "function" && effects.isSnowing())),
+      );
+      runtime.isFishCursorEnabled =
+        wantsEnabled && remainingFish > 0 && !weatherBlocksCursor;
       applyFishCursorState();
     };
 
@@ -442,4 +451,3 @@
     ...(window.PenguinPetModules || {}),
     createFishEconomy,
   };
-})();

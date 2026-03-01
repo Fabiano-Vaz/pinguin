@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const effects = (window.PenguinPetEffects = window.PenguinPetEffects || {});
 
   function scarePenguinFromLightning() {
@@ -166,4 +167,3 @@
     createLightningFlash,
     createLightningBolt,
   });
-})();

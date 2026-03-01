@@ -5,7 +5,7 @@ const clearModule = (modulePath) => {
   delete require.cache[resolved];
 };
 
-(() => {
+{
   global.window = {
     PenguinPetShared: {
       getActionStates: () => ({ idle: "assets/idle.svg", default: "assets/default.svg" }),
@@ -34,9 +34,9 @@ const clearModule = (modulePath) => {
   assert.equal(window.PenguinPet.constants.snowTopRatio, 0.8);
   assert.equal(window.PenguinPet.constants.backgroundImage, "assets/bg.png");
   assert.equal(window.PenguinPet.constants.SPEED_WALK, 1.5);
-})();
+}
 
-(() => {
+{
   global.window = {
     PenguinPet: {
       constants: {},
@@ -59,6 +59,6 @@ const clearModule = (modulePath) => {
   assert.equal(window.PenguinPet.constants.game.runner.debug, true);
   assert.equal(window.PenguinPet.constants.game.runner.worldSpeedInitial, 250);
   assert.equal(window.PenguinPet.constants.runner.worldSpeedInitial, 250);
-})();
+}
 
 console.log("config bootstrap tests passed");

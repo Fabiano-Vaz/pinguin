@@ -32,7 +32,7 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
       });
     }
 
-    for (const fishEl of fishOnGround) {
+    for (const fishEl of Array.from(fishOnGround)) {
       if (tracked.has(fishEl)) continue;
       if (this.foodTargets.length >= maxQueuedTargets) break;
       const rect = fishEl.getBoundingClientRect();

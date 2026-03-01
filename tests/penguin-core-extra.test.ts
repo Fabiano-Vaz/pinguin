@@ -5,7 +5,7 @@ const {
   createTimerRegistry,
 } = require("../src/penguin/penguin-core.ts");
 
-(() => {
+{
   const sm = createActivityStateMachine("idle");
   assert.equal(sm.canTransition("dragging"), true);
   assert.equal(sm.canTransition(""), false);
@@ -21,14 +21,14 @@ const {
   }
 
   assert.ok(sm.getHistory().length <= 40);
-})();
+}
 
-(() => {
+{
   assert.equal(ACTIVITY_TRANSITIONS.idle.has("dragging"), true);
   assert.equal(ACTIVITY_TRANSITIONS.dragging.has("fishing"), false);
-})();
+}
 
-(() => {
+{
   const cleared = [];
   const registry = createTimerRegistry({
     setTimeoutFn: (fn) => ({ type: "timeout", fn }),
@@ -45,6 +45,6 @@ const {
   assert.equal(registry.clearAll(), 3);
   assert.equal(registry.snapshot().total, 0);
   assert.equal(cleared.length, 3);
-})();
+}
 
 console.log("penguin-core extra tests passed");

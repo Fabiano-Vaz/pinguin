@@ -1,4 +1,5 @@
-(() => {
+export {};
+
   const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
   modules.interactionsPointer = ({
@@ -281,4 +282,3 @@
           : setInterval(onDropPoll, 100);
     },
   });
-})();

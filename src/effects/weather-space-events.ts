@@ -1,4 +1,3 @@
-(() => {
   const effectModules =
     (window.PenguinPetEffectModules = window.PenguinPetEffectModules || {});
 
@@ -171,4 +170,3 @@
       }, delay);
     },
   });
-})();

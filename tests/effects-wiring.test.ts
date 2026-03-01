@@ -5,7 +5,7 @@ const clearModule = (modulePath) => {
   delete require.cache[resolved];
 };
 
-(() => {
+{
   global.window = {
     PenguinPet: {
       constants: { a: 1 },
@@ -29,9 +29,9 @@ const clearModule = (modulePath) => {
   assert.equal(window.PenguinPetEffects.getPhrases().idle[0], "oi");
   assert.equal(window.PenguinPetEffects.state.customFlag, true);
   assert.equal(window.PenguinPetEffects.state.snowSpawnIntervalId, 123);
-})();
+}
 
-(() => {
+{
   const clickFn = () => "click";
   const rainFn = () => "rain";
   const customEffect = () => "custom";
@@ -53,6 +53,6 @@ const clearModule = (modulePath) => {
   assert.equal(window.PenguinPet.effects.customEffect, customEffect);
   assert.equal(window.PenguinPet.effects.createClickEffect, clickFn);
   assert.equal(window.PenguinPet.effects.startRainCycle, rainFn);
-})();
+}
 
 console.log("effects wiring tests passed");

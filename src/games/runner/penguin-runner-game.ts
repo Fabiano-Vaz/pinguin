@@ -231,6 +231,8 @@ if (runner) {
     game.nextHelicopterIndex = 0;
     game.nextFishDropScore = runnerConfig.fishDropEveryScore || 100;
     game.debugLastCollisionAt = 0;
+    game.windDirection = 0;
+    game.windReactionUntilMs = 0;
 
     if (game.debugCollisionHideTimeoutId) {
       clearTimeout(game.debugCollisionHideTimeoutId);
@@ -260,6 +262,8 @@ if (runner) {
     game.isGameOver = false;
     game.penguin.isJumpPressed = false;
     game.penguin.isCrouching = false;
+    game.windDirection = 0;
+    game.windReactionUntilMs = 0;
 
     if (game.debugCollisionHideTimeoutId) {
       clearTimeout(game.debugCollisionHideTimeoutId);

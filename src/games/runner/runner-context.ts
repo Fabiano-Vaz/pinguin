@@ -55,6 +55,8 @@ const constants = (pet.constants || {}) as Record<string, any>;
   const RUNNER_MOON_RESPAWN_PADDING_PX = runnerConfig.moonRespawnPaddingPx || 180;
   const RUNNER_GROUND_DECOR_SCROLL_SPEED_PX_PER_SEC =
     runnerConfig.groundDecorScrollSpeedPxPerSec || 180;
+  const RUNNER_WIND_REACTION_DURATION_MS =
+    runnerConfig.windReactionDurationMs || 900;
   const STORAGE_KEY_BEST_SCORE =
     runnerConfig.storageBestScoreKey || "pinguinRunnerBestScore";
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -109,6 +111,8 @@ const constants = (pet.constants || {}) as Record<string, any>;
     fishCursorWasEnabledRuntime: null,
     debugLastCollisionAt: 0,
     debugCollisionHideTimeoutId: 0,
+    windDirection: 0,
+    windReactionUntilMs: 0,
     penguin: {
       x: 0,
       y: 0,
@@ -242,9 +246,15 @@ const constants = (pet.constants || {}) as Record<string, any>;
     penguinEl.style.height = `${drawHeight}px`;
   };
   const applyPenguinMotionVisual = () => {
-    // Keep transform animation disabled so the SVG internal animation stays smooth.
+    const isReactingToWind =
+      game.active &&
+      !game.isGameOver &&
+      game.windDirection !== 0 &&
+      Date.now() < game.windReactionUntilMs;
+    const facingScaleX = isReactingToWind ? -game.windDirection : 1;
+    // Only use horizontal flip here so the SVG internal animation stays smooth.
     penguinEl.style.animation = "";
-    penguinEl.style.transform = "none";
+    penguinEl.style.transform = `scaleX(${facingScaleX})`;
   };
   const centerPenguin = () => {
     game.penguin.x = Math.round(window.innerWidth * (runnerConfig.penguinCenterXRatio || 0.23));
@@ -482,5 +492,14 @@ const constants = (pet.constants || {}) as Record<string, any>;
     clearDebugHitboxes,
     renderHud,
   };
+
+  window.addEventListener("penguin:wind-gust", (event: Event) => {
+    if (!game.active || game.isGameOver) return;
+    const customEvent = event as CustomEvent<{ direction?: number }>;
+    const rawDirection = customEvent.detail && customEvent.detail.direction;
+    if (!Number.isFinite(rawDirection) || rawDirection === 0) return;
+    game.windDirection = rawDirection > 0 ? 1 : -1;
+    game.windReactionUntilMs = Date.now() + RUNNER_WIND_REACTION_DURATION_MS;
+  });
 
   setPenguinRunnerGame(runnerGame);

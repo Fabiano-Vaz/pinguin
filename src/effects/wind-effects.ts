@@ -5,6 +5,11 @@ export {};
   function createWindGust(direction) {
     const constants = effects.getConstants ? effects.getConstants() : {};
     const dir = direction >= 0 ? 1 : -1;
+    window.dispatchEvent(
+      new CustomEvent("penguin:wind-gust", {
+        detail: { direction: dir },
+      }),
+    );
     const count = Math.floor(Math.random() * 6) + 7;
     const travel = window.innerWidth * 1.1;
 

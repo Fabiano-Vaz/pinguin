@@ -118,6 +118,8 @@ export interface RunnerGameState {
   fishCursorWasEnabledRuntime: boolean | null;
   debugLastCollisionAt: number;
   debugCollisionHideTimeoutId: any;
+  windDirection: number;
+  windReactionUntilMs: number;
   penguin: RunnerPenguinState;
 }
 

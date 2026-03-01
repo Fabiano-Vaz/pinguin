@@ -10,9 +10,6 @@ body.runner-mode .snow-event-snowman,
 body.runner-mode .rain-drop,
 body.runner-mode .lightning-flash,
 body.runner-mode .lightning-bolt,
-body.runner-mode .wind-gust,
-body.runner-mode .wind-streak,
-body.runner-mode .wind-whirl,
 body.runner-mode .penguin-debug-panel {
   display: none !important;
 }

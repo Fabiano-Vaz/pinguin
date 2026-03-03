@@ -59,10 +59,6 @@ body {
   cursor: auto;
 }
 
-body.fish-cursor-enabled {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text y="20" font-size="20">🐟</text></svg>'), auto;
-}
-
 @media (max-width: 768px) {
   body {
     --penguin-size: var(--penguin-size-mobile);

@@ -1,7 +1,17 @@
 # 🐧 Pinguim Pet
 
-Leve um pinguim cheio de personalidade para dentro do VS Code.  
+Leve um pinguim cheio de personalidade para dentro do VS Code.
 Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida, conversa, joga com você e transforma o editor em um cantinho mais divertido.
+
+## 🎬 Demonstração
+
+<h1 align="left">Pressione 'SPACE' para iniciar o mini game</h1>
+
+![Minigame Runner](assets/gif%20readme/game.gif)
+
+<h1 align="left">Pinguim Pet</h1>
+
+![IA do Pinguim](assets/gif%20readme/ia.gif)
 
 ## ✨ Por que instalar
 
@@ -74,6 +84,6 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 
 ## ⚙️ Configuração disponível
 
-| Propriedade | Padrão | O que faz |
-| --- | --- | --- |
+| Propriedade                 | Padrão | O que faz                                                     |
+| --------------------------- | ------ | ------------------------------------------------------------- |
 | `pinguin.autoOpenOnStartup` | `true` | Abre o painel do pinguim automaticamente ao iniciar o VS Code |

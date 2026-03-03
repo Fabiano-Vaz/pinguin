@@ -22,10 +22,10 @@
   </defs>
 
   <rect width="260" height="260" fill="transparent" />
-  <ellipse cx="130" cy="170" rx="102" ry="72" fill="url(#groundGlow)" />
+  <!-- <ellipse cx="130" cy="170" rx="102" ry="72" fill="url(#groundGlow)" /> -->
 
   <!-- Sombra no chão -->
-  <ellipse cx="130" cy="190" rx="80" ry="18" fill="#000" opacity="0.22" />
+  <!-- <ellipse cx="130" cy="190" rx="80" ry="18" fill="#000" opacity="0.22" /> -->
 
   <!-- Corpo deitado -->
   <g transform="translate(130 150) rotate(-14) translate(-130 -150)" filter="url(#shadow)">

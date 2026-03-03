@@ -15,17 +15,24 @@ export const createCoreMethods = ({
     runtime.isFishCursorEnabled = Boolean(enabled);
   },
 
-  holdFishCursorFor(ms = 5000) {
-    if (this.fishCursorResumeTimeout) {
-      clearTimeout(this.fishCursorResumeTimeout);
-      this.fishCursorResumeTimeout = null;
-    }
+  holdFishCursorFor(_ms = 5000) {
+    // Fish cursor removed — this is now a no-op kept for call-site compatibility.
+  },
 
-    this.setFishCursorEnabled(false);
-    this.fishCursorResumeTimeout = setTimeout(() => {
-      this.setFishCursorEnabled(true);
-      this.fishCursorResumeTimeout = null;
-    }, ms);
+  cancelFishing() {
+    if (!this.isFishingActive) return;
+    this.activeFishingSessionId = null;
+    this.isFishingActive = false;
+    if (typeof this.clearManagedContext === "function") {
+      this.clearManagedContext("fishing_action");
+    }
+    if (typeof this.unlockVisualSprite === "function") {
+      this.unlockVisualSprite();
+    }
+    this.element.style.animation = "";
+    if (typeof this.setActivityMode === "function") {
+      this.setActivityMode("idle", "fishing:cancelled", { force: true });
+    }
   },
 
   invalidateBehaviorFlow() {
@@ -41,12 +48,12 @@ export const createCoreMethods = ({
     return token === (this.behaviorFlowToken || 0);
   },
 
-    getActionRegistry() {
-      const registry = { ...AI_ACTION_REGISTRY };
-      Object.keys(actionStates || {}).forEach((state) => {
-        if (state === "default" || state === "snowman") return;
-        registry[`state:${state}`] = `Visual/action state "${state}".`;
-      });
+  getActionRegistry() {
+    const registry = { ...AI_ACTION_REGISTRY };
+    Object.keys(actionStates || {}).forEach((state) => {
+      if (state === "default" || state === "snowman") return;
+      registry[`state:${state}`] = `Visual/action state "${state}".`;
+    });
     return registry;
   },
 
@@ -80,15 +87,15 @@ export const createCoreMethods = ({
     if (this.recentActions.length > 30) this.recentActions.shift();
   },
 
-    isCursorTouchingPenguin() {
-      if (!runtime.isMouseInsideViewport) return false;
-      if (runtime.isFishCursorEnabled === false) return false;
-      return (
-        runtime.mouseX >= this.x &&
-        runtime.mouseX <= this.x + penguinSize &&
-        runtime.mouseY >= this.y &&
-        runtime.mouseY <= this.y + penguinSize
-      );
+  isCursorTouchingPenguin() {
+    if (!runtime.isMouseInsideViewport) return false;
+    if (runtime.isFishCursorEnabled === false) return false;
+    return (
+      runtime.mouseX >= this.x &&
+      runtime.mouseX <= this.x + penguinSize &&
+      runtime.mouseY >= this.y &&
+      runtime.mouseY <= this.y + penguinSize
+    );
   },
 
   getStepTransitionDelay() {
@@ -106,7 +113,9 @@ export const createCoreMethods = ({
     this.activeFishingSessionId = fishingSessionId;
     this.isFishingActive = true;
     if (typeof this.setActivityMode === "function") {
-      this.setActivityMode("fishing", "runFishingAction:start", { force: true });
+      this.setActivityMode("fishing", "runFishingAction:start", {
+        force: true,
+      });
     }
     if (typeof this.clearManagedContext === "function") {
       this.clearManagedContext("fishing_action");
@@ -114,11 +123,9 @@ export const createCoreMethods = ({
     if (typeof this.hideUmbrella === "function") {
       this.hideUmbrella();
     }
-    this.fishCursorEnabledBeforeFishing = runtime.isFishCursorEnabled !== false;
-    if (typeof runtime.setFishCursorEnabled === "function") {
-      runtime.setFishCursorEnabled(false);
-    } else {
-      runtime.isFishCursorEnabled = false;
+    this.fishCursorEnabledBeforeFishing = null;
+    if (typeof this.setFishCursorEnabled === "function") {
+      this.setFishCursorEnabled(false);
     }
     const totalDurationMs = Number.isFinite(step.duration)
       ? Math.max(10000, step.duration)
@@ -177,17 +184,9 @@ export const createCoreMethods = ({
       this.activeFishingSessionId = null;
       this.isFishingActive = false;
       if (typeof this.setActivityMode === "function") {
-        this.setActivityMode("idle", "runFishingAction:finish", { force: true });
-      }
-      const shouldRestoreFishCursor =
-        this.fishCursorEnabledBeforeFishing &&
-        (typeof runtime.getFishStock !== "function" || runtime.getFishStock() > 0);
-      if (shouldRestoreFishCursor) {
-        if (typeof runtime.setFishCursorEnabled === "function") {
-          runtime.setFishCursorEnabled(true);
-        } else {
-          runtime.isFishCursorEnabled = true;
-        }
+        this.setActivityMode("idle", "runFishingAction:finish", {
+          force: true,
+        });
       }
       this.fishCursorEnabledBeforeFishing = null;
       if (typeof this.unlockVisualSprite === "function") {

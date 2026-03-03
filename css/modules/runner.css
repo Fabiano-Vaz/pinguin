@@ -14,8 +14,7 @@ body.runner-mode .penguin-debug-panel {
   display: none !important;
 }
 
-body.runner-mode,
-body.runner-mode.fish-cursor-enabled {
+body.runner-mode {
   cursor: auto !important;
 }
 

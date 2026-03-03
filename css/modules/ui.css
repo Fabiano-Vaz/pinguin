@@ -4,17 +4,26 @@
   left: 12px;
   z-index: var(--z-hud);
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   padding: 8px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: 12px;
   background: var(--color-overlay-dark-45);
   color: var(--color-white);
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
   pointer-events: auto;
-  cursor: pointer;
+  cursor: default;
+  min-width: 72px;
+}
+
+.fish-hud-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
 }
 
 .fish-stock-icon {
@@ -24,6 +33,39 @@
 .fish-stock-count {
   min-width: 20px;
   text-align: right;
+}
+
+.fish-hud-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fish-hud-btn {
+  display: block;
+  width: 100%;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.80);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+  pointer-events: auto;
+}
+
+.fish-hud-btn:hover {
+  background: rgba(255, 255, 255, 0.20);
+  color: var(--color-white);
+}
+
+.fish-hud-btn:active {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(1px);
 }
 
 .penguin-debug-panel {
@@ -110,7 +152,7 @@
   margin-bottom: 8px;
 }
 
-.penguin-debug-grid > div {
+.penguin-debug-grid>div {
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -134,7 +176,7 @@
   margin-bottom: 8px;
 }
 
-.penguin-debug-flags > span {
+.penguin-debug-flags>span {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -164,7 +206,7 @@
   background: #5a6678;
 }
 
-.penguin-debug-section + .penguin-debug-section {
+.penguin-debug-section+.penguin-debug-section {
   margin-top: 6px;
 }
 
@@ -212,9 +254,10 @@
   .fish-stock-hud {
     top: 8px;
     left: 8px;
-    gap: 6px;
+    gap: 5px;
     padding: 6px 8px;
     font-size: 12px;
+    min-width: 62px;
   }
 
   .fish-stock-icon {
@@ -223,6 +266,11 @@
 
   .fish-stock-count {
     min-width: 16px;
+  }
+
+  .fish-hud-btn {
+    font-size: 10px;
+    padding: 3px 5px;
   }
 
   .penguin-debug-panel {

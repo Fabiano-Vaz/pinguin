@@ -347,6 +347,19 @@ const createFishEconomy = (deps) => {
     const targets = effects.createFoodDrops(dropX, dropY, 1);
     if (!targets || targets.length === 0) return;
 
+    // Trigger a small jump immediately so the penguin leaps to catch the fish.
+    if (
+      !penguin.isJumpLocked &&
+      !penguin.isDragging &&
+      !penguin.isWalkingAway &&
+      !penguin.isCaveirinhaMode &&
+      !penguin.isTemporaryDead &&
+      typeof penguin.startJumpArc === "function" &&
+      typeof penguin.getWalkMinY === "function"
+    ) {
+      penguin.startJumpArc(penguin.x, penguin.getWalkMinY());
+    }
+
     setTimeout(() => {
       const currentPenguin = getCurrentPenguin();
       if (!currentPenguin) return;

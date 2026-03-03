@@ -25,6 +25,10 @@ body.runner-mode .fish-stock-hud {
   z-index: var(--z-runner-hud);
 }
 
+body.runner-mode .fish-hud-actions {
+  display: none;
+}
+
 @media (max-width: 700px) {
   body.runner-mode .fish-stock-hud {
     top: 8px;

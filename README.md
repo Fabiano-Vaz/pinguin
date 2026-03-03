@@ -7,11 +7,7 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 
 <h1 align="left">Pressione 'SPACE' para iniciar o mini game</h1>
 
-![Minigame Runner](assets/gif%20readme/game.gif)
-
 <h1 align="left">Pinguim Pet</h1>
-
-![IA do Pinguim](assets/gif%20readme/ia.gif)
 
 ## ✨ Por que instalar
 

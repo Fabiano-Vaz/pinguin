@@ -42,6 +42,7 @@
   font-weight: 700;
   white-space: nowrap;
   box-shadow: var(--shadow-bubble);
+  text-align: center;
 }
 
 .bubble-dot {

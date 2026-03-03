@@ -34,6 +34,7 @@ export const ASSET_FILES: AssetMap = {
   helicopterA: "helicopterA.gif",
   helicopterB: "helicopterB.gif",
   snowman: "snowman.svg",
+  cruzeiro: "pinguim cruzeiro.svg",
 };
 
 export const DEFAULT_CONFIG = {
@@ -60,7 +61,9 @@ const resolveString = (value: unknown, fallback: string) => {
   return trimmed.length > 0 ? trimmed : fallback;
 };
 
-export const buildAssetPaths = (assetResolver?: (fileName: string, state: string) => string) => {
+export const buildAssetPaths = (
+  assetResolver?: (fileName: string, state: string) => string,
+) => {
   const resolve =
     typeof assetResolver === "function"
       ? assetResolver
@@ -95,8 +98,16 @@ export const getActionStates = (
 
 export const getMergedConfig = (overrides: Record<string, unknown> = {}) => ({
   size: resolveNumber(overrides.size, DEFAULT_CONFIG.size, 1),
-  groundRatio: resolveNumber(overrides.groundRatio, DEFAULT_CONFIG.groundRatio, 0.01, 1),
-  backgroundImage: resolveString(overrides.backgroundImage, DEFAULT_CONFIG.backgroundImage),
+  groundRatio: resolveNumber(
+    overrides.groundRatio,
+    DEFAULT_CONFIG.groundRatio,
+    0.01,
+    1,
+  ),
+  backgroundImage: resolveString(
+    overrides.backgroundImage,
+    DEFAULT_CONFIG.backgroundImage,
+  ),
 });
 
 const shared = {
@@ -108,6 +119,7 @@ const shared = {
 };
 
 if (typeof globalThis !== "undefined") {
-  (globalThis as typeof globalThis & { PenguinPetShared?: typeof shared }).PenguinPetShared =
-    shared;
+  (
+    globalThis as typeof globalThis & { PenguinPetShared?: typeof shared }
+  ).PenguinPetShared = shared;
 }

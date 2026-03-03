@@ -41,6 +41,22 @@ modules.interactionsPointer = ({
     document.addEventListener("mouseleave", () => {
       this.onDragEnd();
     });
+
+    // Detecta a sequência digitada "ZERO" para exibir o pinguim Cruzeiro
+    let _zeroSeqBuffer = "";
+    window.addEventListener("keydown", (e) => {
+      const ch = e.key && e.key.length === 1 ? e.key.toUpperCase() : "";
+      if (ch) {
+        _zeroSeqBuffer = (_zeroSeqBuffer + ch).slice(-4);
+        if (_zeroSeqBuffer === "ZERO") {
+          _zeroSeqBuffer = "";
+          if (typeof this.triggerCruzeiro === "function")
+            this.triggerCruzeiro();
+        }
+      } else {
+        _zeroSeqBuffer = "";
+      }
+    });
   },
 
   clearPendingDropReaction() {

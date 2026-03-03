@@ -27,6 +27,23 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
         return;
       }
 
+      if (this.isCruzeiroMode) {
+        this.customMotion = null;
+        this.isMoving = false;
+        this.isChasing = false;
+        this.allowAirMovement = false;
+        this.targetX = this.x;
+        this.targetY = this.y;
+        this.element.style.left = this.x + "px";
+        this.element.style.top = this.y + "px";
+        this.applyTransform(this.isWalkingAway ? 1 : undefined);
+        this.updateBubblePosition();
+        this.updateUmbrellaPosition();
+        this.renderDebugPanel(now);
+        requestAnimationFrame((ts) => this.update(ts));
+        return;
+      }
+
       if (this.isTemporaryDead) {
         this.customMotion = null;
         this.isMoving = false;
@@ -228,6 +245,117 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
   },
 
   recoverInvalidPose() {
+    const now = Date.now();
+
+    // --- Detecta isWalkingAway preso ---
+    if (this.isWalkingAway) {
+      const motionType = this.customMotion?.type;
+      const inValidMotion =
+        motionType === "walkAwayExit" || motionType === "returnAfterWalkAway";
+
+      if (!inValidMotion && this.element?.style.opacity !== "0") {
+        // Está de costas sem nenhuma animação válida rodando
+        if (!this.walkingAwayStuckSince) {
+          this.walkingAwayStuckSince = now;
+        } else if (now - this.walkingAwayStuckSince > 4000) {
+          this.walkingAwayStuckSince = 0;
+          console.warn(
+            "[PenguinPet] isWalkingAway preso — forçando reset completo",
+          );
+          this.forceFullReset();
+          return;
+        }
+      } else {
+        this.walkingAwayStuckSince = 0;
+      }
+
+      // Também detecta customMotion walkAway que demora demais (> 12 s)
+      if (inValidMotion) {
+        if (!this.walkingMotionStuckSince) {
+          this.walkingMotionStuckSince = now;
+        } else if (now - this.walkingMotionStuckSince > 12000) {
+          this.walkingMotionStuckSince = 0;
+          console.warn(
+            "[PenguinPet] customMotion walk-away expirado — forçando reset completo",
+          );
+          this.forceFullReset();
+          return;
+        }
+      } else {
+        this.walkingMotionStuckSince = 0;
+      }
+    } else {
+      this.walkingAwayStuckSince = 0;
+      this.walkingMotionStuckSince = 0;
+    }
+
+    // --- Detecta aiLocked preso sem fila ---
+    if (
+      this.aiLocked &&
+      Array.isArray(this.stepQueue) &&
+      this.stepQueue.length === 0
+    ) {
+      if (!this.aiLockedStuckSince) {
+        this.aiLockedStuckSince = now;
+      } else if (now - this.aiLockedStuckSince > 6000) {
+        this.aiLockedStuckSince = 0;
+        console.warn("[PenguinPet] aiLocked preso sem fila — desbloqueando");
+        this.aiLocked = false;
+        if (typeof this.scheduleNextBehavior === "function") {
+          this.scheduleNextBehavior();
+        }
+      }
+    } else {
+      this.aiLockedStuckSince = 0;
+    }
+
+    // --- Detecta isFishingActive preso (> 30 s) ---
+    if (this.isFishingActive) {
+      if (!this.fishingStuckSince) {
+        this.fishingStuckSince = now;
+      } else if (now - this.fishingStuckSince > 30000) {
+        this.fishingStuckSince = 0;
+        console.warn(
+          "[PenguinPet] isFishingActive preso — forçando reset completo",
+        );
+        if (typeof this.cancelFishing === "function") this.cancelFishing();
+        this.forceFullReset();
+        return;
+      }
+    } else {
+      this.fishingStuckSince = 0;
+    }
+
+    // --- Detecta runningCrouched preso perseguindo comida (> 8 s) ---
+    if (
+      this.currentState === "runningCrouched" &&
+      Boolean(this.currentFoodTarget)
+    ) {
+      if (!this.foodChaseStuckSince) {
+        this.foodChaseStuckSince = now;
+      } else if (now - this.foodChaseStuckSince > 8000) {
+        this.foodChaseStuckSince = 0;
+        console.warn(
+          "[PenguinPet] runningCrouched/food-chase preso — cancelando caçada",
+        );
+        this.currentFoodTarget = null;
+        this.isEatingFood = false;
+        this.foodTargets = [];
+        this.customMotion = null;
+        this.isMoving = false;
+        this.aiLocked = false;
+        if (typeof this.unlockVisualSprite === "function")
+          this.unlockVisualSprite();
+        if (typeof this.setState === "function") this.setState("idle");
+        if (typeof this.scheduleNextBehavior === "function")
+          this.scheduleNextBehavior();
+        return;
+      }
+    } else {
+      this.foodChaseStuckSince = 0;
+    }
+
+    // --- Pose inválida sem justificativa ---
     const isPoseState =
       this.currentState === "eating" ||
       this.currentState === "runningCrouched" ||
@@ -251,7 +379,6 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
       return;
     }
 
-    const now = Date.now();
     if (!this.invalidPoseSince) {
       this.invalidPoseSince = now;
       return;
@@ -270,12 +397,56 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
     }
   },
 
+  forceFullReset() {
+    this.customMotion = null;
+    this.isMoving = false;
+    this.isChasing = false;
+    this.isCruzeiroMode = false;
+    this.isWalkingAway = false;
+    this.isDragging = false;
+    this.allowAirMovement = false;
+    this.isFishingActive = false;
+    this.isEatingFood = false;
+    this.currentFoodTarget = null;
+    this.aiLocked = false;
+    this.stepQueue = [];
+    this.visualScale = 1;
+    this.facingRight = true;
+    this.walkingAwayStuckSince = 0;
+    this.walkingMotionStuckSince = 0;
+    this.aiLockedStuckSince = 0;
+    this.fishingStuckSince = 0;
+    this.foodChaseStuckSince = 0;
+    this.invalidPoseSince = 0;
+    if (this.element) this.element.style.opacity = "1";
+    this.x = Math.max(0, Math.min(this.x, window.innerWidth - penguinSize));
+    this.y = this.clampY(this.y, false);
+    this.targetX = this.x;
+    this.targetY = this.y;
+    if (typeof this.stopWaddleSteps === "function") this.stopWaddleSteps();
+    if (typeof this.stopWingFlap === "function") this.stopWingFlap();
+    if (typeof this.unlockVisualSprite === "function")
+      this.unlockVisualSprite();
+    if (typeof this.setActivityMode === "function") {
+      this.setActivityMode("idle", "force-reset", { force: true });
+    }
+    if (typeof this.setState === "function") this.setState("idle");
+    if (typeof this.applyTransform === "function") this.applyTransform();
+    setTimeout(() => {
+      if (typeof this.scheduleNextBehavior === "function") {
+        this.scheduleNextBehavior();
+      }
+    }, 500);
+  },
+
   showUmbrella() {
     if (this.blockUmbrellaUntilNextRain) return;
     if (this.isTemporaryDead || this.currentState === "deadLying") return;
     if (this.isFishingActive) return;
     if (this.currentState === "sleeping" || this.currentState === "full")
       return;
+    // Não abre guarda-chuva enquanto o sprite estiver travado (ex: pinguim Cruzeiro)
+    if (Date.now() < (this.visualLockUntil || 0)) return;
     if (this.umbrellaEl.classList.contains("flying-away")) return;
     if (this.umbrellaEl.classList.contains("open")) return;
     this.updateUmbrellaPosition();

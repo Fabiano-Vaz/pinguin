@@ -267,6 +267,12 @@ modules.interactionsClick = ({ phrases, PENGUIN_DOUBLE_CLICK_MS }) => ({
     if (this.isJumpLocked) return;
     if (this.isFishingActive) {
       if (typeof this.cancelFishing === "function") this.cancelFishing();
+      if (typeof this.startJumpArc === "function") {
+        const baseY =
+          typeof this.getWalkMinY === "function" ? this.getWalkMinY() : this.y;
+        this.startJumpArc(this.x, baseY);
+      }
+      return;
     }
     if (this.isWalkingAway || this.isDragging) return;
 

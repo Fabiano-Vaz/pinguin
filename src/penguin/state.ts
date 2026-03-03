@@ -5,6 +5,17 @@ const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 modules.state = ({ actionStates }) => ({
   setState(state) {
     if (
+      this.isCruzeiroMode &&
+      state !== "cruzeiro" &&
+      state !== "jumping" &&
+      state !== "idle"
+    ) {
+      return;
+    }
+    if (this.isCruzeiroMode && state === "idle") {
+      return;
+    }
+    if (
       state === "beaten" &&
       Date.now() > (Number(this.beatenStateAllowedUntil) || 0)
     ) {

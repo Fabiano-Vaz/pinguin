@@ -486,6 +486,16 @@ const constants = (pet.constants || {}) as Record<string, any>;
     getGroundY,
     getGroundLineY,
     getPenguinBox,
+    setDebugEnabled: (enabled: boolean) => {
+      const nextEnabled = Boolean(enabled);
+      runnerConfig.debug = nextEnabled;
+      runnerGame.DEBUG = nextEnabled;
+      if (!nextEnabled) {
+        debugCollisionDot.classList.remove("is-visible");
+        clearDebugHitboxes();
+      }
+      return runnerGame.DEBUG;
+    },
     hasCollision,
     showDebugCollisionDot,
     renderDebugHitboxes,

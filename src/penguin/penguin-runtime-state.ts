@@ -100,6 +100,44 @@ import { DebugPanelComponent } from "./components/debug-panel-component";
       this.debugPanelEl = this.debugPanelComponent.ensure();
     },
 
+    hideDebugPanel() {
+      if (this.debugPanelComponent && typeof this.debugPanelComponent.dispose === "function") {
+        this.debugPanelComponent.dispose();
+      } else if (this.debugPanelEl && this.debugPanelEl.isConnected) {
+        this.debugPanelEl.remove();
+      }
+      this.debugPanelEl = null;
+      this.lastDebugRenderAt = 0;
+    },
+
+    setDebugEnabled(enabled) {
+      const nextEnabled = Boolean(enabled);
+      this.debugEnabled = nextEnabled;
+
+      if (window.PENGUIN_CONFIG && typeof window.PENGUIN_CONFIG === "object") {
+        window.PENGUIN_CONFIG.debugPanel = nextEnabled;
+      }
+
+      try {
+        localStorage.setItem("penguin.debugPanel", nextEnabled ? "1" : "0");
+      } catch {
+        // Ignore storage failures.
+      }
+
+      if (nextEnabled) {
+        this.ensureDebugPanel();
+        this.renderDebugPanel();
+      } else {
+        this.hideDebugPanel();
+      }
+
+      return this.debugEnabled;
+    },
+
+    toggleDebugEnabled() {
+      return this.setDebugEnabled(!this.debugEnabled);
+    },
+
     renderDebugPanel(now = performance.now()) {
       if (!this.debugEnabled) return;
       if (!this.debugPanelEl || !this.debugPanelEl.isConnected) {

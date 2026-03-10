@@ -19,12 +19,13 @@ modules.createDebugTools = ({
   debugHitboxLayer: HTMLDivElement;
 }): RunnerDebugTools => {
   const debugHitboxPool: HTMLDivElement[] = [];
+  const isDebugEnabled = (): boolean => Boolean(runnerConfig.debug ?? DEBUG);
 
   const showDebugCollisionDot = (
     a: { x: number; y: number; width: number; height: number },
     b: { x: number; y: number; width: number; height: number },
   ): void => {
-    if (!DEBUG) return;
+    if (!isDebugEnabled()) return;
 
     const overlapLeft = Math.max(a.x, b.x);
     const overlapTop = Math.max(a.y, b.y);
@@ -72,7 +73,7 @@ modules.createDebugTools = ({
     penguinBox: { x: number; y: number; width: number; height: number } | null,
     obstacleBoxes: Array<{ x: number; y: number; width: number; height: number }> = [],
   ): void => {
-    if (!DEBUG) return;
+    if (!isDebugEnabled()) return;
 
     const boxes: Array<{ x: number; y: number; width: number; height: number; role: string }> =
       [];

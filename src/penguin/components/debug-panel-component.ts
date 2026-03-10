@@ -72,6 +72,16 @@ export class DebugPanelComponent {
     return this.element;
   }
 
+  dispose(): void {
+    if (!this.element) return;
+    this.element.removeEventListener("pointerdown", this.handlePointerDown);
+    this.element.removeEventListener("click", this.handleClick);
+    if (this.element.isConnected) {
+      this.element.remove();
+    }
+    this.element = null;
+  }
+
   getActionTarget(event: Event): Element | null {
     const rawTarget = event && event.target ? event.target : null;
     const textTarget = rawTarget instanceof Text ? rawTarget : null;

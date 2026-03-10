@@ -227,6 +227,7 @@ export interface PenguinRunnerGameGlobal {
   getGroundY: () => number;
   getGroundLineY: () => number;
   getPenguinBox: () => { x: number; y: number; width: number; height: number };
+  setDebugEnabled: (enabled: boolean) => boolean;
   hasCollision: (
     a: { x: number; y: number; width: number; height: number },
     b: { x: number; y: number; width: number; height: number },

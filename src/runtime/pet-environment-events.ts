@@ -7,9 +7,118 @@ const createEnvironmentEvents = (deps) => {
   const shakeSpeedThreshold = 4000;
   const shakeCooldownMs = 1200;
   const rainClickDelayMs = 220;
+  const debugSequence = "debug";
+  const debugSequenceTimeoutMs = 1600;
   let shakeSamples = [];
   let lastWindAt = 0;
   let pendingRainFlashTimeoutId = null;
+  let debugSequenceBuffer = "";
+  let debugSequenceLastAt = 0;
+
+  const syncDebugMode = (enabled, currentPenguin) => {
+    const nextEnabled = Boolean(enabled);
+
+    if (window.PENGUIN_CONFIG && typeof window.PENGUIN_CONFIG === "object") {
+      window.PENGUIN_CONFIG.debugPanel = nextEnabled;
+      if (!window.PENGUIN_CONFIG.constants || typeof window.PENGUIN_CONFIG.constants !== "object") {
+        window.PENGUIN_CONFIG.constants = {};
+      }
+      if (
+        !window.PENGUIN_CONFIG.constants.game ||
+        typeof window.PENGUIN_CONFIG.constants.game !== "object"
+      ) {
+        window.PENGUIN_CONFIG.constants.game = {};
+      }
+      if (
+        !window.PENGUIN_CONFIG.constants.game.runner ||
+        typeof window.PENGUIN_CONFIG.constants.game.runner !== "object"
+      ) {
+        window.PENGUIN_CONFIG.constants.game.runner = {};
+      }
+      window.PENGUIN_CONFIG.constants.game.runner.debug = nextEnabled;
+    }
+
+    if (currentPenguin) {
+      if (typeof currentPenguin.setDebugEnabled === "function") {
+        currentPenguin.setDebugEnabled(nextEnabled);
+      } else {
+        currentPenguin.debugEnabled = nextEnabled;
+      }
+    }
+
+    const runnerGame = window.PenguinRunnerGame || null;
+    if (runnerGame) {
+      if (typeof runnerGame.setDebugEnabled === "function") {
+        runnerGame.setDebugEnabled(nextEnabled);
+      } else {
+        runnerGame.DEBUG = nextEnabled;
+        if (runnerGame.runnerConfig && typeof runnerGame.runnerConfig === "object") {
+          runnerGame.runnerConfig.debug = nextEnabled;
+        }
+        if (!nextEnabled) {
+          if (typeof runnerGame.clearDebugHitboxes === "function") {
+            runnerGame.clearDebugHitboxes();
+          }
+          const collisionDot = runnerGame.elements?.debugCollisionDot;
+          if (collisionDot?.classList) {
+            collisionDot.classList.remove("is-visible");
+          }
+        }
+      }
+    }
+
+    try {
+      localStorage.setItem("penguin.debugPanel", nextEnabled ? "1" : "0");
+      localStorage.setItem("penguin.runnerDebug", nextEnabled ? "1" : "0");
+    } catch {
+      // Ignore storage failures.
+    }
+
+    console.info(
+      `[PenguinPet] Debug mode ${nextEnabled ? "enabled" : "disabled"} via keyboard`,
+    );
+    return nextEnabled;
+  };
+
+  const handleDebugSequenceKey = (event, currentPenguin, key) => {
+    if (!key || key.length !== 1 || !/^[a-z]$/.test(key)) {
+      debugSequenceBuffer = "";
+      debugSequenceLastAt = 0;
+      return false;
+    }
+
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+      debugSequenceBuffer = "";
+      debugSequenceLastAt = 0;
+      return false;
+    }
+
+    const now = Date.now();
+    if (now - debugSequenceLastAt > debugSequenceTimeoutMs) {
+      debugSequenceBuffer = "";
+    }
+    debugSequenceLastAt = now;
+    debugSequenceBuffer = (debugSequenceBuffer + key).slice(-debugSequence.length);
+
+    if (debugSequenceBuffer === debugSequence) {
+      debugSequenceBuffer = "";
+      debugSequenceLastAt = 0;
+      event.preventDefault();
+      const runnerGame = window.PenguinRunnerGame || null;
+      const currentlyEnabled = Boolean(
+        currentPenguin?.debugEnabled || runnerGame?.DEBUG,
+      );
+      syncDebugMode(!currentlyEnabled, currentPenguin);
+      return true;
+    }
+
+    if (debugSequence.startsWith(debugSequenceBuffer)) {
+      return true;
+    }
+
+    debugSequenceBuffer = key === debugSequence.charAt(0) ? key : "";
+    return debugSequence.startsWith(debugSequenceBuffer);
+  };
 
   const detectMouseShake = (x, y) => {
     const currentPenguin =
@@ -210,6 +319,11 @@ const createEnvironmentEvents = (deps) => {
         window.PenguinPet && window.PenguinPet.penguin
           ? window.PenguinPet.penguin
           : penguin;
+
+      if (handleDebugSequenceKey(event, currentPenguin, key)) {
+        return;
+      }
+
       if (currentPenguin && currentPenguin.isTemporaryDead) return;
 
       if (key === "arrowright") {

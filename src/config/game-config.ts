@@ -1,190 +1,193 @@
 export {};
 
-  const pet = window.PenguinPet || {};
-  const constants = pet.constants || {};
-  const configuredConstants =
-    window.PENGUIN_CONFIG && typeof window.PENGUIN_CONFIG.constants === "object"
-      ? window.PENGUIN_CONFIG.constants
-      : {};
+const pet = window.PenguinPet || {};
+const constants = pet.constants || {};
+const configuredConstants =
+  window.PENGUIN_CONFIG && typeof window.PENGUIN_CONFIG.constants === "object"
+    ? window.PENGUIN_CONFIG.constants
+    : {};
 
-  const configuredGame =
-    configuredConstants && typeof configuredConstants.game === "object"
-      ? configuredConstants.game
-      : {};
+const configuredGame =
+  configuredConstants && typeof configuredConstants.game === "object"
+    ? configuredConstants.game
+    : {};
 
-  const mergeConfigSection = (defaults, overrides) => {
-    if (!overrides || typeof overrides !== "object") return { ...defaults };
-    return { ...defaults, ...overrides };
-  };
+const mergeConfigSection = (defaults, overrides) => {
+  if (!overrides || typeof overrides !== "object") return { ...defaults };
+  return { ...defaults, ...overrides };
+};
 
-  const readStoredBoolean = (key, fallback = false) => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw === "1") return true;
-      if (raw === "0") return false;
-    } catch {
-      // Ignore storage failures.
-    }
-    return fallback;
-  };
+const readStoredBoolean = (key, fallback = false) => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === "1") return true;
+    if (raw === "0") return false;
+  } catch {
+    // Ignore storage failures.
+  }
+  return fallback;
+};
 
-  const runnerConfig = mergeConfigSection(
-    {
-      debug: false,
-      storageBestScoreKey: "pinguinRunnerBestScore",
-      penguinVisualOffsetYPx: 10,
-      backgroundScrollSpeedPxPerSec: 8,
-      moonScrollSpeedPxPerSec: 6,
-      moonTopPx: 36,
-      moonRightPx: 88,
-      moonSizePx: 90,
-      moonRespawnPaddingPx: 180,
-      groundDecorScrollSpeedPxPerSec: 180,
-      playfieldHeightRatio: 0.78,
-      groundOffsetYPx: 8,
-      penguinCenterXRatio: 0.23,
-      worldSpeedInitial: 220,
-      worldSpeedMin: 220,
-      worldSpeedMax: Number.POSITIVE_INFINITY,
-      worldSpeedGainPerSec: 9,
-      gravityPxPerSec2: 2350,
-      fallGravityMultiplier: 1.32,
-      lowJumpGravityMultiplier: 1.7,
-      diveGravityMultiplier: 3.2,
-      jumpVelocityPxPerSec: -860,
-      maxFallSpeedPxPerSec: 1650,
-      jumpBufferMs: 140,
-      coyoteTimeMs: 110,
-      spawnGapMinMs: 980,
-      spawnGapMaxMs: 1750,
-      initialSpawnTimerMs: 860,
-      scorePerSecond: 10,
-      fishDropEveryScore: 100,
-      difficultyScoreDivisor: 250,
-      difficultyTimeDivisorMs: 16000,
-      difficultyMaxLevel: Number.POSITIVE_INFINITY,
-      spawnRateFactorFloor: 0.15,
-      groundDecorCountWidthDivisorPx: 90,
-      groundDecorCountMin: 8,
-      groundDecorCountMax: 28,
-      groundDecorWidthMinPx: 26,
-      groundDecorWidthRangePx: 62,
-      groundDecorHeightMinPx: 4,
-      groundDecorHeightRangePx: 6,
-      groundDecorXJitterPx: 40,
-      groundDecorYBasePx: 8,
-      groundDecorYJitterPx: 16,
-      groundDecorOpacity: 0.28,
-      penguinWidthPx: 68,
-      penguinStandingHeightPx: 68,
-      penguinCrouchingHeightPx: 68,
-      transitionFadeInMs: 180,
-      transitionHoldMs: 190,
-      transitionFadeOutMs: 450,
-      transitionOverlayMaxOpacity: 0.55,
-      shakeDurationMs: 380,
-      shakeResetMs: 390,
-      debugCollisionHideMs: 160,
-      debugCollisionThrottleMs: 80,
-      penguinHitboxWidthInsetRatio: 0.2,
-      penguinHitboxCrouchedWidthInsetRatio: 0.7,
-      penguinHitboxTopInsetRatio: 0.18,
-      penguinHitboxBottomInsetRatio: 0.1,
-      penguinHitboxCrouchedTopInsetRatio: 0.22,
-      penguinHitboxCrouchedBottomInsetRatio: 0.12,
-      obstacleSpawnOffsetX: 48,
-      obstacleDespawnX: -42,
-      obstacleScoreDefault: 5,
-      obstacleScoreCrouch: 7,
-      obstacleGapBasePx: 220,
-      obstacleGapDifficultyFactor: 7,
-      obstacleGapMinPx: 100,
-      obstacleGapCrouchBonusPx: 42,
-      obstacleAirplaneChanceMinLevel: 1.5,
-      obstacleAirplaneChance: 0.2,
-      obstacleSnowmanChanceAtHighLevel: 0.4,
-      obstacleSnowmanChanceAtLowLevel: 0.4,
-      obstacleSnowmanChanceSnowingMultiplier: 1.75,
-      obstacleSnowmanChanceSnowingMax: 0.85,
-      obstacleIcebergTallChance: 0.6,
-      obstacleIcebergJaggedChance: 0.8,
-      obstacleSnowmanHitboxInsetXRatio: 0.22,
-      obstacleSnowmanHitboxInsetYRatio: 0.18,
-      obstacleHitboxWidthInsetRatio: 0.12,
-      obstacleHitboxHeightInsetRatio: 0.08,
-      obstacleHitboxCrouchWidthInsetRatio: 0.16,
-      obstacleHitboxCrouchHeightInsetRatio: 0.12,
-      helicopterFallbackHitboxRatios: {
-        left: 0.38,
-        right: 0.38,
-        top: 0.34,
-        bottom: 0.34,
+const runnerConfig = mergeConfigSection(
+  {
+    debug: false,
+    storageBestScoreKey: "pinguinRunnerBestScore",
+    penguinVisualOffsetYPx: 10,
+    backgroundScrollSpeedPxPerSec: 8,
+    moonScrollSpeedPxPerSec: 6,
+    moonTopPx: 36,
+    moonRightPx: 88,
+    moonSizePx: 90,
+    moonRespawnPaddingPx: 180,
+    groundDecorScrollSpeedPxPerSec: 180,
+    playfieldHeightRatio: 0.78,
+    groundOffsetYPx: 8,
+    penguinCenterXRatio: 0.23,
+    worldSpeedInitial: 220,
+    worldSpeedMin: 220,
+    worldSpeedMax: Number.POSITIVE_INFINITY,
+    worldSpeedGainPerSec: 9,
+    gravityPxPerSec2: 2350,
+    fallGravityMultiplier: 1.32,
+    lowJumpGravityMultiplier: 1.7,
+    diveGravityMultiplier: 3.2,
+    jumpVelocityPxPerSec: -860,
+    maxFallSpeedPxPerSec: 1650,
+    jumpBufferMs: 140,
+    coyoteTimeMs: 110,
+    spawnGapMinMs: 980,
+    spawnGapMaxMs: 1750,
+    initialSpawnTimerMs: 860,
+    scorePerSecond: 10,
+    fishDropEveryScore: 100,
+    difficultyScoreDivisor: 250,
+    difficultyTimeDivisorMs: 16000,
+    difficultyMaxLevel: Number.POSITIVE_INFINITY,
+    spawnRateFactorFloor: 0.15,
+    groundDecorCountWidthDivisorPx: 90,
+    groundDecorCountMin: 8,
+    groundDecorCountMax: 28,
+    groundDecorWidthMinPx: 26,
+    groundDecorWidthRangePx: 62,
+    groundDecorHeightMinPx: 4,
+    groundDecorHeightRangePx: 6,
+    groundDecorXJitterPx: 40,
+    groundDecorYBasePx: 8,
+    groundDecorYJitterPx: 16,
+    groundDecorOpacity: 0.28,
+    penguinWidthPx: 68,
+    penguinStandingHeightPx: 68,
+    penguinCrouchingHeightPx: 68,
+    transitionFadeInMs: 180,
+    transitionHoldMs: 190,
+    transitionFadeOutMs: 450,
+    transitionOverlayMaxOpacity: 0.55,
+    shakeDurationMs: 380,
+    shakeResetMs: 390,
+    debugCollisionHideMs: 160,
+    debugCollisionThrottleMs: 80,
+    penguinHitboxWidthInsetRatio: 0.2,
+    penguinHitboxCrouchedWidthInsetRatio: 0.7,
+    penguinHitboxTopInsetRatio: 0.18,
+    penguinHitboxBottomInsetRatio: 0.1,
+    penguinHitboxCrouchedTopInsetRatio: 0.22,
+    penguinHitboxCrouchedBottomInsetRatio: 0.12,
+    obstacleSpawnOffsetX: 48,
+    obstacleDespawnX: -42,
+    obstacleScoreDefault: 5,
+    obstacleScoreCrouch: 7,
+    obstacleGapBasePx: 220,
+    obstacleGapDifficultyFactor: 7,
+    obstacleGapMinPx: 100,
+    obstacleGapCrouchBonusPx: 42,
+    obstacleAirplaneChanceMinLevel: 1.5,
+    obstacleAirplaneChance: 0.2,
+    obstacleSnowmanChanceAtHighLevel: 0.4,
+    obstacleSnowmanChanceAtLowLevel: 0.4,
+    obstacleSnowmanChanceSnowingMultiplier: 1.75,
+    obstacleSnowmanChanceSnowingMax: 0.85,
+    obstacleIcebergTallChance: 0.6,
+    obstacleIcebergJaggedChance: 0.8,
+    obstacleSnowmanHitboxInsetXRatio: 0.22,
+    obstacleSnowmanHitboxInsetYRatio: 0.18,
+    obstacleHitboxWidthInsetRatio: 0.12,
+    obstacleHitboxHeightInsetRatio: 0.08,
+    obstacleHitboxCrouchWidthInsetRatio: 0.16,
+    obstacleHitboxCrouchHeightInsetRatio: 0.12,
+    helicopterFallbackHitboxRatios: {
+      left: 0.38,
+      right: 0.38,
+      top: 0.34,
+      bottom: 0.34,
+    },
+    obstacleTemplates: {
+      icebergTall: {
+        id: "icebergTall",
+        minWidth: 34,
+        maxWidth: 52,
+        minHeight: 36,
+        maxHeight: 60,
+        topOffset: 9,
+        requiresCrouch: false,
+        color: "linear-gradient(180deg, rgb(244,252,255), rgb(145,214,236))",
       },
-      obstacleTemplates: {
-        icebergTall: {
-          id: "icebergTall",
-          minWidth: 34,
-          maxWidth: 52,
-          minHeight: 36,
-          maxHeight: 60,
-          topOffset: 9,
-          requiresCrouch: false,
-          color: "linear-gradient(180deg, rgb(244,252,255), rgb(145,214,236))",
-        },
-        snowman: {
-          id: "snowman",
-          minWidth: 56,
-          maxWidth: 78,
-          minHeight: 64,
-          maxHeight: 94,
-          topOffset: 9,
-          requiresCrouch: false,
-          color: "linear-gradient(180deg, rgb(255,255,255), rgb(231,241,252))",
-        },
-        icebergJagged: {
-          id: "icebergJagged",
-          minWidth: 40,
-          maxWidth: 60,
-          minHeight: 30,
-          maxHeight: 50,
-          topOffset: 9,
-          requiresCrouch: false,
-          color: "linear-gradient(180deg, rgb(248,253,255), rgb(132,205,230))",
-        },
-        icebergSpire: {
-          id: "icebergSpire",
-          minWidth: 30,
-          maxWidth: 44,
-          minHeight: 42,
-          maxHeight: 68,
-          topOffset: 9,
-          requiresCrouch: false,
-          color: "linear-gradient(180deg, rgb(244,252,255), rgb(125,196,224))",
-        },
-        airplane: {
-          id: "airplane",
-          minWidth: 52,
-          maxWidth: 72,
-          minHeight: 18,
-          maxHeight: 26,
-          topOffset: -52,
-          requiresCrouch: true,
-          color: "transparent",
-        },
+      snowman: {
+        id: "snowman",
+        minWidth: 56,
+        maxWidth: 78,
+        minHeight: 64,
+        maxHeight: 94,
+        topOffset: 9,
+        requiresCrouch: false,
+        color: "linear-gradient(180deg, rgb(255,255,255), rgb(231,241,252))",
+      },
+      icebergJagged: {
+        id: "icebergJagged",
+        minWidth: 40,
+        maxWidth: 60,
+        minHeight: 30,
+        maxHeight: 50,
+        topOffset: 9,
+        requiresCrouch: false,
+        color: "linear-gradient(180deg, rgb(248,253,255), rgb(132,205,230))",
+      },
+      icebergSpire: {
+        id: "icebergSpire",
+        minWidth: 30,
+        maxWidth: 44,
+        minHeight: 42,
+        maxHeight: 68,
+        topOffset: 9,
+        requiresCrouch: false,
+        color: "linear-gradient(180deg, rgb(244,252,255), rgb(125,196,224))",
+      },
+      airplane: {
+        id: "airplane",
+        minWidth: 52,
+        maxWidth: 72,
+        minHeight: 18,
+        maxHeight: 26,
+        topOffset: -52,
+        requiresCrouch: true,
+        color: "transparent",
       },
     },
-    configuredGame.runner || configuredConstants.runner,
-  );
-  runnerConfig.debug = readStoredBoolean("penguin.runnerDebug", Boolean(runnerConfig.debug));
+  },
+  configuredGame.runner || configuredConstants.runner,
+);
+runnerConfig.debug = readStoredBoolean(
+  "penguin.runnerDebug",
+  Boolean(runnerConfig.debug),
+);
 
-  window.PenguinPet = {
-    ...pet,
-    constants: {
-      ...constants,
-      game: {
-        ...(constants.game || {}),
-        runner: runnerConfig,
-      },
+window.PenguinPet = {
+  ...pet,
+  constants: {
+    ...constants,
+    game: {
+      ...(constants.game || {}),
       runner: runnerConfig,
     },
-  };
+    runner: runnerConfig,
+  },
+};

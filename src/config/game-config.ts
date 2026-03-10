@@ -17,6 +17,17 @@ export {};
     return { ...defaults, ...overrides };
   };
 
+  const readStoredBoolean = (key, fallback = false) => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw === "1") return true;
+      if (raw === "0") return false;
+    } catch {
+      // Ignore storage failures.
+    }
+    return fallback;
+  };
+
   const runnerConfig = mergeConfigSection(
     {
       debug: false,
@@ -164,6 +175,7 @@ export {};
     },
     configuredGame.runner || configuredConstants.runner,
   );
+  runnerConfig.debug = readStoredBoolean("penguin.runnerDebug", Boolean(runnerConfig.debug));
 
   window.PenguinPet = {
     ...pet,

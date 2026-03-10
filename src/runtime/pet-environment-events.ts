@@ -20,7 +20,10 @@ const createEnvironmentEvents = (deps) => {
 
     if (window.PENGUIN_CONFIG && typeof window.PENGUIN_CONFIG === "object") {
       window.PENGUIN_CONFIG.debugPanel = nextEnabled;
-      if (!window.PENGUIN_CONFIG.constants || typeof window.PENGUIN_CONFIG.constants !== "object") {
+      if (
+        !window.PENGUIN_CONFIG.constants ||
+        typeof window.PENGUIN_CONFIG.constants !== "object"
+      ) {
         window.PENGUIN_CONFIG.constants = {};
       }
       if (
@@ -52,7 +55,10 @@ const createEnvironmentEvents = (deps) => {
         runnerGame.setDebugEnabled(nextEnabled);
       } else {
         runnerGame.DEBUG = nextEnabled;
-        if (runnerGame.runnerConfig && typeof runnerGame.runnerConfig === "object") {
+        if (
+          runnerGame.runnerConfig &&
+          typeof runnerGame.runnerConfig === "object"
+        ) {
           runnerGame.runnerConfig.debug = nextEnabled;
         }
         if (!nextEnabled) {
@@ -98,7 +104,9 @@ const createEnvironmentEvents = (deps) => {
       debugSequenceBuffer = "";
     }
     debugSequenceLastAt = now;
-    debugSequenceBuffer = (debugSequenceBuffer + key).slice(-debugSequence.length);
+    debugSequenceBuffer = (debugSequenceBuffer + key).slice(
+      -debugSequence.length,
+    );
 
     if (debugSequenceBuffer === debugSequence) {
       debugSequenceBuffer = "";

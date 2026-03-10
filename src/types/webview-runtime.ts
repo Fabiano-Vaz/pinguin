@@ -172,7 +172,12 @@ export interface RunnerDebugTools {
   ) => void;
   renderDebugHitboxes?: (
     penguinBox: { x: number; y: number; width: number; height: number } | null,
-    obstacleBoxes?: Array<{ x: number; y: number; width: number; height: number }>,
+    obstacleBoxes?: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>,
   ) => void;
   clearDebugHitboxes?: () => void;
 }
@@ -238,7 +243,12 @@ export interface PenguinRunnerGameGlobal {
   ) => void;
   renderDebugHitboxes: (
     penguinBox: { x: number; y: number; width: number; height: number } | null,
-    obstacleBoxes?: Array<{ x: number; y: number; width: number; height: number }>,
+    obstacleBoxes?: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }>,
   ) => void;
   clearDebugHitboxes: () => void;
   renderHud: () => void;

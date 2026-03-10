@@ -1,7 +1,11 @@
 export {};
 
 import { getPenguinRunnerModules } from "../../runtime/webview-globals.ts";
-import type { RunnerDebugTools, RunnerGameState, UnknownRecord } from "../../types/webview-runtime.ts";
+import type {
+  RunnerDebugTools,
+  RunnerGameState,
+  UnknownRecord,
+} from "../../types/webview-runtime.ts";
 
 const modules = getPenguinRunnerModules();
 
@@ -48,10 +52,13 @@ modules.createDebugTools = ({
       clearTimeout(game.debugCollisionHideTimeoutId);
     }
 
-    game.debugCollisionHideTimeoutId = window.setTimeout(() => {
-      debugCollisionDot.classList.remove("is-visible");
-      game.debugCollisionHideTimeoutId = 0;
-    }, Number(runnerConfig.debugCollisionHideMs) || 160);
+    game.debugCollisionHideTimeoutId = window.setTimeout(
+      () => {
+        debugCollisionDot.classList.remove("is-visible");
+        game.debugCollisionHideTimeoutId = 0;
+      },
+      Number(runnerConfig.debugCollisionHideMs) || 160,
+    );
   };
 
   const clearDebugHitboxes = (): void => {
@@ -71,12 +78,22 @@ modules.createDebugTools = ({
 
   const renderDebugHitboxes = (
     penguinBox: { x: number; y: number; width: number; height: number } | null,
-    obstacleBoxes: Array<{ x: number; y: number; width: number; height: number }> = [],
+    obstacleBoxes: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }> = [],
   ): void => {
     if (!isDebugEnabled()) return;
 
-    const boxes: Array<{ x: number; y: number; width: number; height: number; role: string }> =
-      [];
+    const boxes: Array<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      role: string;
+    }> = [];
     if (penguinBox) {
       boxes.push({ ...penguinBox, role: "penguin" });
     }

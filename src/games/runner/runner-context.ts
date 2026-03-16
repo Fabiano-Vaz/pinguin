@@ -45,7 +45,7 @@ const helicopterVariants = Array.isArray(assetsFactory.helicopterVariants)
   : [
       {
         key: "A",
-        src: "assets/helicopterA.gif",
+        src: "assets/plane.gif",
         scale: 4,
         hitboxInsetRatios: { left: 0.37, right: 0.39, top: 0.34, bottom: 0.34 },
       },

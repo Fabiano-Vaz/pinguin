@@ -40,7 +40,7 @@ modules.createRunnerAssets = ({
   const helicopterVariants = [
     {
       key: "A",
-      src: resolveSprite("helicopterA", "assets/helicopterA.gif"),
+      src: resolveSprite("plane", "assets/plane.gif"),
       scale: 4,
       hitboxInsetRatios: {
         left: 0.37,

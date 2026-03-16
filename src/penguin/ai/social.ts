@@ -137,7 +137,6 @@ export const createSocialMethods = ({ phrases }) => ({
     this.lockVisualSprite(cruzeirSrc, holdCruzeiroMs + jumpDurationMs + 1200);
     this.currentState = "cruzeiro";
     if (this.img) this.img.src = cruzeirSrc;
-    this.visualScale = 1.5;
     this.applyTransform();
     if (line) this.showSpeech(line, 2800, false);
 
@@ -148,7 +147,6 @@ export const createSocialMethods = ({ phrases }) => ({
       if (jumpSrc && this.img) this.img.src = jumpSrc;
       this.element.style.animation =
         "jumping 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite";
-      this.visualScale = 1;
       this.applyTransform();
 
       // Fase 3: após 2s pulando, volta ao normal

@@ -3,6 +3,33 @@ export {};
 const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
 
 modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
+  recoverStuckJumpState() {
+    this.jumpLockStuckSince = 0;
+    this.jumpPoseStuckSince = 0;
+    this.isJumpLocked = false;
+    this.allowJumpStateTransition = true;
+
+    if (typeof this.unlockVisualSprite === "function") {
+      this.unlockVisualSprite();
+    }
+
+    if (typeof this.setState === "function") {
+      if (this.isFishingActive) {
+        this.setState("fishing");
+      } else if (
+        this.isEatingFood ||
+        this.isCursorTouchEating ||
+        this.currentFoodTarget
+      ) {
+        this.setState("eating");
+      } else if (!this.isMoving) {
+        this.setState("idle");
+      }
+    }
+
+    this.allowJumpStateTransition = false;
+  },
+
   update(now = performance.now()) {
     const dtSeconds = Math.min(
       0.05,
@@ -246,6 +273,44 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
 
   recoverInvalidPose() {
     const now = Date.now();
+    const isJumpMotionActive =
+      Boolean(this.customMotion) && this.customMotion.type === "jumpVertical";
+    const hasManagedJumpVisual =
+      this.isCruzeiroMode ||
+      (typeof this.element?.style?.animation === "string" &&
+        this.element.style.animation.includes("jumping"));
+
+    if (this.isJumpLocked && !isJumpMotionActive && !hasManagedJumpVisual) {
+      if (!this.jumpLockStuckSince) {
+        this.jumpLockStuckSince = now;
+      } else if (now - this.jumpLockStuckSince > 1200) {
+        console.warn(
+          "[PenguinPet] isJumpLocked preso sem jumpVertical — recuperando",
+        );
+        this.recoverStuckJumpState();
+        return;
+      }
+    } else {
+      this.jumpLockStuckSince = 0;
+    }
+
+    if (
+      this.currentState === "jumping" &&
+      !isJumpMotionActive &&
+      !hasManagedJumpVisual
+    ) {
+      if (!this.jumpPoseStuckSince) {
+        this.jumpPoseStuckSince = now;
+      } else if (now - this.jumpPoseStuckSince > 1200) {
+        console.warn(
+          "[PenguinPet] state=jumping sem motion de pulo — recuperando",
+        );
+        this.recoverStuckJumpState();
+        return;
+      }
+    } else {
+      this.jumpPoseStuckSince = 0;
+    }
 
     // --- Detecta isWalkingAway preso ---
     if (this.isWalkingAway) {
@@ -417,6 +482,8 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
     this.aiLockedStuckSince = 0;
     this.fishingStuckSince = 0;
     this.foodChaseStuckSince = 0;
+    this.jumpLockStuckSince = 0;
+    this.jumpPoseStuckSince = 0;
     this.invalidPoseSince = 0;
     if (this.element) this.element.style.opacity = "1";
     this.x = Math.max(0, Math.min(this.x, window.innerWidth - penguinSize));

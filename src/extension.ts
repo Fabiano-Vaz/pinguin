@@ -11,7 +11,10 @@ type RuntimeFlags = {
 
 export function activate(context: vscode.ExtensionContext) {
   const runtimeFlags = loadRuntimeFlags(context.extensionPath);
-  const provider = new PenguinSidebarProvider(context.extensionUri, runtimeFlags);
+  const provider = new PenguinSidebarProvider(
+    context.extensionUri,
+    runtimeFlags,
+  );
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(SIDEBAR_VIEW_ID, provider, {
       webviewOptions: { retainContextWhenHidden: true },
@@ -109,7 +112,7 @@ function getWebviewContent(
   <title>Pinguim Pet</title>
   <link rel="stylesheet" href="${cssUri}">
 </head>
-<body>
+<body tabindex="0" data-keyboard-surface="penguin-pet">
   <script nonce="${nonce}">
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
     window.PENGUIN_CONFIG = ${JSON.stringify(webviewConfig)};

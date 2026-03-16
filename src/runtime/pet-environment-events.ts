@@ -14,6 +14,33 @@ const createEnvironmentEvents = (deps) => {
   let pendingRainFlashTimeoutId = null;
   let debugSequenceBuffer = "";
   let debugSequenceLastAt = 0;
+  const seenKeydownEvents = new WeakSet();
+
+  const focusKeyboardSurface = () => {
+    const focusOptions = { preventScroll: true };
+    const target =
+      (typeof document !== "undefined" &&
+        document.body &&
+        typeof document.body.focus === "function" &&
+        document.body) ||
+      (typeof document !== "undefined" &&
+        document.documentElement &&
+        typeof document.documentElement.focus === "function" &&
+        document.documentElement) ||
+      null;
+
+    if (!target) return;
+
+    try {
+      target.focus(focusOptions);
+    } catch {
+      try {
+        target.focus();
+      } catch {
+        // Ignore focus failures inside hosts that do not expose programmatic focus.
+      }
+    }
+  };
 
   const syncDebugMode = (enabled, currentPenguin) => {
     const nextEnabled = Boolean(enabled);
@@ -125,7 +152,9 @@ const createEnvironmentEvents = (deps) => {
     }
 
     debugSequenceBuffer = key === debugSequence.charAt(0) ? key : "";
-    return debugSequence.startsWith(debugSequenceBuffer);
+    return debugSequenceBuffer.length > 0
+      ? debugSequence.startsWith(debugSequenceBuffer)
+      : false;
   };
 
   const detectMouseShake = (x, y) => {
@@ -168,6 +197,7 @@ const createEnvironmentEvents = (deps) => {
   };
 
   const onClick = (event) => {
+    focusKeyboardSurface();
     if (!penguin) return;
     if (penguin.isTemporaryDead) return;
 
@@ -303,12 +333,26 @@ const createEnvironmentEvents = (deps) => {
       runtime.isMouseInsideViewport = true;
       runtime.mouseX = event.clientX;
       runtime.mouseY = event.clientY;
+      focusKeyboardSurface();
     },
     mouseleave: () => {
       runtime.isMouseInsideViewport = false;
     },
     click: onClick,
+    visibilitychange: () => {
+      if (typeof document === "undefined") return;
+      if (document.visibilityState !== "visible") return;
+      focusKeyboardSurface();
+    },
+    focus: () => {
+      focusKeyboardSurface();
+    },
     keydown: (event) => {
+      if (event && typeof event === "object") {
+        if (seenKeydownEvents.has(event)) return;
+        seenKeydownEvents.add(event);
+      }
+
       if (!effects) return;
       if (event.defaultPrevented) return;
 
@@ -424,7 +468,11 @@ const createEnvironmentEvents = (deps) => {
     document.addEventListener("mouseenter", handlers.mouseenter);
     document.addEventListener("mouseleave", handlers.mouseleave);
     document.addEventListener("click", handlers.click);
+    document.addEventListener("visibilitychange", handlers.visibilitychange);
     document.addEventListener("keydown", handlers.keydown);
+    window.addEventListener("focus", handlers.focus);
+    window.addEventListener("keydown", handlers.keydown);
+    focusKeyboardSurface();
   };
 
   const detach = () => {
@@ -437,7 +485,10 @@ const createEnvironmentEvents = (deps) => {
     document.removeEventListener("mouseenter", handlers.mouseenter);
     document.removeEventListener("mouseleave", handlers.mouseleave);
     document.removeEventListener("click", handlers.click);
+    document.removeEventListener("visibilitychange", handlers.visibilitychange);
     document.removeEventListener("keydown", handlers.keydown);
+    window.removeEventListener("focus", handlers.focus);
+    window.removeEventListener("keydown", handlers.keydown);
   };
 
   return {

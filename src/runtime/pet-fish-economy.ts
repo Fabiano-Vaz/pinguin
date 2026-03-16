@@ -417,12 +417,13 @@ const createFishEconomy = (deps) => {
     updateFishStockHud();
   };
 
-  // Fish cursor removed — keep setFishCursorEnabled as a no-op stub
-  // so ai/core.ts and weather-cycles.ts callers don't break.
-  const setFishCursorEnabled = (_enabled?: boolean) => {
-    runtime.isFishCursorEnabled = false;
+  // The special cursor visual was removed, but the availability flag still
+  // drives interactions and weather locks across the runtime.
+  const setFishCursorEnabled = (enabled = true) => {
+    const nextEnabled = Boolean(enabled);
+    runtime.isFishCursorEnabled = nextEnabled;
     if (document.body) {
-      document.body.classList.remove("fish-cursor-enabled");
+      document.body.classList.toggle("fish-cursor-enabled", nextEnabled);
     }
   };
 
@@ -436,10 +437,12 @@ const createFishEconomy = (deps) => {
     announceFishIfNeeded();
 
     if (remainingFish <= 0) {
+      setFishCursorEnabled(false);
       scheduleNoFishTantrum();
       scheduleNoFishAutoFishing();
       clearNaturalConsume();
     } else {
+      setFishCursorEnabled(true);
       scheduleNaturalConsume();
     }
 
@@ -454,6 +457,7 @@ const createFishEconomy = (deps) => {
 
     clearNoFishTantrum();
     clearNoFishAutoFishing();
+    setFishCursorEnabled(true);
     scheduleNaturalConsume();
 
     return remainingFish;
@@ -482,7 +486,7 @@ const createFishEconomy = (deps) => {
   };
 
   const initialize = () => {
-    setFishCursorEnabled(false);
+    setFishCursorEnabled(remainingFish > 0);
     mountFishStockHud();
     runtime.fishStock = remainingFish;
 

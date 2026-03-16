@@ -1,15 +1,40 @@
 export {};
 
-import { getPenguinPet, getPenguinRunnerGame } from "../../runtime/webview-globals.ts";
-import type { RunnerObstacle, RunnerObstacleTemplate } from "../../types/webview-runtime.ts";
+import {
+  getPenguinPet,
+  getPenguinRunnerGame,
+} from "../../runtime/webview-globals.ts";
+import type {
+  RunnerObstacle,
+  RunnerObstacleTemplate,
+} from "../../types/webview-runtime.ts";
 
 const runner = getPenguinRunnerGame();
 if (runner) {
-
   const runnerConfig = (runner.runnerConfig || {}) as Record<string, any>;
   const { game, helicopterVariants, snowmanObstacleImage, elements } = runner;
   const { stage } = elements;
-  const obstacleTemplates = (runnerConfig.obstacleTemplates || {}) as Record<string, RunnerObstacleTemplate>;
+  const obstacleTemplates = (runnerConfig.obstacleTemplates || {}) as Record<
+    string,
+    RunnerObstacleTemplate
+  >;
+
+  const getAircraftVisualClass = ({
+    key,
+    src,
+  }: {
+    key?: string;
+    src?: string;
+  }) => {
+    const normalizedSrc = String(src || "").toLowerCase();
+    if (normalizedSrc.includes("helicopterb.gif") || key === "B") {
+      return "runner-helicopter";
+    }
+    if (normalizedSrc.includes("plane.gif") || key === "A") {
+      return "runner-plane";
+    }
+    return "runner-helicopter";
+  };
 
   const chooseObstacleTemplate = () => {
     const level = runner.difficultyLevel();
@@ -17,24 +42,31 @@ if (runner) {
     const pet = getPenguinPet();
     const isSnowingNow = Boolean(
       pet.effects &&
-        typeof pet.effects.isSnowing === "function" &&
-        pet.effects.isSnowing(),
+      typeof pet.effects.isSnowing === "function" &&
+      pet.effects.isSnowing(),
     );
 
     const airplaneMinLevel = runnerConfig.obstacleAirplaneChanceMinLevel || 1.5;
     const airplaneChance = runnerConfig.obstacleAirplaneChance || 0.2;
     const snowingMultiplier =
       runnerConfig.obstacleSnowmanChanceSnowingMultiplier || 1.75;
-    const snowingSnowmanMax = runnerConfig.obstacleSnowmanChanceSnowingMax || 0.85;
+    const snowingSnowmanMax =
+      runnerConfig.obstacleSnowmanChanceSnowingMax || 0.85;
     const baseSnowmanHighLevelChance =
       runnerConfig.obstacleSnowmanChanceAtHighLevel || 0.4;
     const baseSnowmanLowLevelChance =
       runnerConfig.obstacleSnowmanChanceAtLowLevel || 0.4;
     const snowmanHighLevelChance = isSnowingNow
-      ? Math.min(snowingSnowmanMax, baseSnowmanHighLevelChance * snowingMultiplier)
+      ? Math.min(
+          snowingSnowmanMax,
+          baseSnowmanHighLevelChance * snowingMultiplier,
+        )
       : baseSnowmanHighLevelChance;
     const snowmanLowLevelChance = isSnowingNow
-      ? Math.min(snowingSnowmanMax, baseSnowmanLowLevelChance * snowingMultiplier)
+      ? Math.min(
+          snowingSnowmanMax,
+          baseSnowmanLowLevelChance * snowingMultiplier,
+        )
       : baseSnowmanLowLevelChance;
     const icebergTallChance = runnerConfig.obstacleIcebergTallChance || 0.6;
     const icebergJaggedChance = runnerConfig.obstacleIcebergJaggedChance || 0.8;
@@ -61,7 +93,10 @@ if (runner) {
     );
   };
 
-  const createObstacleVisual = (el: HTMLDivElement, template: RunnerObstacleTemplate): void => {
+  const createObstacleVisual = (
+    el: HTMLDivElement,
+    template: RunnerObstacleTemplate,
+  ): void => {
     el.style.border = "none";
     el.style.boxShadow = "0 7px 14px rgba(0,0,0,0.2)";
     el.style.background = template.color;
@@ -83,13 +118,19 @@ if (runner) {
         helicopterVariants[(firstIndex + 1) % helicopterVariants.length];
 
       el.dataset.heliVariantKey = selectedVariant.key;
-      el.dataset.heliHitboxLeft = String(selectedVariant.hitboxInsetRatios.left);
-      el.dataset.heliHitboxRight = String(selectedVariant.hitboxInsetRatios.right);
+      el.dataset.heliHitboxLeft = String(
+        selectedVariant.hitboxInsetRatios.left,
+      );
+      el.dataset.heliHitboxRight = String(
+        selectedVariant.hitboxInsetRatios.right,
+      );
       el.dataset.heliHitboxTop = String(selectedVariant.hitboxInsetRatios.top);
-      el.dataset.heliHitboxBottom = String(selectedVariant.hitboxInsetRatios.bottom);
+      el.dataset.heliHitboxBottom = String(
+        selectedVariant.hitboxInsetRatios.bottom,
+      );
 
       heliImg.src = selectedVariant.src;
-      heliImg.className = "runner-helicopter";
+      heliImg.className = getAircraftVisualClass(selectedVariant);
       heliImg.alt = "helicopter";
       heliImg.draggable = false;
       heliImg.style.setProperty("--heli-scale", String(selectedVariant.scale));
@@ -102,12 +143,24 @@ if (runner) {
 
         heliImg.dataset.fallbackTried = "1";
         el.dataset.heliVariantKey = fallbackVariant.key;
-        el.dataset.heliHitboxLeft = String(fallbackVariant.hitboxInsetRatios.left);
-        el.dataset.heliHitboxRight = String(fallbackVariant.hitboxInsetRatios.right);
-        el.dataset.heliHitboxTop = String(fallbackVariant.hitboxInsetRatios.top);
-        el.dataset.heliHitboxBottom = String(fallbackVariant.hitboxInsetRatios.bottom);
+        el.dataset.heliHitboxLeft = String(
+          fallbackVariant.hitboxInsetRatios.left,
+        );
+        el.dataset.heliHitboxRight = String(
+          fallbackVariant.hitboxInsetRatios.right,
+        );
+        el.dataset.heliHitboxTop = String(
+          fallbackVariant.hitboxInsetRatios.top,
+        );
+        el.dataset.heliHitboxBottom = String(
+          fallbackVariant.hitboxInsetRatios.bottom,
+        );
         heliImg.src = fallbackVariant.src;
-        heliImg.style.setProperty("--heli-scale", String(fallbackVariant.scale));
+        heliImg.className = getAircraftVisualClass(fallbackVariant);
+        heliImg.style.setProperty(
+          "--heli-scale",
+          String(fallbackVariant.scale),
+        );
       });
 
       el.appendChild(heliImg);
@@ -162,13 +215,16 @@ if (runner) {
     obstacle.className = "runner-obstacle";
 
     const width = Math.round(
-      template.minWidth + Math.random() * (template.maxWidth - template.minWidth),
+      template.minWidth +
+        Math.random() * (template.maxWidth - template.minWidth),
     );
     const height = Math.round(
-      template.minHeight + Math.random() * (template.maxHeight - template.minHeight),
+      template.minHeight +
+        Math.random() * (template.maxHeight - template.minHeight),
     );
 
-    const spawnX = window.innerWidth + (runnerConfig.obstacleSpawnOffsetX || 48);
+    const spawnX =
+      window.innerWidth + (runnerConfig.obstacleSpawnOffsetX || 48);
     const groundLineY = runner.getGroundLineY();
     const y = groundLineY - height + template.topOffset;
 
@@ -194,18 +250,26 @@ if (runner) {
 
   const getObstacleHitbox = (obstacle: RunnerObstacle) => {
     if (obstacle.id === "airplane") {
-      const helicopterEl = obstacle.el.querySelector(".runner-helicopter");
+      const helicopterEl = obstacle.el.querySelector(
+        ".runner-helicopter, .runner-plane",
+      );
       if (helicopterEl) {
         const rect = helicopterEl.getBoundingClientRect();
         const heliFallback = runnerConfig.helicopterFallbackHitboxRatios || {};
         const leftRatio =
-          Number(obstacle.el.dataset.heliHitboxLeft) || heliFallback.left || 0.38;
+          Number(obstacle.el.dataset.heliHitboxLeft) ||
+          heliFallback.left ||
+          0.38;
         const rightRatio =
-          Number(obstacle.el.dataset.heliHitboxRight) || heliFallback.right || 0.38;
+          Number(obstacle.el.dataset.heliHitboxRight) ||
+          heliFallback.right ||
+          0.38;
         const topRatio =
           Number(obstacle.el.dataset.heliHitboxTop) || heliFallback.top || 0.34;
         const bottomRatio =
-          Number(obstacle.el.dataset.heliHitboxBottom) || heliFallback.bottom || 0.34;
+          Number(obstacle.el.dataset.heliHitboxBottom) ||
+          heliFallback.bottom ||
+          0.34;
         const insetLeft = Math.round(rect.width * leftRatio);
         const insetRight = Math.round(rect.width * rightRatio);
         const insetTop = Math.round(rect.height * topRatio);
@@ -221,10 +285,12 @@ if (runner) {
 
     if (obstacle.id === "snowman") {
       const insetX = Math.round(
-        obstacle.width * (runnerConfig.obstacleSnowmanHitboxInsetXRatio || 0.22),
+        obstacle.width *
+          (runnerConfig.obstacleSnowmanHitboxInsetXRatio || 0.22),
       );
       const insetY = Math.round(
-        obstacle.height * (runnerConfig.obstacleSnowmanHitboxInsetYRatio || 0.18),
+        obstacle.height *
+          (runnerConfig.obstacleSnowmanHitboxInsetYRatio || 0.18),
       );
       return {
         x: obstacle.x + insetX,
@@ -259,7 +325,8 @@ if (runner) {
     const minimumGapPx = Math.max(
       runnerConfig.obstacleGapMinPx || 100,
       (runnerConfig.obstacleGapBasePx || 220) -
-        runner.difficultyLevel() * (runnerConfig.obstacleGapDifficultyFactor || 7) +
+        runner.difficultyLevel() *
+          (runnerConfig.obstacleGapDifficultyFactor || 7) +
         (last.requiresCrouch ? runnerConfig.obstacleGapCrouchBonusPx || 42 : 0),
     );
 
@@ -286,7 +353,10 @@ if (runner) {
       if (!game.isGameOver && runner.hasCollision(penguinBox, obstacleHitbox)) {
         if (runner.DEBUG) {
           const now = performance.now();
-          if (now - game.debugLastCollisionAt > (runnerConfig.debugCollisionThrottleMs || 80)) {
+          if (
+            now - game.debugLastCollisionAt >
+            (runnerConfig.debugCollisionThrottleMs || 80)
+          ) {
             runner.showDebugCollisionDot(penguinBox, obstacleHitbox);
             game.debugLastCollisionAt = now;
           }
@@ -299,7 +369,10 @@ if (runner) {
         return;
       }
 
-      if (obstacle.x + obstacle.width < (runnerConfig.obstacleDespawnX || -42)) {
+      if (
+        obstacle.x + obstacle.width <
+        (runnerConfig.obstacleDespawnX || -42)
+      ) {
         obstacle.el.remove();
         game.obstacles.splice(i, 1);
       }
@@ -323,4 +396,4 @@ if (runner) {
   runner.ensureSafeSpawnGap = ensureSafeSpawnGap;
   runner.updateObstacles = updateObstacles;
   runner.realignObstacleY = realignObstacleY;
-  }
+}

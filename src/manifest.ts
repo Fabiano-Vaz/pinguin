@@ -31,7 +31,7 @@ export const ASSET_FILES: AssetMap = {
   runnerBackgroundDark: "backgroung-dark.png",
   runnerBackgroundDarkB: "backgroung-darkB.png",
   moon: "lua.png",
-  helicopterA: "helicopterA.gif",
+  plane: "plane.gif",
   helicopterB: "helicopterB.gif",
   snowman: "snowman.svg",
   cruzeiro: "pinguim cruzeiro.svg",

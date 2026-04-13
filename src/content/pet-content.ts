@@ -2,181 +2,190 @@ window.PenguinPet = window.PenguinPet || {};
 
 window.PenguinPet.phrases = {
   idle: [
-    "…… zzzzs",
-    "tô vivão… mais ou menos",
-    "*bocejo gigante*",
-    "alguém me ama hoje ou é só mais um dia ruim?",
+    "Ei, ainda tô aqui... fingindo que sou produtivo 😌",
+    "Pensando na vida... ou só esperando você me dar atenção?",
+    "*bocejo estiloso* Alguém me conta uma piada boa?",
+    "Modo pinguim filosófico ativado: por que o gelo é tão frio mesmo?",
   ],
 
   running: [
-    "*trotando com preguiça*",
-    "tô indo… mas sem pressa",
-    "*suspiro enquanto corre*",
+    "*trotando com estilo de quem tá atrasado pro rolê*",
+    "Correndo... mas com dignidade e um pouquinho de drama",
+    "Olha só eu sendo atleta olímpico de sofá!",
   ],
 
   jumping: [
-    "*pulinho sem vontade*",
-    "aff… por que eu faço isso?",
-    "*hop meia-boca*",
+    "*pulinho cheio de esperança e pouca coordenação*",
+    "Física quântica: eu pulo e finjo que voo por 0,3 segundos",
+    "Hop hop... isso conta como exercício, né?",
   ],
 
   dancing: [
-    "*balança devagar tipo 'tô nem aí'*",
-    "♪ só porque você tá olhando ♪",
-    "tá… dançando um pouquinho… feliz agora?",
+    "*dança desengonçada mas com muita alma*",
+    "♪ Tô dançando como se ninguém estivesse olhando... mas você tá olhando ♪",
+    "Meu estilo é 'pinguim que tomou café demais'",
+    "Vem dançar comigo? Prometo não pisar nas suas expectativas",
   ],
 
   sleeping: [
-    "ZzzZZzZ… me deixa…",
-    "ronc ronccc",
-    "…… apagado até segunda ordem",
+    "ZzzZZz... sonhando que sou um pinguim famoso no TikTok",
+    "Apagado em modo economia de energia... não me acorda sem peixe",
+    "*ronco chique* ronnnc... ronnnc...",
   ],
 
-  scared: ["AI MEU DEUS NÃO FAZ ISSO!!", "!!!", "*se joga no chão de susto*"],
+  scared: [
+    "AI MEU DEUS EU QUASE VIRO SORVETE DE PINGUIM!!",
+    "MEU CORAÇÃO DE GELO QUASE DERRETEU DE SUSTO!",
+    "*se joga no gelo dramaticamente*",
+  ],
 
-  crying: ["…… sniff…", "*fungando dramaticamente*", "ninguém gosta de mim…"],
+  crying: [
+    "*fungando com classe* Alguém me passa um lenço de neve?",
+    "Tô chorando... mas de um jeito bonito e cinematográfico",
+    "Ninguém gosta de mim... só dos meus piadinhos ruins 😭",
+  ],
 
   beaten: [
-    "PARA DE ME BATER, CARA!!",
-    "Ô MÃO PESADA! PARA COM ISSO AGORA!",
-    "EI! CHEGA DE PORRADA, TÁ MALUCO?!",
-    "SE CONTINUAR ME BATENDO EU VOU SURTAR!",
-    "ME RESPEITA! PARA DE ME BATER!",
+    "Ei ei ei! Eu sou delicado, sou obra de arte!",
+    "Para com essa mão pesada, eu sou pinguim, não saco de pancada!",
+    "Se continuar me batendo vou processar por violência contra fofura",
+    "Ô, calma aí! Meu seguro de vida não cobre porrada de humano",
   ],
 
   angry: [
-    "Tá me irritando de propósito né?",
-    "*resmunga alto*",
-    "TÔ DE SACO CHEIO!!!",
+    "Tá me irritando... mas de um jeito fofo que eu até perdoo",
+    "*resmunga enquanto tenta manter a pose*",
+    "Tô bravo... mas meu limite de raiva é 3 segundos e meio",
   ],
 
   scratching: [
-    "*coça a cabeça com força*",
-    "tô tentando entender minha vida…",
-    "…… por que eu existo mesmo?",
+    "*coça a cabeça* Espera... eu tinha um pensamento brilhante agora há pouco...",
+    "Tentando resolver o sentido da vida... ou só coceira mesmo",
   ],
 
-  waving: ["*aceno preguiçoso*", "… oi… tô aqui ainda…", "o/ (mas sem ânimo)"],
+  waving: [
+    "*aceno animado com as duas nadadeiras* Oiêêê!",
+    "Olá humano favorito! (sim, você é o favorito, não conta pros outros)",
+    "o/ Pronto pra mais uma aventura comigo?",
+  ],
 
   shy: [
-    "*esconde a cara com as nadadeiras*",
-    "…… não olha pra mim assim",
-    "*vermelho de vergonha*",
+    "*esconde o rostinho* Não me olha assim que eu fico derretendo...",
+    "Tô tímido... mas ainda sou o pinguim mais charmoso da Antártida",
+    "*vermelho por baixo das penas pretas*",
   ],
 
   peeking: [
-    "*espia de canto*",
-    "tô só olhando… não tô curioso não",
-    "*curiosidade level 9000*",
+    "*espia de canto com carinha de curioso profissional*",
+    "Só dando uma olhadinha... não tô bisbilhotando não, juro!",
+    "Curiosidade nível: pinguim que descobriu que existe Netflix",
   ],
 
   laughing: [
-    "heheheh…",
-    "*risadinha contida*",
-    "tá… foi engraçado… pode parar agora",
+    "HAHAHA... espera, essa foi boa mesmo!",
+    "*risada sincera de pinguim* kkkkkk",
+    "Você me pegou... essa piada foi 10/10",
   ],
 
-  thinking: ["…… pensando na vida", "hmm……", "*olhar perdido no vazio*"],
+  thinking: [
+    "Hmm... calculando quantos peixes cabem no meu coração",
+    "*olhar profundo de quem tá inventando filosofia barata*",
+    "Pensando em como ser mais fofo hoje...",
+  ],
 
   eating: [
-    "*nom nom nom com vontade*",
-    "peixe é vida",
-    "mmmh… melhor coisa do mundo",
+    "*nom nom nom com elegância* Peixe é amor em forma de comida",
+    "Isso aqui é terapia com escamas",
+    "Comendo como se não houvesse amanhã... porque amanhã pode não ter peixe",
   ],
 
   full: [
-    "SOCORRO EU VOU EXPLODIR DE PEIXE",
-    "bucho lotado… não cabe nem ar",
-    "comi demais e agora tô arrependido… mas faria de novo",
+    "Socorro... virei um balão de peixe com pernas",
+    "Estou oficialmente 87% peixe agora",
+    "Comi tanto que meu nome agora é Pinguim Recheado",
   ],
 
-  fullSleep: ["Tô entrando em coma alimentar… até mais"],
+  fullSleep: ["Tô entrando em coma gastronômico... me acorda em 2028"],
 
   fishing: [
-    "aff… lá vou eu de novo ser explorador de gelo",
-    "ninguém me dá peixe de graça nessa vida né…",
-    "pescar é sofrimento disfarçado de hobby",
-    "se vier filé mignon eu perdoo o universo",
+    "Lá vou eu ser pescador profissional... de novo",
+    "Trabalhando honestamente pra sustentar meu vício em peixe",
+    "Se eu voltar sem peixe, finjo que fui atacado por uma foca",
+    "Pescar é só uma desculpa chique pra tomar vento gelado na cara",
   ],
 
   flying: [
-    "*bate asinha com esforço*",
-    "sou um pinguim voador… por 3 segundos",
-    "*flap flap cansado*",
+    "*bate as asas com otimismo* Hoje é o dia que eu viro águia!",
+    "Sou um pinguim voador... por aproximadamente 2,7 segundos",
+    "Flap flap... isso é aerodinâmica ou só desespero?",
   ],
 
   turningBack: [
-    "*olha desconfiado pra trás*",
-    "tô sentindo que vão me clicar de novo…",
-    "*olhar de quem já sofreu*",
+    "*olha pra trás com desconfiança fashion*",
+    "Tô sentindo que vão me clicar... minha intuição de pinguim nunca erra",
+    "Se for pra me bater, pelo menos avisa antes",
   ],
 
   // Frases especiais
   dropped: [
-    "Tá me jogando de novo? Sério isso?",
-    "Dói, sabia? … emocionalmente também",
-    "*olhar de profunda decepção e julgamento*",
-    "Mais uma vez e eu deleto minha existência",
+    "De novo me jogando? Eu sou pinguim, não peteca!",
+    "*suspiro dramático* Meu terapeuta vai cobrar hora extra por isso...",
+    "Tá testando minha paciência ou minha capacidade de perdoar?",
   ],
 
   love: [
-    "…… te amo, tá? Não conta pra ninguém",
-    "♥♥♥ (mas finge que não viu)",
-    "*abraço imaginário desajeitado*",
-    "você é meu peixe favorito da vida",
+    "Tá... eu admito. Você é minha pessoa favorita do planeta Terra (e da Antártida)",
+    "*abraço desajeitado mas cheio de amor*",
+    "Você derrete meu coração de gelo todo dia ♥",
+    "Te amo mais que peixe fresco... e olha que isso é muito!",
   ],
 
   rant: [
-    "PARA DE CLICAR EM MIM CAR**LHO!!!",
-    "EU NÃO SOU BRINQUEDO NÃO!!!",
-    "TÁ ACHANDO QUE EU GOSTO DISSO???",
-    "VAI CLICAR NA TUA MÃE!!!",
+    "NÃO SOU BRINQUEDO NÃO, SEU SER HUMANO SEM NOÇÃO!",
+    "PARA DE CLICAR EM MIM COMO SE EU FOSSE UM BOTÃO DE ELEVADOR!",
+    "EU TENHO SENTIMENTOS, CARA... e eles estão todos ofendidos agora!",
   ],
 
   fishLow: [
-    "meus peixinhos… tão indo embora…",
-    "só mais uns 3… não me abandona assim",
-    "tá acabando o estoque… socorro",
+    "Meus peixinhos estão acabando... tô quase virando vegano de tristeza",
+    "Só mais uns peixinhos... não me abandona nessa hora difícil",
   ],
 
-  fishLast: ["ÚLTIMO PEIXINHO DO APOCALIPSE!!!"],
+  fishLast: ["ÚLTIMO PEIXINHO!!! Isso é o apocalipse ou só segunda-feira?"],
 
   fishEmpty: [
-    "…… sem peixe = pinguim morto por dentro",
-    "Tô morrendo de fome e você aí de boa?",
-    "Cadê meu amor em forma de peixe???",
-    "Vamos jogar ou eu entro em greve?",
+    "Sem peixe = pinguim em crise existencial",
+    "Cadê meu combustível emocional???",
+    "Tô em greve de fofura até você me dar peixe",
   ],
 
   fishRage: [
-    "QUERO PEIXE AGORA OU EU GRITO",
-    "PEIXEEEEEEEEEEEE!!!!!!",
-    "VOCÊ TÁ ME MATANDO DEVAGAR SEM PEIXE",
-    "É SÓ UM PEIXINHO… NÃO Custa NADA",
+    "PEIXE AGORA OU EU FAÇO UMA PERFORMANCE DE DRAMA SHAKESPEARIANO!",
+    "EU EXIJO MEU DIREITO CONSTITUCIONAL A PEIXE!",
+    "É SÓ UM PEIXINHO... NÃO PRECISA SER TÃO DIFÍCIL, UNIVERSO!",
   ],
 
   fishHudFishingPrompt: [
-    "Tá me mandando trabalhar né, seu preguiçoso?",
-    "Beleza… vou pescar… mas só por você <3",
-    "Se eu voltar sem peixe a culpa é sua",
+    "Beleza... vou pescar. Mas só porque você pediu com esses olhinhos bonitos",
+    "Trabalhando pra sustentar esse relacionamento tóxico com fome",
+    "Se eu não voltar, conta pras próximas gerações que eu tentei",
   ],
 
-  loveSymbol: ["♥", "♡", "<3 (mas de verdade)"],
+  loveSymbol: ["♥", "♡", "<3", "💙"],
 
   snowmanFlirt: [
-    "você é frio… mas derrete meu coraçãozinho",
-    "se eu te abraçar eu viro água… vale o risco?",
-    "posso te admirar até virar estátua de gelo?",
-    "você caiu do céu ou é só mais um floco perfeito?",
+    "Você é tão frio... mas ainda consegue esquentar meu coraçãozinho",
+    "Se eu te abraçar eu viro poça... mas valeria cada segundo derretido",
+    "Posso te derreter com meu charme de pinguim?",
   ],
 
   shootingStarWish: [
-    "faz um pedido comigo… mas pede peixe pra mim tá?",
-    "estrela cadente! Pede pra eu nunca ficar sem peixe",
-    "vamos desejar juntos… eu começo: PEIXE ETERNO",
+    "Estrela cadente! Rápido, pede peixe eterno pra mim",
+    "Faz um pedido... mas o meu já é: mais momentos assim com você",
+    "Desejo feito: que esse pinguim nunca fique sem você (e sem peixe)",
   ],
 
-  cruzeiro: ["ZÊÊÊÊÊROOO!!!"],
+  cruzeiro: ["ZÊÊÊÊÊROOO!!! ⚽🔥"],
 };
 
 window.PenguinPet.behaviors = [

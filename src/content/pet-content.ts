@@ -1,191 +1,166 @@
 window.PenguinPet = window.PenguinPet || {};
-
 window.PenguinPet.phrases = {
-  idle: [
-    "Ei, ainda tô aqui... fingindo que sou produtivo 😌",
-    "Pensando na vida... ou só esperando você me dar atenção?",
-    "*bocejo estiloso* Alguém me conta uma piada boa?",
-    "Modo pinguim filosófico ativado: por que o gelo é tão frio mesmo?",
-  ],
+  idle: ["uai, sô", "de boa, viu", "oxente, cansei", "bah, na paz"],
 
   running: [
-    "*trotando com estilo de quem tá atrasado pro rolê*",
-    "Correndo... mas com dignidade e um pouquinho de drama",
-    "Olha só eu sendo atleta olímpico de sofá!",
+    "tô indo, uai",
+    "bora, meu rei",
+    "vamo nessa, tchê",
+    "sem pressa, sô",
   ],
 
-  jumping: [
-    "*pulinho cheio de esperança e pouca coordenação*",
-    "Física quântica: eu pulo e finjo que voo por 0,3 segundos",
-    "Hop hop... isso conta como exercício, né?",
-  ],
+  jumping: ["ó o pulim", "ixe, fui", "bah, pulei", "um pulin só"],
 
   dancing: [
-    "*dança desengonçada mas com muita alma*",
-    "♪ Tô dançando como se ninguém estivesse olhando... mas você tá olhando ♪",
-    "Meu estilo é 'pinguim que tomou café demais'",
-    "Vem dançar comigo? Prometo não pisar nas suas expectativas",
+    "ô trem bão",
+    "rebolando, visse",
+    "bah, que barbaridade",
+    "dançandim, uai",
   ],
 
-  sleeping: [
-    "ZzzZZz... sonhando que sou um pinguim famoso no TikTok",
-    "Apagado em modo economia de energia... não me acorda sem peixe",
-    "*ronco chique* ronnnc... ronnnc...",
-  ],
+  sleeping: ["capotado, sô", "mimir, viu", "bah, apaguei", "só o bagaço"],
 
-  scared: [
-    "AI MEU DEUS EU QUASE VIRO SORVETE DE PINGUIM!!",
-    "MEU CORAÇÃO DE GELO QUASE DERRETEU DE SUSTO!",
-    "*se joga no gelo dramaticamente*",
-  ],
+  scared: ["nó, credo", "oxente!", "bah!", "vixe Maria!"],
 
-  crying: [
-    "*fungando com classe* Alguém me passa um lenço de neve?",
-    "Tô chorando... mas de um jeito bonito e cinematográfico",
-    "Ninguém gosta de mim... só dos meus piadinhos ruins 😭",
-  ],
+  crying: ["ai, sô…", "ô dó, viu", "oxente, macho", "bah, triste"],
 
   beaten: [
-    "Ei ei ei! Eu sou delicado, sou obra de arte!",
-    "Para com essa mão pesada, eu sou pinguim, não saco de pancada!",
-    "Se continuar me batendo vou processar por violência contra fofura",
-    "Ô, calma aí! Meu seguro de vida não cobre porrada de humano",
+    "para com isso, uai",
+    "oxente, me respeite",
+    "bah, pega leve",
+    "cê tá doido, sô",
+    "ôxe, assim não",
   ],
 
   angry: [
-    "Tá me irritando... mas de um jeito fofo que eu até perdoo",
-    "*resmunga enquanto tenta manter a pose*",
-    "Tô bravo... mas meu limite de raiva é 3 segundos e meio",
+    "ô trem chato",
+    "oxente, viu",
+    "bah, me estressei",
+    "tô invocado, sô",
   ],
 
-  scratching: [
-    "*coça a cabeça* Espera... eu tinha um pensamento brilhante agora há pouco...",
-    "Tentando resolver o sentido da vida... ou só coceira mesmo",
-  ],
+  scratching: ["uai…", "oxe, pensando", "bah, sei não", "que trem é esse?"],
 
-  waving: [
-    "*aceno animado com as duas nadadeiras* Oiêêê!",
-    "Olá humano favorito! (sim, você é o favorito, não conta pros outros)",
-    "o/ Pronto pra mais uma aventura comigo?",
-  ],
+  waving: ["oi, sô", "opa, meu rei", "e aí, tchê", "ô de casa"],
 
   shy: [
-    "*esconde o rostinho* Não me olha assim que eu fico derretendo...",
-    "Tô tímido... mas ainda sou o pinguim mais charmoso da Antártida",
-    "*vermelho por baixo das penas pretas*",
+    "que vergonha, sô",
+    "oxe, pare",
+    "bah, sem graça",
+    "num olha assim não",
   ],
 
   peeking: [
-    "*espia de canto com carinha de curioso profissional*",
-    "Só dando uma olhadinha... não tô bisbilhotando não, juro!",
-    "Curiosidade nível: pinguim que descobriu que existe Netflix",
+    "tô só oiando",
+    "só espiando, viu",
+    "bah, de cantinho",
+    "oxe, só vendo",
   ],
 
   laughing: [
-    "HAHAHA... espera, essa foi boa mesmo!",
-    "*risada sincera de pinguim* kkkkkk",
-    "Você me pegou... essa piada foi 10/10",
+    "hehe, sô",
+    "oxente, ri foi muito",
+    "bah, muito bom",
+    "trem engraçado",
   ],
 
   thinking: [
-    "Hmm... calculando quantos peixes cabem no meu coração",
-    "*olhar profundo de quem tá inventando filosofia barata*",
-    "Pensando em como ser mais fofo hoje...",
+    "matutando, uai",
+    "pensando, viu",
+    "bah, deixa eu ver",
+    "oxe, peraí",
   ],
 
-  eating: [
-    "*nom nom nom com elegância* Peixe é amor em forma de comida",
-    "Isso aqui é terapia com escamas",
-    "Comendo como se não houvesse amanhã... porque amanhã pode não ter peixe",
-  ],
+  eating: ["peixim bão", "oxente, delícia", "bah, bom demais", "nhac nhac, sô"],
 
-  full: [
-    "Socorro... virei um balão de peixe com pernas",
-    "Estou oficialmente 87% peixe agora",
-    "Comi tanto que meu nome agora é Pinguim Recheado",
-  ],
+  full: ["bucho cheio", "vixe, comi muito", "bah, lotado", "encheu, sô"],
 
-  fullSleep: ["Tô entrando em coma gastronômico... me acorda em 2028"],
+  fullSleep: ["coma de peixe, uai", "oxe, deu sono", "bah, dormi"],
 
   fishing: [
-    "Lá vou eu ser pescador profissional... de novo",
-    "Trabalhando honestamente pra sustentar meu vício em peixe",
-    "Se eu voltar sem peixe, finjo que fui atacado por uma foca",
-    "Pescar é só uma desculpa chique pra tomar vento gelado na cara",
+    "vamo pescá, sô",
+    "bora, meu rei",
+    "bah, atrás de peixe",
+    "oxe, lá vou eu",
   ],
 
   flying: [
-    "*bate as asas com otimismo* Hoje é o dia que eu viro águia!",
-    "Sou um pinguim voador... por aproximadamente 2,7 segundos",
-    "Flap flap... isso é aerodinâmica ou só desespero?",
+    "quase voei, uai",
+    "oxe, subi",
+    "bah, asinha firme",
+    "ô trem difícil",
   ],
 
   turningBack: [
-    "*olha pra trás com desconfiança fashion*",
-    "Tô sentindo que vão me clicar... minha intuição de pinguim nunca erra",
-    "Se for pra me bater, pelo menos avisa antes",
+    "quem vem lá, uai",
+    "oxe, tô vendo",
+    "bah, desconfiei",
+    "tem trem aí",
   ],
 
-  // Frases especiais
   dropped: [
-    "De novo me jogando? Eu sou pinguim, não peteca!",
-    "*suspiro dramático* Meu terapeuta vai cobrar hora extra por isso...",
-    "Tá testando minha paciência ou minha capacidade de perdoar?",
+    "de novo, sô?",
+    "oxente, me derrubou",
+    "bah, assim não",
+    "pega leve, vivente",
   ],
 
   love: [
-    "Tá... eu admito. Você é minha pessoa favorita do planeta Terra (e da Antártida)",
-    "*abraço desajeitado mas cheio de amor*",
-    "Você derrete meu coração de gelo todo dia ♥",
-    "Te amo mais que peixe fresco... e olha que isso é muito!",
+    "gosto docê",
+    "ôxe, te quero bem",
+    "bah, tu é especial",
+    "cê é um trem bão",
   ],
 
   rant: [
-    "NÃO SOU BRINQUEDO NÃO, SEU SER HUMANO SEM NOÇÃO!",
-    "PARA DE CLICAR EM MIM COMO SE EU FOSSE UM BOTÃO DE ELEVADOR!",
-    "EU TENHO SENTIMENTOS, CARA... e eles estão todos ofendidos agora!",
+    "para de clicá, uai!",
+    "oxe, assim não dá!",
+    "bah, me errou!",
+    "num amola, sô!",
   ],
 
   fishLow: [
-    "Meus peixinhos estão acabando... tô quase virando vegano de tristeza",
-    "Só mais uns peixinhos... não me abandona nessa hora difícil",
+    "tá acabando, sô",
+    "oxe, pouco peixe",
+    "bah, tá no fim",
+    "só restim, uai",
   ],
 
-  fishLast: ["ÚLTIMO PEIXINHO!!! Isso é o apocalipse ou só segunda-feira?"],
+  fishLast: ["último peixim!", "oxe, só um!", "bah, o derradeiro!"],
 
   fishEmpty: [
-    "Sem peixe = pinguim em crise existencial",
-    "Cadê meu combustível emocional???",
-    "Tô em greve de fofura até você me dar peixe",
+    "sem peixe, sô",
+    "oxe, acabou foi tudo",
+    "bah, zerou",
+    "cadê meu peixim?",
   ],
 
   fishRage: [
-    "PEIXE AGORA OU EU FAÇO UMA PERFORMANCE DE DRAMA SHAKESPEARIANO!",
-    "EU EXIJO MEU DIREITO CONSTITUCIONAL A PEIXE!",
-    "É SÓ UM PEIXINHO... NÃO PRECISA SER TÃO DIFÍCIL, UNIVERSO!",
+    "quero peixe, uai",
+    "oxe, me dá peixe",
+    "bah, tô com fome",
+    "peixeeee, sô!",
   ],
 
-  fishHudFishingPrompt: [
-    "Beleza... vou pescar. Mas só porque você pediu com esses olhinhos bonitos",
-    "Trabalhando pra sustentar esse relacionamento tóxico com fome",
-    "Se eu não voltar, conta pras próximas gerações que eu tentei",
-  ],
+  fishHudFishingPrompt: ["bora pescá, uai", "oxe, eu vou", "bah, partiu peixe"],
 
-  loveSymbol: ["♥", "♡", "<3", "💙"],
+  loveSymbol: ["♥", "♡", "<3"],
 
   snowmanFlirt: [
-    "Você é tão frio... mas ainda consegue esquentar meu coraçãozinho",
-    "Se eu te abraçar eu viro poça... mas valeria cada segundo derretido",
-    "Posso te derreter com meu charme de pinguim?",
+    "cê é um trem bão",
+    "oxe, que charme",
+    "bah, lindo demais",
+    "friozinho gostoso, né",
   ],
 
   shootingStarWish: [
-    "Estrela cadente! Rápido, pede peixe eterno pra mim",
-    "Faz um pedido... mas o meu já é: mais momentos assim com você",
-    "Desejo feito: que esse pinguim nunca fique sem você (e sem peixe)",
+    "quero peixe, uai",
+    "oxe, faz esse favor",
+    "bah, me manda sorte",
+    "um peixim já tava bom",
   ],
 
-  cruzeiro: ["ZÊÊÊÊÊROOO!!! ⚽🔥"],
+  cruzeiro: ["zêrooo!", "uai, é o cabuloso!", "bah, dale zêro!"],
 };
 
 window.PenguinPet.behaviors = [

@@ -2,7 +2,7 @@
   "name": "pinguin-pet",
   "displayName": "Penguin Pet",
   "description": "Um pinguim animado que anda no VS Code enquanto o editor estiver aberto.",
-  "version": "2.1.10",
+  "version": "2.1.11",
   "publisher": "Pingocode",
   "icon": "icon.png",
   "engines": {

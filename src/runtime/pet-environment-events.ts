@@ -333,7 +333,6 @@ const createEnvironmentEvents = (deps) => {
       runtime.isMouseInsideViewport = true;
       runtime.mouseX = event.clientX;
       runtime.mouseY = event.clientY;
-      focusKeyboardSurface();
     },
     mouseleave: () => {
       runtime.isMouseInsideViewport = false;

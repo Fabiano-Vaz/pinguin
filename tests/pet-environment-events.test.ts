@@ -88,6 +88,15 @@ const createListenerTarget = () => {
   assert.equal(typeof window.listeners.get("keydown"), "function");
   assert.equal(bodyFocusCalls > 0, true);
 
+  const mouseenter = document.listeners.get("mouseenter");
+  const focusCallsAfterAttach = bodyFocusCalls;
+  mouseenter({ clientX: 10, clientY: 20 });
+  assert.equal(bodyFocusCalls, focusCallsAfterAttach);
+
+  const visibilitychange = document.listeners.get("visibilitychange");
+  visibilitychange();
+  assert.equal(bodyFocusCalls, focusCallsAfterAttach + 1);
+
   const keydown = window.listeners.get("keydown");
   keydown({
     key: "v",

@@ -14,8 +14,8 @@ const hasUneatenFishOnGround = () =>
 const isMiniGameActive = () =>
   Boolean(
     document.body &&
-      (document.body.classList.contains("runner-mode") ||
-        document.body.classList.contains("memory-mode")),
+    (document.body.classList.contains("runner-mode") ||
+      document.body.classList.contains("memory-mode")),
   );
 
 const getPhraseList = (phrases, key, fallbackKey = "idle") => {
@@ -432,7 +432,7 @@ const createFishEconomy = (deps) => {
 
     const btnGames = document.createElement("button");
     btnGames.className = "fish-hud-btn fish-hud-games-toggle";
-    btnGames.textContent = "Mini games";
+    btnGames.textContent = "Games";
     setGamesButtonExpanded(btnGames, false);
     btnGames.addEventListener("click", (event) => {
       event.preventDefault();

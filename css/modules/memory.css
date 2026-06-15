@@ -10,22 +10,13 @@ body.memory-mode .snow-event-snowman,
 body.memory-mode .rain-drop,
 body.memory-mode .lightning-flash,
 body.memory-mode .lightning-bolt,
-body.memory-mode .penguin-debug-panel {
+body.memory-mode .penguin-debug-panel,
+body.memory-mode .fish-stock-hud {
   display: none !important;
 }
 
 body.memory-mode {
   cursor: auto !important;
-}
-
-body.memory-mode .fish-stock-hud {
-  top: 12px;
-  left: 12px;
-  z-index: var(--z-runner-hud);
-}
-
-body.memory-mode .fish-hud-actions {
-  display: none;
 }
 
 .memory-game {
@@ -35,7 +26,7 @@ body.memory-mode .fish-hud-actions {
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 12px;
   overflow: auto;
   pointer-events: auto;
   background:
@@ -50,8 +41,8 @@ body.memory-mode .fish-hud-actions {
 }
 
 .memory-panel {
-  width: min(620px, 100%);
-  padding: 22px;
+  width: min(560px, 100%);
+  padding: 18px;
   border: 1px solid rgba(255, 255, 255, 0.42);
   border-radius: 24px;
   color: var(--color-white);
@@ -101,8 +92,8 @@ body.memory-mode .fish-hud-actions {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  margin: 18px 0;
-  padding: 10px 14px;
+  margin: 14px 0;
+  padding: 8px 12px;
   border-radius: 12px;
   color: #e8f7ff;
   background: rgba(255, 255, 255, 0.09);
@@ -112,12 +103,12 @@ body.memory-mode .fish-hud-actions {
 .memory-board {
   display: grid;
   grid-template-columns: repeat(4, minmax(64px, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .memory-card {
   position: relative;
-  min-height: 104px;
+  min-height: 88px;
   border: 0;
   border-radius: 16px;
   color: #17608d;
@@ -183,8 +174,8 @@ body.memory-mode .fish-hud-actions {
 }
 
 .memory-result {
-  min-height: 26px;
-  margin-top: 14px;
+  min-height: 0;
+  margin-top: 0;
   color: #fff3a4;
   text-align: center;
   font-weight: 700;
@@ -193,6 +184,8 @@ body.memory-mode .fish-hud-actions {
 }
 
 .memory-result.is-visible {
+  min-height: 22px;
+  margin-top: 10px;
   opacity: 1;
 }
 
@@ -229,36 +222,102 @@ body.memory-mode .fish-hud-actions {
 @media (max-width: 520px) {
   .memory-game {
     align-items: flex-start;
-    padding: 12px;
+    padding: 8px;
   }
 
   .memory-panel {
-    padding: 16px;
-    border-radius: 18px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .memory-title {
+    font-size: 22px;
+  }
+
+  .memory-subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+  }
+
+  .memory-close {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
   }
 
   .memory-stats {
     flex-wrap: wrap;
-    margin: 14px 0;
+    margin: 9px 0;
+    padding: 7px 9px;
+    gap: 6px 10px;
     font-size: 12px;
   }
 
   .memory-board {
     grid-template-columns: repeat(3, minmax(58px, 1fr));
-    gap: 9px;
+    gap: 7px;
   }
 
   .memory-card {
-    min-height: 82px;
+    min-height: 62px;
+    border-radius: 12px;
+  }
+
+  .memory-card-face {
+    border-radius: 12px;
+  }
+
+  .memory-card-back {
+    font-size: 28px;
+  }
+
+  .memory-card-front {
+    font-size: 32px;
+  }
+
+  .memory-restart {
+    margin-top: 7px;
+    padding: 7px 13px;
+    font-size: 12px;
+  }
+
+  .memory-hint {
+    margin-top: 7px;
+    font-size: 10px;
   }
 }
 
-@media (max-height: 600px) and (min-width: 521px) {
+@media (max-height: 600px) {
   .memory-game {
     align-items: flex-start;
   }
 
   .memory-card {
-    min-height: 78px;
+    min-height: 58px;
+  }
+
+  .memory-panel {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .memory-stats {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .memory-hint {
+    display: none;
+  }
+}
+
+@media (max-height: 430px) {
+  .memory-subtitle {
+    display: none;
+  }
+
+  .memory-card {
+    min-height: 50px;
   }
 }

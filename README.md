@@ -53,6 +53,7 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 ### Sistema de peixe e rotina inteligente
 
 - HUD de estoque de peixes.
+- Botões rápidos para comer, pescar e acessar os mini games.
 - Queda de peixe no cenário para coleta.
 - Prioridade automática para caça/comida quando necessário.
 - Sessão de pesca com ganho progressivo de peixes.
@@ -66,16 +67,18 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Pulo responsivo e movimentação fluida.
 - Pontuação + recorde salvos.
 - Você ganha peixes ao evoluir no jogo.
-- Ao perder, o Runner consome até `5` peixes ou todo o estoque disponível.
+- Ao perder, o Runner consome `5` peixes.
+- Se houver menos de `5`, todo o estoque restante é consumido.
+- A tela de fim de jogo informa quantos peixes foram perdidos.
 
 ### Memória Gelada
 
 - Tabuleiro com pares de itens de neve e inverno.
 - Contador de jogadas, tempo e pares encontrados.
 - Cartas acertadas permanecem viradas e destacadas no tabuleiro.
-- Cada par encontrado adiciona `3` peixes ao estoque.
+- Cada par encontrado adiciona `2` peixes ao estoque.
 - Cada tentativa errada remove `1` peixe.
-- O HUD de peixes permanece visível durante a partida.
+- O estoque de peixes permanece visível no painel da partida.
 - O consumo automático de peixes fica pausado enquanto o jogo está aberto.
 - Se o estoque chegar a zero, a partida termina em game over.
 - Após o game over, saia do jogo para o pinguim voltar a pescar.
@@ -87,7 +90,12 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 
 - `V`: pulo especial (toques repetidos aumentam o impulso, como tentativa de voo).
 - `M`: abrir ou fechar o jogo da memória.
-- `Mini games`: botão abaixo de `Pescar` para escolher entre Runner e Memória.
+
+### Menu de mini games
+
+- Clique em `Mini games`, abaixo do botão `Pescar`.
+- Escolha `Runner` ou `Memória` no submenu.
+- Os atalhos de teclado continuam disponíveis.
 
 ### No Runner
 

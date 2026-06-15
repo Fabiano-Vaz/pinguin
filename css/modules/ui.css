@@ -68,6 +68,42 @@
   transform: translateY(1px);
 }
 
+.fish-hud-games-toggle {
+  margin-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.fish-hud-games-menu {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 1px;
+  padding-top: 3px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.fish-hud-games-menu.is-open {
+  display: flex;
+}
+
+.fish-hud-game-option {
+  width: 100%;
+  padding: 4px 5px;
+  border: 0;
+  border-radius: 6px;
+  color: #d8f2ff;
+  background: rgba(46, 139, 192, 0.28);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fish-hud-game-option:hover,
+.fish-hud-game-option:focus-visible {
+  color: var(--color-white);
+  background: rgba(68, 174, 231, 0.48);
+}
+
 .penguin-debug-panel {
   position: fixed;
   right: 12px;

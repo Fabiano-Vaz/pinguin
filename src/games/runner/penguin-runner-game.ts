@@ -52,9 +52,26 @@ if (runner) {
   };
 
   const endGame = () => {
+    if (game.isGameOver) return;
     game.isGameOver = true;
     runner.shakeStage();
     runner.setPenguinSprite("front");
+
+    const runtime = getPenguinPet().runtime || pet.runtime;
+    const fishStock =
+      runtime && typeof runtime.getFishStock === "function"
+        ? runtime.getFishStock()
+        : runtime && Number.isFinite(runtime.fishStock)
+          ? Number(runtime.fishStock)
+          : 0;
+    const fishPenalty = Math.min(5, Math.max(0, Math.floor(fishStock)));
+    if (
+      fishPenalty > 0 &&
+      runtime &&
+      typeof runtime.consumeFishStock === "function"
+    ) {
+      runtime.consumeFishStock(fishPenalty);
+    }
 
     const scoreInt = Math.floor(game.score);
     if (scoreInt > game.bestScore) {
@@ -71,7 +88,7 @@ if (runner) {
       runner.setPenguinSprite(randomReaction);
     }, 260);
 
-    message.textContent = `Fim de jogo | Pontos ${scoreInt} | Recorde ${game.bestScore} | Space para reiniciar`;
+    message.textContent = `Fim de jogo | -${fishPenalty} peixes | Pontos ${scoreInt} | Recorde ${game.bestScore} | Space para reiniciar`;
     hint.textContent = "";
   };
 
@@ -284,6 +301,9 @@ if (runner) {
     requestAnimationFrame(frame);
   };
 
+  runner.start = startGame;
+  runner.stop = stopGame;
+
   const isJumpKey = (event: KeyboardEvent): boolean =>
     event.code === "ArrowUp" ||
     event.code === "KeyW" ||
@@ -305,6 +325,7 @@ if (runner) {
 
     if (!game.active) {
       if (isStartKey(event)) {
+        if (window.PenguinMemoryGame && window.PenguinMemoryGame.active) return;
         event.preventDefault();
         startGame();
       }

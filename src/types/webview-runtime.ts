@@ -1,7 +1,10 @@
 export type UnknownRecord = Record<string, any>;
 
 export interface PenguinRuntime {
-  addFishStock?: (amount: number) => void;
+  addFishStock?: (amount: number) => number;
+  consumeFishStock?: (amount: number) => boolean;
+  getFishStock?: () => number;
+  fishStock?: number;
   isFishCursorEnabled?: boolean;
   setFishCursorEnabled?: (enabled: boolean) => void;
   [key: string]: any;
@@ -200,6 +203,8 @@ export interface PenguinRunnerGameGlobal {
   pet: PenguinPetGlobal;
   runnerConfig: UnknownRecord;
   game: RunnerGameState;
+  start?: () => void;
+  stop?: () => void;
   sprites: Record<string, string>;
   snowmanObstacleImage: string;
   helicopterVariants: RunnerHelicopterVariant[];
@@ -263,4 +268,11 @@ export interface PenguinRunnerGameGlobal {
   ensureSafeSpawnGap?: () => boolean;
   updateObstacles?: (deltaMs: number) => void;
   realignObstacleY?: () => void;
+}
+
+export interface PenguinMemoryGameGlobal {
+  active: boolean;
+  start: () => void;
+  stop: () => void;
+  restart: () => void;
 }

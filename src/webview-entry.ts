@@ -24,3 +24,4 @@ import "./main";
 import "./games/runner/runner-context";
 import "./games/runner/runner-obstacles";
 import "./games/runner/penguin-runner-game";
+import "./games/memory/snow-memory-game";

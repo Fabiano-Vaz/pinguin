@@ -2,6 +2,7 @@ import type {
   PenguinPetEffectsRegistry,
   PenguinPetGlobal,
   PenguinPetModulesRegistry,
+  PenguinMemoryGameGlobal,
   PenguinRunnerGameGlobal,
   RunnerModulesRegistry,
 } from "./webview-runtime";
@@ -18,6 +19,7 @@ declare global {
     PenguinRunnerModules?: RunnerModulesRegistry;
     PenguinPetShared?: any;
     PenguinRunnerGame?: PenguinRunnerGameGlobal;
+    PenguinMemoryGame?: PenguinMemoryGameGlobal;
     PENGUIN_CONFIG?: any;
     PENGUIN_ASSETS?: Record<string, string>;
   }

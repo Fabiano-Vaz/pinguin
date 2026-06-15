@@ -1,47 +1,66 @@
 window.PenguinPet = window.PenguinPet || {};
 window.PenguinPet.phrases = {
-  idle: ["uai, sô", "de boa, viu", "oxente, cansei", "bah, na paz"],
+  idle: [
+    "tá tranquilo por aqui...",
+    "de boa, respirando o ar condicionado",
+    "tô só te fazendo companhia, uai",
+    "calma, que o dia tá bom",
+  ],
 
   running: [
-    "tô indo, uai",
-    "bora, meu rei",
-    "vamo nessa, tchê",
-    "sem pressa, sô",
+    "vou dar uma voltinha",
+    "bora explorar um pouquinho",
+    "tô de passagem, sô",
+    "andando com estilo",
   ],
 
-  jumping: ["ó o pulim", "ixe, fui", "bah, pulei", "um pulin só"],
+  jumping: ["ó o pulim", "ixe, fui", "pulei", "um pulin só"],
 
   dancing: [
-    "ô trem bão",
-    "rebolando, visse",
-    "bah, que barbaridade",
-    "dançandim, uai",
+    "reboladinho de felicidade",
+    "trem bão demais!",
+    "dançando pro dia melhorar",
+    "olha o passinho",
   ],
 
-  sleeping: ["capotado, sô", "mimir, viu", "bah, apaguei", "só o bagaço"],
+  sleeping: ["capotado...", "mimir, viu", "apaguei", "só o bagaço"],
 
-  scared: ["nó, credo", "oxente!", "bah!", "vixe Maria!"],
+  scared: ["nó, credo", "oxente!", "vixe Maria!"],
 
-  crying: ["ai, sô…", "ô dó, viu", "oxente, macho", "bah, triste"],
+  crying: [
+    "tô triste agora...",
+    "ai, dói um pouquinho",
+    "não merecia isso, uai",
+    "tá doendo o bico...",
+  ],
 
   beaten: [
-    "para com isso, uai",
-    "oxente, me respeite",
-    "bah, pega leve",
-    "cê tá doido, sô",
-    "ôxe, assim não",
+    "ei, vai com calma...",
+    "tá me zoando, é?",
+    "para, que eu fico chateadinho",
+    "assim você me derruba de vez",
   ],
 
   angry: [
-    "ô trem chato",
-    "oxente, viu",
-    "bah, me estressei",
-    "tô invocado, sô",
+    "tô um pouquinho irritadinho...",
+    "hmmpf...",
+    "não gostei não",
+    "tá me estressando, viu",
   ],
 
-  scratching: ["uai…", "oxe, pensando", "bah, sei não", "que trem é esse?"],
+  scratching: [
+    "pensando aqui...",
+    "que ideia será...",
+    "matutando alto",
+    "tô bolando um plano",
+  ],
 
-  waving: ["oi, sô", "opa, meu rei", "e aí, tchê", "ô de casa"],
+  waving: [
+    "oi oi! 👋",
+    "e aí, meu humano preferido",
+    "tô aqui te vendo codar",
+    "olááá!",
+  ],
 
   shy: [
     "que vergonha, sô",
@@ -55,112 +74,128 @@ window.PenguinPet.phrases = {
     "só espiando, viu",
     "bah, de cantinho",
     "oxe, só vendo",
+    "só dando uma espiadinha",
+    "tô de olho no seu progresso",
+    "curioso por natureza",
+    "o que você tá fazendo aí?",
   ],
 
   laughing: [
-    "hehe, sô",
-    "oxente, ri foi muito",
-    "bah, muito bom",
-    "trem engraçado",
+    "hehehe, muito bom!",
+    "tá me fazendo rir, sô",
+    "ksksks",
+    "essa foi boa demais",
   ],
 
   thinking: [
-    "matutando, uai",
-    "pensando, viu",
-    "bah, deixa eu ver",
-    "oxe, peraí",
+    "deixa eu pensar...",
+    "ideia vindo...",
+    "tô bolando aqui",
+    "peraí que tá quase",
   ],
 
-  eating: ["peixim bão", "oxente, delícia", "bah, bom demais", "nhac nhac, sô"],
+  ating: [
+    "peixim fresquinho, delícia!",
+    "nham nham nham ✨",
+    "obrigado pelo peixe!",
+    "tá uma maravilha",
+  ],
 
   full: ["bucho cheio", "vixe, comi muito", "bah, lotado", "encheu, sô"],
 
-  fullSleep: ["coma de peixe, uai", "oxe, deu sono", "bah, dormi"],
+  fullSleep: [
+    "coma de peixe ativada zZz",
+    "agora vou tirar um cochilo merecido",
+    "tô no modo off",
+  ],
 
   fishing: [
-    "vamo pescá, sô",
-    "bora, meu rei",
-    "bah, atrás de peixe",
-    "oxe, lá vou eu",
+    "vou tentar pescar pra gente",
+    "bora ver se mordeu",
+    "pescando com carinho",
+    "torce pra eu pegar um grandão",
   ],
 
   flying: [
-    "quase voei, uai",
-    "oxe, subi",
-    "bah, asinha firme",
-    "ô trem difícil",
+    "quase voei de verdade!",
+    "asa bateu forte",
+    "tô me sentindo leve",
+    "voou baixinho, mas voou",
   ],
 
   turningBack: [
-    "quem vem lá, uai",
-    "oxe, tô vendo",
-    "bah, desconfiei",
-    "tem trem aí",
+    "tem alguém aí?",
+    "só verificando...",
+    "tô de olho no perímetro",
+    "quem tá passando?",
   ],
 
   dropped: [
-    "de novo, sô?",
-    "oxente, me derrubou",
-    "bah, assim não",
-    "pega leve, vivente",
+    "ei, cuidado comigo...",
+    "quase me machuquei, uai",
+    "você me derrubou de novo...",
+    "tô meio tonto agora",
   ],
 
   love: [
-    "gosto docê",
-    "ôxe, te quero bem",
-    "bah, tu é especial",
-    "cê é um trem bão",
+    "gosto muito de você, sabia?",
+    "você é meu humano favorito",
+    "cê me faz feliz, sô",
+    "❤️ tô aqui pra te animar",
+    "tu é especial pra mim",
   ],
 
   rant: [
-    "para de clicá, uai!",
-    "oxe, assim não dá!",
-    "bah, me errou!",
-    "num amola, sô!",
+    "para de me clicar tanto!",
+    "ei, tá me perturbando...",
+    "assim eu fico nervoso",
+    "respeita o pinguim!",
   ],
-
   fishLow: [
-    "tá acabando, sô",
-    "oxe, pouco peixe",
-    "bah, tá no fim",
-    "só restim, uai",
+    "tô comendo pouco, hein...",
+    "os peixinhos estão acabando",
+    "preciso repor o estoque",
   ],
 
-  fishLast: ["último peixim!", "oxe, só um!", "bah, o derradeiro!"],
+  fishLast: ["é o último peixim...", "só mais um restinho", "última boquinha"],
 
   fishEmpty: [
-    "sem peixe, sô",
-    "oxe, acabou foi tudo",
-    "bah, zerou",
-    "cadê meu peixim?",
+    "acabou meu peixe...",
+    "tô com fome, sô",
+    "não tem mais nenhum...",
+    "me ajuda a pescar?",
   ],
 
   fishRage: [
-    "quero peixe, uai",
-    "oxe, me dá peixe",
-    "bah, tô com fome",
-    "peixeeee, sô!",
+    "quero peeeixe!",
+    "tô morrendo de fome aqui!",
+    "peixinho pelo amor de deus",
+    "bah, me dá um peixe vai",
   ],
 
-  fishHudFishingPrompt: ["bora pescá, uai", "oxe, eu vou", "bah, partiu peixe"],
+  fishHudFishingPrompt: [
+    "bora pescar juntos?",
+    "vou tentar pegar uns peixes",
+    "partiu repor o estoque!",
+  ],
 
   loveSymbol: ["♥", "♡", "<3"],
 
   snowmanFlirt: [
-    "cê é um trem bão",
-    "oxe, que charme",
-    "bah, lindo demais",
-    "friozinho gostoso, né",
+    "que boneco charmoso",
+    "ele é quase tão bonito quanto eu",
+    "friozinho gostoso né",
+    "tá elegante esse bonequinho",
   ],
 
   shootingStarWish: [
-    "quero peixe, uai",
-    "oxe, faz esse favor",
-    "bah, me manda sorte",
-    "um peixim já tava bom",
+    "quero mais peixes...",
+    "faz meu humano codar feliz",
+    "que hoje seja um dia bom",
+    "estrela, me ajuda aí",
   ],
 
-  cruzeiro: ["zêrooo!", "uai, é o cabuloso!", "bah, dale zêro!"],
+  cruzeiro: ["É O CRUZEIRO, PORRA!", "dale zêrooo!", "vai, rapaz!"],
 };
 
 window.PenguinPet.behaviors = [

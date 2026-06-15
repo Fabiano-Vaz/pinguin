@@ -11,6 +11,13 @@ const DEFAULTS = {
 const hasUneatenFishOnGround = () =>
   Boolean(document.querySelector(".food-fish-drop:not(.eaten)"));
 
+const isMiniGameActive = () =>
+  Boolean(
+    document.body &&
+      (document.body.classList.contains("runner-mode") ||
+        document.body.classList.contains("memory-mode")),
+  );
+
 const getPhraseList = (phrases, key, fallbackKey = "idle") => {
   const candidate = phrases && phrases[key];
   if (Array.isArray(candidate) && candidate.length > 0) return candidate;
@@ -105,7 +112,7 @@ const createFishEconomy = (deps) => {
       noFishTantrumTimeoutId = null;
 
       if (remainingFish > 0) return;
-      if (document.body && document.body.classList.contains("runner-mode")) {
+      if (isMiniGameActive()) {
         scheduleNoFishTantrum();
         return;
       }
@@ -166,7 +173,7 @@ const createFishEconomy = (deps) => {
       noFishAutoFishingTimeoutId = null;
 
       if (remainingFish > 0) return;
-      if (document.body && document.body.classList.contains("runner-mode")) {
+      if (isMiniGameActive()) {
         scheduleNoFishAutoFishing();
         return;
       }
@@ -210,7 +217,7 @@ const createFishEconomy = (deps) => {
       naturalConsumeTimeoutId = null;
 
       if (remainingFish <= 0) return;
-      if (document.body && document.body.classList.contains("runner-mode")) {
+      if (isMiniGameActive()) {
         scheduleNaturalConsume();
         return;
       }
@@ -390,12 +397,26 @@ const createFishEconomy = (deps) => {
     const actions = document.createElement("div");
     actions.className = "fish-hud-actions";
 
+    const gamesMenu = document.createElement("div");
+    gamesMenu.className = "fish-hud-games-menu";
+
+    const setGamesMenuOpen = (open) => {
+      gamesMenu.classList.toggle("is-open", Boolean(open));
+    };
+
+    const setGamesButtonExpanded = (button, expanded) => {
+      if (typeof button.setAttribute === "function") {
+        button.setAttribute("aria-expanded", String(Boolean(expanded)));
+      }
+    };
+
     const btnEat = document.createElement("button");
     btnEat.className = "fish-hud-btn";
     btnEat.textContent = "Comer";
     btnEat.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
+      setGamesMenuOpen(false);
       triggerEat();
     });
 
@@ -405,11 +426,56 @@ const createFishEconomy = (deps) => {
     btnFish.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
+      setGamesMenuOpen(false);
       triggerFishing();
     });
 
+    const btnGames = document.createElement("button");
+    btnGames.className = "fish-hud-btn fish-hud-games-toggle";
+    btnGames.textContent = "Mini games";
+    setGamesButtonExpanded(btnGames, false);
+    btnGames.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const nextOpen = !gamesMenu.classList.contains("is-open");
+      setGamesMenuOpen(nextOpen);
+      setGamesButtonExpanded(btnGames, nextOpen);
+    });
+
+    const btnRunner = document.createElement("button");
+    btnRunner.className = "fish-hud-game-option";
+    btnRunner.textContent = "Runner";
+    btnRunner.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setGamesMenuOpen(false);
+      setGamesButtonExpanded(btnGames, false);
+      const runner = window.PenguinRunnerGame;
+      if (runner && typeof runner.start === "function") {
+        runner.start();
+      }
+    });
+
+    const btnMemory = document.createElement("button");
+    btnMemory.className = "fish-hud-game-option";
+    btnMemory.textContent = "Memória";
+    btnMemory.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setGamesMenuOpen(false);
+      setGamesButtonExpanded(btnGames, false);
+      const memory = window.PenguinMemoryGame;
+      if (memory && typeof memory.start === "function") {
+        memory.start();
+      }
+    });
+
+    gamesMenu.appendChild(btnRunner);
+    gamesMenu.appendChild(btnMemory);
     actions.appendChild(btnEat);
     actions.appendChild(btnFish);
+    actions.appendChild(btnGames);
+    actions.appendChild(gamesMenu);
     hud.appendChild(actions);
 
     document.body.appendChild(hud);

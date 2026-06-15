@@ -5,9 +5,12 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 
 ## 🎬 Demonstração
 
-<h1 align="left">Pressione 'SPACE' para iniciar o mini game</h1>
+### Mini games
 
 ![Minigame Runner](https://raw.githubusercontent.com/Fabiano-Vaz/pinguin/main/assets/gif%20readme/game.gif)
+
+- Pressione `Space` para iniciar o Runner.
+- Pressione `M` para abrir a Memória Gelada.
 
 <h1 align="left">Pinguim Pet</h1>
 
@@ -17,7 +20,7 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 
 - Dá vida ao seu VS Code sem atrapalhar seu fluxo.
 - Tem comportamento dinâmico e imprevisível (não fica repetitivo).
-- Recompensa interação com minigame e sistema de peixes.
+- Recompensa a interação com mini games integrados ao sistema de peixes.
 - Funciona como um “companheiro de mesa” enquanto você programa.
 
 ## 💙 Tudo que ele faz
@@ -54,6 +57,7 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Prioridade automática para caça/comida quando necessário.
 - Sessão de pesca com ganho progressivo de peixes.
 - Frases de fome e convite para jogar quando está sem peixe.
+- O estoque também funciona como recompensa e recurso nos mini games.
 
 ### Minigame Runner integrado
 
@@ -62,12 +66,28 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Pulo responsivo e movimentação fluida.
 - Pontuação + recorde salvos.
 - Você ganha peixes ao evoluir no jogo.
+- Ao perder, o Runner consome até `5` peixes ou todo o estoque disponível.
+
+### Memória Gelada
+
+- Tabuleiro com pares de itens de neve e inverno.
+- Contador de jogadas, tempo e pares encontrados.
+- Cartas acertadas permanecem viradas e destacadas no tabuleiro.
+- Cada par encontrado adiciona `3` peixes ao estoque.
+- Cada tentativa errada remove `1` peixe.
+- O HUD de peixes permanece visível durante a partida.
+- O consumo automático de peixes fica pausado enquanto o jogo está aberto.
+- Se o estoque chegar a zero, a partida termina em game over.
+- Após o game over, saia do jogo para o pinguim voltar a pescar.
+- Layout responsivo para o painel lateral.
 
 ## 🎮 Controles principais
 
 ### Fora do jogo
 
 - `V`: pulo especial (toques repetidos aumentam o impulso, como tentativa de voo).
+- `M`: abrir ou fechar o jogo da memória.
+- `Mini games`: botão abaixo de `Pescar` para escolher entre Runner e Memória.
 
 ### No Runner
 
@@ -75,6 +95,13 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - `Space`, `↑` ou `W`: pular/reiniciar.
 - `↓` ou `S`: abaixar.
 - `Esc`: sair do runner.
+
+### Na Memória Gelada
+
+- Clique nas cartas para encontrar os pares.
+- Encontre pares para ganhar peixes e evite erros para não perder o estoque.
+- Use `Embaralhar novamente` para iniciar uma nova rodada.
+- `M` ou `Esc`: sair do jogo.
 
 ## 🚀 Como usar
 

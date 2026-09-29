@@ -122,12 +122,6 @@ export {};
   const petConfig = {
     speech: speechConfig,
     motion: motionConfig,
-    prelude: {
-      emotions: ["shy"],
-      emotionDurationMs: 1600,
-      idleDurationMs: 350,
-      chance: 0.06,
-    },
     behavior: {
       delayMinMs: 5000,
       delayVariationMs: 7000,
@@ -172,10 +166,6 @@ export {};
       BUBBLE_INTERVAL_JITTER_MS: speechConfig.intervalJitterMs,
       BUBBLE_SHOW_CHANCE: speechConfig.showChance,
       EMOTION_DURATION_MULTIPLIER: speechConfig.emotionDurationMultiplier,
-      PRELUDE_EMOTIONS: petConfig.prelude.emotions,
-      PRELUDE_EMOTION_DURATION_MS: petConfig.prelude.emotionDurationMs,
-      PRELUDE_IDLE_DURATION_MS: petConfig.prelude.idleDurationMs,
-      PRELUDE_CHANCE: petConfig.prelude.chance,
       BEHAVIOR_DELAY_MIN_MS: petConfig.behavior.delayMinMs,
       BEHAVIOR_DELAY_VARIATION_MS: petConfig.behavior.delayVariationMs,
       STEP_TRANSITION_DELAY_MS: petConfig.behavior.stepTransitionDelayMs,

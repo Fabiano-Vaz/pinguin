@@ -1,3 +1,6 @@
+import { FishStockLedger, type FishStockStorage } from "./fish-stock-ledger.ts";
+import { createFishStockStorage } from "./fish-stock-storage.ts";
+
 const DEFAULTS = {
   initialFishStock: 5,
   noFishTantrumMinMs: 8000,
@@ -5,7 +8,7 @@ const DEFAULTS = {
   noFishAutoFishDelayMs: 10000,
   naturalConsumeMinMs: 45000,
   naturalConsumeMaxMs: 100000,
-  naturalConsumeEnabled: true,
+  naturalConsumeEnabled: false,
 };
 
 const hasUneatenFishOnGround = () =>
@@ -44,7 +47,22 @@ const createFishEconomy = (deps) => {
     ...(deps && deps.settings ? deps.settings : {}),
   };
 
-  let remainingFish = settings.initialFishStock;
+  const now: () => number = deps?.now || Date.now;
+  const storage: FishStockStorage = deps?.storage || createFishStockStorage();
+  let saved: unknown;
+  try { saved = storage.load(); } catch { /* Storage unavailable: keep the session usable. */ }
+  const ledger = new FishStockLedger(saved, settings.initialFishStock, now);
+  let remainingFish = ledger.balance;
+  let expirationTimeoutId = null;
+  let disposed = false;
+  const persistStock = () => {
+    try { storage.save(ledger.snapshot); } catch { /* Keep the current session balance. */ }
+  };
+  const stockListeners = new Set<() => void>();
+  const subscribeFishStock = (listener: () => void) => {
+    stockListeners.add(listener);
+    return () => { stockListeners.delete(listener); };
+  };
   let fishStockCountEl = null;
   let lastFishWarningLevel = null;
   let noFishTantrumTimeoutId = null;
@@ -217,7 +235,7 @@ const createFishEconomy = (deps) => {
       naturalConsumeTimeoutId = null;
 
       if (remainingFish <= 0) return;
-      if (isMiniGameActive()) {
+      if (isMiniGameActive() || runtime.isWardrobeOpen) {
         scheduleNaturalConsume();
         return;
       }
@@ -274,8 +292,8 @@ const createFishEconomy = (deps) => {
   };
 
   const updateFishStockHud = () => {
-    if (!fishStockCountEl) return;
-    fishStockCountEl.textContent = String(Math.max(0, remainingFish));
+    if (fishStockCountEl) fishStockCountEl.textContent = String(Math.max(0, remainingFish));
+    stockListeners.forEach((listener) => listener());
   };
 
   const triggerFishing = () => {
@@ -493,39 +511,64 @@ const createFishEconomy = (deps) => {
     }
   };
 
-  const consumeFishStock = (amount = 1) => {
-    const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
-    if (remainingFish < safeAmount) return false;
+  const scheduleExpiration = () => {
+    if (expirationTimeoutId !== null) clearTimeout(expirationTimeoutId);
+    expirationTimeoutId = null;
+    if (disposed) return;
+    const next = ledger.nextExpiration;
+    if (next === undefined) return;
+    // Recheck wall time after suspension/clock changes, without one timer per fish.
+    expirationTimeoutId = setTimeout(() => {
+      expirationTimeoutId = null;
+      refreshExpiration();
+      scheduleExpiration();
+    }, Math.max(1, Math.min(next - now(), 60000)));
+  };
 
-    remainingFish -= safeAmount;
+  const syncStock = () => {
+    remainingFish = ledger.balance;
     runtime.fishStock = remainingFish;
-    updateFishStockHud();
-    announceFishIfNeeded();
-
+    persistStock();
+    scheduleExpiration();
+    setFishCursorEnabled(remainingFish > 0);
     if (remainingFish <= 0) {
-      setFishCursorEnabled(false);
       scheduleNoFishTantrum();
       scheduleNoFishAutoFishing();
       clearNaturalConsume();
     } else {
-      setFishCursorEnabled(true);
+      clearNoFishTantrum();
+      clearNoFishAutoFishing();
       scheduleNaturalConsume();
     }
+    updateFishStockHud();
+  };
 
+  const refreshExpiration = () => {
+    if (disposed) return;
+    if (ledger.expire() > 0) {
+      syncStock();
+      announceFishIfNeeded();
+    }
+  };
+
+  const consumeFishStock = (amount = 1) => {
+    refreshExpiration();
+    const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
+    if (!ledger.spend(safeAmount)) return false;
+    syncStock();
+    announceFishIfNeeded();
     return true;
   };
 
   const addFishStock = (amount = 1) => {
+    refreshExpiration();
     const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
-    remainingFish += safeAmount;
-    runtime.fishStock = remainingFish;
-    updateFishStockHud();
+    if (ledger.add(safeAmount)) syncStock();
+    return remainingFish;
+  };
 
-    clearNoFishTantrum();
-    clearNoFishAutoFishing();
-    setFishCursorEnabled(true);
-    scheduleNaturalConsume();
-
+  const getFishStock = () => {
+    refreshExpiration();
     return remainingFish;
   };
 
@@ -552,19 +595,20 @@ const createFishEconomy = (deps) => {
   };
 
   const initialize = () => {
-    setFishCursorEnabled(remainingFish > 0);
+    ledger.expire();
+    remainingFish = ledger.balance;
     mountFishStockHud();
-    runtime.fishStock = remainingFish;
-
-    if (remainingFish <= 0) {
-      scheduleNoFishTantrum();
-      scheduleNoFishAutoFishing();
-    } else {
-      scheduleNaturalConsume();
-    }
+    syncStock();
+    document.addEventListener?.("visibilitychange", refreshExpiration);
+    window.addEventListener?.("focus", refreshExpiration);
   };
 
   const dispose = () => {
+    disposed = true;
+    if (expirationTimeoutId !== null) clearTimeout(expirationTimeoutId);
+    document.removeEventListener?.("visibilitychange", refreshExpiration);
+    window.removeEventListener?.("focus", refreshExpiration);
+    stockListeners.clear();
     clearNoFishTantrum();
     clearNoFishAutoFishing();
     clearNaturalConsume();
@@ -573,7 +617,8 @@ const createFishEconomy = (deps) => {
   runtime.setFishCursorEnabled = setFishCursorEnabled;
   runtime.consumeFishStock = consumeFishStock;
   runtime.addFishStock = addFishStock;
-  runtime.getFishStock = () => remainingFish;
+  runtime.getFishStock = getFishStock;
+  runtime.subscribeFishStock = subscribeFishStock;
 
   return {
     initialize,
@@ -581,7 +626,8 @@ const createFishEconomy = (deps) => {
     complainNoFishOnClick,
     consumeFishStock,
     addFishStock,
-    getFishStock: () => remainingFish,
+    getFishStock,
+    subscribeFishStock,
   };
 };
 

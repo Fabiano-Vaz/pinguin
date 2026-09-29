@@ -3,6 +3,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { buildAssetPaths, getMergedConfig } from "./manifest";
 
+import { FISH_STOCK_KEY, parseFishStock } from "./runtime/fish-stock-ledger";
+
 const SIDEBAR_VIEW_ID = "pinguinPet.sidebar";
 type RuntimeFlags = {
   debugPanel: boolean;
@@ -12,7 +14,7 @@ type RuntimeFlags = {
 export function activate(context: vscode.ExtensionContext) {
   const runtimeFlags = loadRuntimeFlags(context.extensionPath);
   const provider = new PenguinSidebarProvider(
-    context.extensionUri,
+    context,
     runtimeFlags,
   );
   context.subscriptions.push(
@@ -44,23 +46,34 @@ export function activate(context: vscode.ExtensionContext) {
 
 class PenguinSidebarProvider implements vscode.WebviewViewProvider {
   constructor(
-    private readonly extensionUri: vscode.Uri,
+    private readonly context: vscode.ExtensionContext,
     private readonly runtimeFlags: RuntimeFlags,
   ) {}
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
+    const extensionUri = this.context.extensionUri;
+    const listener = webviewView.webview.onDidReceiveMessage(async (message: unknown) => {
+      if (!message || typeof message !== "object") return;
+      const incoming = message as { type?: string; snapshot?: unknown };
+      if (incoming.type !== "penguin:save-fish-stock") return;
+      const snapshot = parseFishStock(incoming.snapshot);
+      if (snapshot) await this.context.globalState.update(FISH_STOCK_KEY, snapshot);
+    });
+    this.context.subscriptions.push(listener);
+    webviewView.onDidDispose(() => listener.dispose());
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
-        vscode.Uri.joinPath(this.extensionUri, "assets"),
-        vscode.Uri.joinPath(this.extensionUri, "css"),
-        vscode.Uri.joinPath(this.extensionUri, "dist", "webview"),
+        vscode.Uri.joinPath(extensionUri, "assets"),
+        vscode.Uri.joinPath(extensionUri, "css"),
+        vscode.Uri.joinPath(extensionUri, "dist", "webview"),
       ],
     };
     webviewView.webview.html = getWebviewContent(
       webviewView.webview,
-      this.extensionUri,
+      extensionUri,
       this.runtimeFlags,
+      parseFishStock(this.context.globalState.get(FISH_STOCK_KEY)) ?? null,
     );
   }
 }
@@ -69,6 +82,7 @@ function getWebviewContent(
   webview: vscode.Webview,
   extensionUri: vscode.Uri,
   runtimeFlags: RuntimeFlags,
+  fishStock: ReturnType<typeof parseFishStock> | null,
 ) {
   const cssUri = webview.asWebviewUri(
     vscode.Uri.joinPath(extensionUri, "css", "style.css"),
@@ -114,6 +128,7 @@ function getWebviewContent(
 </head>
 <body tabindex="0" data-keyboard-surface="penguin-pet">
   <script nonce="${nonce}">
+    window.PENGUIN_FISH_STOCK = ${JSON.stringify(fishStock)};
     window.PENGUIN_ASSETS = ${JSON.stringify(webviewAssets)};
     window.PENGUIN_CONFIG = ${JSON.stringify(webviewConfig)};
   </script>

@@ -17,17 +17,17 @@ modules.createRunnerAssets = ({
   };
 
   const sprites = {
-    running: resolveSprite("running", "assets/pinguin correndo.svg"),
+    running: resolveSprite("running", "css:running"),
     crouching: resolveSprite(
       "runningCrouched",
-      "assets/pinguin correndo abaixado.svg",
+      "css:runningCrouched",
     ),
-    jumping: resolveSprite("trace", "assets/trace.svg"),
-    front: resolveSprite("default", "assets/pinguin.svg"),
-    crying: resolveSprite("crying", "assets/pinguin chorando.svg"),
-    angry: resolveSprite("angry", "assets/pinguin com raiva.svg"),
-    flying: resolveSprite("flying", "assets/pinguin voando.svg"),
-    caveirinha: resolveSprite("caveirinha", "assets/pinguin caveirinha.svg"),
+    jumping: resolveSprite("trace", "css:trace"),
+    front: resolveSprite("default", "css:default"),
+    crying: resolveSprite("crying", "css:crying"),
+    angry: resolveSprite("angry", "css:angry"),
+    flying: resolveSprite("flying", "css:flying"),
+    caveirinha: resolveSprite("caveirinha", "css:caveirinha"),
   };
 
   const runnerBackgroundDarkBImage = resolveSprite(
@@ -35,7 +35,7 @@ modules.createRunnerAssets = ({
     "assets/backgroung-darkB.png",
   );
   const runnerMoonImage = resolveSprite("moon", "assets/lua.png");
-  const snowmanObstacleImage = resolveSprite("snowman", "assets/snowman.svg");
+  const snowmanObstacleImage = resolveSprite("snowman", "css:snowman");
 
   const helicopterVariants = [
     {

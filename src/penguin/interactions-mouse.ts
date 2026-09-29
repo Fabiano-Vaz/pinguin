@@ -104,7 +104,7 @@ export {};
           this.setState("peeking");
           if (Math.random() < 0.45) this.speak();
 
-          setTimeout(() => {
+          this.scheduleReaction(() => {
             if (
               typeof this.enforceFoodPriority === "function" &&
               this.enforceFoodPriority()
@@ -122,7 +122,7 @@ export {};
           this.setState("peeking");
           if (Math.random() < 0.45) this.speak();
 
-          setTimeout(() => {
+          this.scheduleReaction(() => {
             if (
               typeof this.enforceFoodPriority === "function" &&
               this.enforceFoodPriority()
@@ -141,7 +141,7 @@ export {};
         this.speed = SPEED_CHASE;
         this.moveToPosition(mouseX, this.getFlyMinY() + halfPenguinSize, SPEED_CHASE, true);
 
-        setTimeout(() => {
+        this.scheduleReaction(() => {
           if (
             typeof this.enforceFoodPriority === "function" &&
             this.enforceFoodPriority()
@@ -156,9 +156,9 @@ export {};
             SPEED_WALK,
           );
 
-          const waitLanding = setInterval(() => {
+          this.setManagedInterval("reaction", "mouse-landing", () => {
             if (!this.isMoving) {
-              clearInterval(waitLanding);
+              this.clearManagedTimer("reaction", "mouse-landing");
               if (!this.isMoving) this.setState("idle");
               this.aiLocked = false;
               this.scheduleNextBehavior();
@@ -185,7 +185,7 @@ export {};
         this.setState(reaction);
         this.speak();
 
-        setTimeout(() => {
+        this.scheduleReaction(() => {
           if (
             typeof this.enforceFoodPriority === "function" &&
             this.enforceFoodPriority()
@@ -214,7 +214,7 @@ export {};
         this.speed = SPEED_CHASE;
         this.setState("running");
 
-        setTimeout(() => {
+        this.scheduleReaction(() => {
           if (
             typeof this.enforceFoodPriority === "function" &&
             this.enforceFoodPriority()
@@ -230,7 +230,7 @@ export {};
       }
     },
 
-    handleMouseProximity() {
+    handleMouseProximity(dtSeconds = 1 / 60) {
       if (this.isTemporaryDead) return;
       if (this.isJumpLocked) return;
       if (this.isFishingActive) return;
@@ -268,7 +268,7 @@ export {};
       }
 
       if (this.mouseReactionCooldown > 0) {
-        this.mouseReactionCooldown -= 16;
+        this.mouseReactionCooldown -= dtSeconds * 1000;
         return;
       }
 
@@ -276,7 +276,8 @@ export {};
         this.lastMouseZone = "close";
         this.mouseReactionCooldown = 3000;
         this.isChasing = false;
-        this.triggerMouseFlee();
+        if ((this.personality?.snapshot.calm ?? 0) > 45) this.triggerMouseCurious();
+        else this.triggerMouseFlee();
       } else if (dist >= 90 && dist < 220 && this.lastMouseZone === "far") {
         this.lastMouseZone = "near";
         if (Math.random() < 0.2) {
@@ -303,7 +304,7 @@ export {};
       this.setState("running");
       this.speak();
 
-      setTimeout(() => {
+      this.scheduleReaction(() => {
         if (
           typeof this.enforceFoodPriority === "function" &&
           this.enforceFoodPriority()
@@ -319,6 +320,7 @@ export {};
     },
 
     triggerMouseFlee() {
+      this.reactPersonality?.("startled");
       this.aiLocked = true;
       this.stepQueue = [];
       this.setState("scared");
@@ -336,7 +338,7 @@ export {};
         Math.max(halfPenguinSize, Math.min(fleeY, this.getWalkMaxY() + halfPenguinSize)),
       );
 
-      setTimeout(() => {
+      this.scheduleReaction(() => {
         if (
           typeof this.enforceFoodPriority === "function" &&
           this.enforceFoodPriority()
@@ -355,7 +357,7 @@ export {};
       this.setState("peeking");
       this.speak();
 
-      setTimeout(() => {
+      this.scheduleReaction(() => {
         if (
           typeof this.enforceFoodPriority === "function" &&
           this.enforceFoodPriority()
@@ -393,9 +395,9 @@ export {};
       this.setState("running");
       this.moveToPosition(targetCenterX, targetTopY + halfPenguinSize, approachSpeed);
 
-      const waitArrival = setInterval(() => {
+      this.setManagedInterval("reaction", "mouse-arrival", () => {
         if (this.isMoving) return;
-        clearInterval(waitArrival);
+        this.clearManagedTimer("reaction", "mouse-arrival");
 
         if (
           typeof this.enforceFoodPriority === "function" &&
@@ -408,7 +410,7 @@ export {};
         this.setState("peeking");
         this.speak();
 
-        setTimeout(() => {
+        this.scheduleReaction(() => {
           if (
             typeof this.enforceFoodPriority === "function" &&
             this.enforceFoodPriority()
@@ -428,7 +430,7 @@ export {};
       this.setState("waving");
       this.speak();
 
-      setTimeout(() => {
+      this.scheduleReaction(() => {
         if (
           typeof this.enforceFoodPriority === "function" &&
           this.enforceFoodPriority()

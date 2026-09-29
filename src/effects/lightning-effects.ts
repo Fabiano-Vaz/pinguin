@@ -16,6 +16,7 @@ export {};
     if (!penguin || penguin.isFishingActive || penguin.isDragging) return;
     if (typeof penguin.setState !== "function") return;
 
+    penguin.reactPersonality?.("startled");
     penguin.setState("scared");
     setTimeout(() => {
       if (
@@ -44,122 +45,62 @@ export {};
   }
 
   function createLightningBolt(x) {
-    const uid = "bg" + Date.now();
-    const svgNS = "http://www.w3.org/2000/svg";
     const viewWidth = 90;
     const viewHeight = 460;
-    const startX = 45;
     const segments = 7;
-    const stepY = viewHeight / segments;
-
-    const points = [];
-    let currentX = startX;
-    points.push(`${startX},0`);
+    const points: [number, number][] = [[45, 0]];
+    let currentX = 45;
     for (let i = 1; i < segments; i += 1) {
-      const sway = (Math.random() * 2 - 1) * 20;
-      currentX = Math.max(12, Math.min(viewWidth - 12, currentX + sway));
-      points.push(`${currentX.toFixed(1)},${Math.round(stepY * i)}`);
+      currentX = Math.max(12, Math.min(78, currentX + (Math.random() * 2 - 1) * 20));
+      points.push([currentX, Math.round((viewHeight / segments) * i)]);
     }
-    const finalX = Math.max(
-      10,
-      Math.min(viewWidth - 10, currentX + (Math.random() * 2 - 1) * 14),
-    );
-    points.push(`${finalX.toFixed(1)},${viewHeight}`);
-    const mainPoints = points.join(" ");
+    points.push([Math.max(10, Math.min(80, currentX + (Math.random() * 2 - 1) * 14)), viewHeight]);
 
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
-    svg.style.cssText =
-      "position:fixed;top:0;left:" +
-      (x - viewWidth / 2) +
-      "px;width:" +
-      viewWidth +
-      "px;height:95vh;" +
-      "pointer-events:none;z-index:9998;overflow:visible;" +
-      "filter:drop-shadow(0 0 7px #fff) drop-shadow(0 0 16px #e7f6ff) drop-shadow(0 0 28px #c9e5ff);";
+    const bolt = document.createElement("div");
+    bolt.className = "lightning-bolt";
+    bolt.style.left = `${x - viewWidth / 2}px`;
+    const scale = Math.min(1, (window.innerHeight * 0.95) / viewHeight);
+    bolt.style.top = `${Math.max(0, (window.innerHeight * 0.95 - viewHeight) / 2)}px`;
+    bolt.style.transform = `scale(${scale})`;
 
-    const defs = document.createElementNS(svgNS, "defs");
-    const grad = document.createElementNS(svgNS, "linearGradient");
-    grad.setAttribute("id", uid);
-    grad.setAttribute("x1", "0");
-    grad.setAttribute("y1", "0");
-    grad.setAttribute("x2", "0");
-    grad.setAttribute("y2", "1");
-    [
-      ["0%", "#ffffff"],
-      ["30%", "#fff176"],
-      ["70%", "#ffeb3b"],
-      ["100%", "#ff6f00"],
-    ].forEach((stopData) => {
-      const stop = document.createElementNS(svgNS, "stop");
-      stop.setAttribute("offset", stopData[0]);
-      stop.setAttribute("stop-color", stopData[1]);
-      grad.appendChild(stop);
-    });
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-
-    const PATH_LEN = 640;
-
-    const halo = document.createElementNS(svgNS, "polyline");
-    halo.setAttribute("points", mainPoints);
-    halo.setAttribute("fill", "none");
-    halo.setAttribute("stroke", "url(#" + uid + ")");
-    halo.setAttribute("stroke-width", "10");
-    halo.setAttribute("stroke-linecap", "round");
-    halo.setAttribute("stroke-linejoin", "round");
-    halo.setAttribute("stroke-opacity", "0.34");
-    halo.style.strokeDasharray = String(PATH_LEN);
-    halo.style.strokeDashoffset = String(PATH_LEN);
-    halo.classList.add("bolt-path");
-    svg.appendChild(halo);
-
-    const core = document.createElementNS(svgNS, "polyline");
-    core.setAttribute("points", mainPoints);
-    core.setAttribute("fill", "none");
-    core.setAttribute("stroke", "url(#" + uid + ")");
-    core.setAttribute("stroke-width", "3.2");
-    core.setAttribute("stroke-linecap", "round");
-    core.setAttribute("stroke-linejoin", "round");
-    core.style.strokeDasharray = String(PATH_LEN);
-    core.style.strokeDashoffset = String(PATH_LEN);
-    core.classList.add("bolt-path");
-    svg.appendChild(core);
+    // Trace both sides of a stroke as a CSS polygon, with joined corners.
+    const outline = (vertices: [number, number][], width: number) => {
+      const sides = [1, -1].map((side) => vertices.map(([px, py], i) => {
+        const before = vertices[Math.max(0, i - 1)];
+        const after = vertices[Math.min(vertices.length - 1, i + 1)];
+        const dx = after[0] - before[0];
+        const dy = after[1] - before[1];
+        const length = Math.hypot(dx, dy) || 1;
+        return `${((px - (dy / length) * width * side / 2) / viewWidth) * 100}% ${((py + (dx / length) * width * side / 2) / viewHeight) * 100}%`;
+      }));
+      return `polygon(${[...sides[0], ...sides[1].reverse()].join(",")})`;
+    };
+    const addStroke = (vertices: [number, number][], width: number, branch = false, halo = false) => {
+      const reveal = document.createElement("div");
+      reveal.className = branch ? "bolt-branch" : "bolt-path";
+      if (branch) reveal.style.animationDelay = `${0.05 + Math.random() * 0.11}s`;
+      const stroke = document.createElement("div");
+      stroke.className = "lightning-stroke";
+      stroke.style.clipPath = outline(vertices, width);
+      if (halo) stroke.style.opacity = "0.34";
+      reveal.appendChild(stroke);
+      bolt.appendChild(reveal);
+    };
+    addStroke(points, 10, false, true);
+    addStroke(points, 3.2);
 
     const branchCount = Math.random() < 0.4 ? 1 : 2;
     for (let i = 0; i < branchCount; i += 1) {
-      const branchStartIndex = 1 + Math.floor(Math.random() * (segments - 2));
-      const [bx, by] = points[branchStartIndex].split(",").map(Number);
+      const [bx, by] = points[1 + Math.floor(Math.random() * (segments - 2))];
       const dir = Math.random() < 0.5 ? -1 : 1;
-      const b1x = Math.max(
-        6,
-        Math.min(viewWidth - 6, bx + dir * (10 + Math.random() * 16)),
-      );
+      const b1x = Math.max(6, Math.min(84, bx + dir * (10 + Math.random() * 16)));
       const b1y = Math.min(viewHeight - 50, by + 36 + Math.random() * 40);
-      const b2x = Math.max(
-        6,
-        Math.min(viewWidth - 6, b1x + dir * (8 + Math.random() * 16)),
-      );
+      const b2x = Math.max(6, Math.min(84, b1x + dir * (8 + Math.random() * 16)));
       const b2y = Math.min(viewHeight - 8, b1y + 28 + Math.random() * 48);
-      const branchPoints = `${bx},${by} ${b1x.toFixed(1)},${b1y.toFixed(1)} ${b2x.toFixed(1)},${b2y.toFixed(1)}`;
-      const branch = document.createElementNS(svgNS, "polyline");
-      branch.setAttribute("points", branchPoints);
-      branch.setAttribute("fill", "none");
-      branch.setAttribute("stroke", "url(#" + uid + ")");
-      branch.setAttribute("stroke-width", "2.1");
-      branch.setAttribute("stroke-linecap", "round");
-      branch.setAttribute("stroke-linejoin", "round");
-      branch.style.strokeDasharray = "180";
-      branch.style.strokeDashoffset = "180";
-      branch.classList.add("bolt-branch");
-      branch.style.animationDelay = `${(0.05 + Math.random() * 0.11).toFixed(3)}s`;
-      svg.appendChild(branch);
+      addStroke([[bx, by], [b1x, b1y], [b2x, b2y]], 2.1, true);
     }
-
-    document.body.appendChild(svg);
-    setTimeout(() => {
-      svg.remove();
-    }, 860);
+    document.body.appendChild(bolt);
+    setTimeout(() => bolt.remove(), 860);
   }
 
   Object.assign(effects, {

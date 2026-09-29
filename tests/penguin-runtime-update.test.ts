@@ -102,3 +102,22 @@ const runtimeUpdateModule = window.PenguinPetModules.penguinRuntimeUpdate({
 }
 
 console.log("penguin runtime update tests passed");
+
+// A final long action owns the lock even when there are no remaining queued steps.
+{
+  const previousNow = Date.now;
+  let now = 1000;
+  Date.now = () => now;
+  try {
+    const penguin = {
+      currentState: "pondering", customMotion: null, isJumpLocked: false,
+      aiLocked: true, stepQueue: [], activeStep: { type: "act", state: "pondering", duration: 18000 },
+      element: { style: { animation: "" } },
+      scheduleNextBehavior() { throw new Error("must not interrupt a legitimate action"); },
+    };
+    runtimeUpdateModule.recoverInvalidPose.call(penguin);
+    now += 9000;
+    runtimeUpdateModule.recoverInvalidPose.call(penguin);
+    assert.equal(penguin.aiLocked, true);
+  } finally { Date.now = previousNow; }
+}

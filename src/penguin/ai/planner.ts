@@ -2,11 +2,6 @@ import { BehaviorSelectionService } from "../../services/behavior-selection-serv
 
 export const createPlannerMethods = ({
   runtime,
-  behaviors,
-  PRELUDE_CHANCE,
-  PRELUDE_EMOTIONS,
-  PRELUDE_EMOTION_DURATION_MS,
-  PRELUDE_IDLE_DURATION_MS,
   BEHAVIOR_DELAY_MIN_MS,
   BEHAVIOR_DELAY_VARIATION_MS,
 }) => ({
@@ -117,7 +112,9 @@ export const createPlannerMethods = ({
       (Number.isFinite(this.debugActionOverrideUntil) ? this.debugActionOverrideUntil : 0) -
         Date.now(),
     );
-    const delay = Math.max(baseDelay, debugHoldRemaining);
+    const needs = this.personality?.snapshot;
+    const personalityDelay = needs?.mood === "sleepy" ? baseDelay * 0.65 : baseDelay;
+    const delay = Math.max(personalityDelay, debugHoldRemaining);
     this.nextBehaviorDueAt = Date.now() + delay;
     const runScheduledBehavior = () => {
       this.nextBehaviorTimeoutId = null;
@@ -154,25 +151,14 @@ export const createPlannerMethods = ({
             ? runtime.fishStock
             : null;
       this.behaviorSelectionService = new BehaviorSelectionService({
-        behaviors,
+        personality: this.personality,
+        getContext: () => this.getPersonalityContext(),
         getFishStock,
       });
     }
     const selectedBehavior = this.behaviorSelectionService.chooseNextBehavior();
     const seq = typeof selectedBehavior === "function" ? selectedBehavior() : [];
-    const withPrelude = Math.random() < PRELUDE_CHANCE;
-
-    this.stepQueue = withPrelude
-      ? [
-          {
-            type: "act",
-            state: PRELUDE_EMOTIONS[Math.floor(Math.random() * PRELUDE_EMOTIONS.length)],
-            duration: PRELUDE_EMOTION_DURATION_MS,
-          },
-          { type: "act", state: "idle", duration: PRELUDE_IDLE_DURATION_MS },
-          ...seq,
-        ]
-      : seq;
+    this.stepQueue = seq;
     this.runNextStep();
   },
 

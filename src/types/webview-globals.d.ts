@@ -11,6 +11,8 @@ export {};
 
 declare global {
   interface Window {
+    PENGUIN_FISH_STOCK?: unknown;
+    acquireVsCodeApi?: () => { postMessage(message: unknown): void };
     PenguinPet?: PenguinPetGlobal;
     PenguinPetModules?: PenguinPetModulesRegistry;
     PenguinPetCore?: any;

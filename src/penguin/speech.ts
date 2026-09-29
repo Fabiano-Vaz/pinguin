@@ -49,11 +49,11 @@ export {};
       this.setState("laughing");
       this.speak();
 
-      setTimeout(() => {
+      this.scheduleReaction(() => {
         if (!this.isMoving) this.setState("idle");
-        setTimeout(() => {
+        this.scheduleReaction(() => {
           this.setState("laughing");
-          setTimeout(() => {
+          this.scheduleReaction(() => {
             this.element.style.animation = "";
             if (!this.isMoving) this.setState("idle");
             if (typeof onDone === "function") onDone();
@@ -91,6 +91,9 @@ export {};
 
       this.bubble = document.createElement("div");
       this.bubble.className = "speech-bubble";
+      this.bubble.style.animationDuration = `${finalDuration}ms`;
+      this.bubble.setAttribute("role", "status");
+      this.bubble.setAttribute("aria-live", "polite");
 
       const content = document.createElement("div");
       content.className = "bubble-content";
@@ -147,7 +150,7 @@ export {};
         this.scheduleNextBubble();
         return;
       }
-      const text = list[Math.floor(Math.random() * list.length)];
+      const text = this.personality ? this.personality.pickLine(list) : list[Math.floor(Math.random() * list.length)];
       this.showSpeech(text);
     },
 

@@ -240,30 +240,11 @@ modules.interactionsClick = ({ phrases, PENGUIN_DOUBLE_CLICK_MS }) => ({
       }
     }
 
-    this.isChasing = false;
-    this.aiLocked = true;
-    this.stepQueue = [];
-    if (this.currentState === "beaten") {
-      this.setState("idle");
-    }
-    this.element.style.animation = "shake 0.45s ease";
-
-    setTimeout(() => {
-      if (
-        typeof this.enforceFoodPriority === "function" &&
-        this.enforceFoodPriority()
-      ) {
-        return;
-      }
-      this.element.style.animation = "";
-      if (!this.isMoving) this.setState("idle");
-      this.aiLocked = false;
-      this.scheduleNextBehavior();
-    }, this.scaleEmotionDuration(2000));
+    this.reactToAffection();
   },
 
   onDoubleClickPenguin() {
-    if (this.isTemporaryDead) return;
+    if (this.isTemporaryDead || this.isCaveirinhaMode || this.isCruzeiroMode || this.isFullBellySequenceActive) return;
     if (this.isJumpLocked) return;
     if (this.isFishingActive) {
       if (typeof this.cancelFishing === "function") this.cancelFishing();
@@ -310,8 +291,15 @@ modules.interactionsClick = ({ phrases, PENGUIN_DOUBLE_CLICK_MS }) => ({
       return;
     }
 
-    if (typeof this.triggerBeatenReaction === "function") {
-      this.triggerBeatenReaction();
-    }
+    this.invalidateBehaviorFlow();
+    this.stepQueue = [];
+    this.reactPersonality?.("play");
+    this.aiLocked = true;
+    this.startJumpArc(this.x, this.clampY(this.y));
+    this.sayPersonality?.("pulo de alegria! esse foi pra você");
+    this.setManagedTimeout("behavior_step", "play-finish", () => {
+      this.aiLocked = false;
+      this.scheduleNextBehavior();
+    }, 1500);
   },
 });

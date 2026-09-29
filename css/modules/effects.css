@@ -167,13 +167,24 @@
   will-change: transform, opacity;
 }
 
-.bolt-path {
-  animation: boltDraw 0.64s ease-out forwards;
+.lightning-bolt {
+  position: fixed;
+  width: 90px;
+  height: 460px;
+  pointer-events: none;
+  z-index: 9998;
+  transform-origin: 50% 0;
+  filter: drop-shadow(0 0 7px #fff) drop-shadow(0 0 16px #e7f6ff) drop-shadow(0 0 28px #c9e5ff);
 }
-
-.bolt-branch {
-  animation: boltDraw 0.46s ease-out forwards;
+.bolt-path, .bolt-branch, .lightning-stroke {
+  position: absolute;
+  inset: 0;
 }
+.lightning-stroke {
+  background: linear-gradient(#fff 0%, #fff176 30%, #ffeb3b 70%, #ff6f00 100%);
+}
+.bolt-path { animation: boltDraw 0.64s ease-out both; }
+.bolt-branch { animation: boltDraw 0.46s ease-out both; }
 
 .wind-streak {
   position: fixed;

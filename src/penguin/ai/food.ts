@@ -103,6 +103,7 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
   },
 
   registerFishEaten() {
+    this.reactPersonality?.("fed");
     if (this.isFullBellySequenceActive) return;
     const now = Date.now();
     const streakWindowMs = 12000;
@@ -293,7 +294,7 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
     this.element.style.animation = "";
     this.setState("runningCrouched");
     const crouchedFishAsset =
-      actionStates.runningCrouched || "assets/pinguin correndo abaixado.svg";
+      actionStates.runningCrouched || "css:runningCrouched";
     if (typeof this.lockVisualSprite === "function") {
       this.lockVisualSprite(crouchedFishAsset, 260);
     }
@@ -361,67 +362,4 @@ export const createFoodMethods = ({ actionStates, runtime, halfPenguinSize, phra
     }
   },
 
-  applyCursorEatingState() {
-    if (this.isFullBellySequenceActive) return;
-    if (this.currentState === "sleeping") {
-      if (this.isCursorTouchEating) {
-        this.isCursorTouchEating = false;
-        this.cursorTouchEatingUntil = 0;
-      }
-      return;
-    }
-    if (this.isFishingActive) {
-      if (this.isCursorTouchEating) {
-        this.isCursorTouchEating = false;
-        this.cursorTouchEatingUntil = 0;
-      }
-      return;
-    }
-
-    const now = Date.now();
-
-    if (this.isDragging || this.currentFoodTarget || this.isEatingFood) {
-      if (this.isCursorTouchEating) {
-        this.isCursorTouchEating = false;
-        this.cursorTouchEatingUntil = 0;
-        this.holdFishCursorFor(5000);
-      }
-      return;
-    }
-
-    if (this.isCursorTouchEating) {
-      this.isChasing = false;
-      this.element.style.animation = "";
-      this.setState("eating");
-
-      if (now < this.cursorTouchEatingUntil) {
-        return;
-      }
-
-      this.isCursorTouchEating = false;
-      this.cursorTouchEatingUntil = 0;
-      this.holdFishCursorFor(5000);
-      if (!this.isMoving) this.setState("idle");
-      return;
-    }
-
-    const touching = this.isCursorTouchingPenguin();
-    if (touching) {
-      if (typeof runtime.consumeFishStock === "function") {
-        const consumed = runtime.consumeFishStock(1);
-        if (!consumed) {
-          this.setFishCursorEnabled(false);
-          return;
-        }
-      }
-      this.registerFishEaten();
-      if (this.isFullBellySequenceActive) return;
-      this.isCursorTouchEating = true;
-      this.cursorTouchEatingUntil = now + 4000;
-      this.isChasing = false;
-      this.setFishCursorEnabled(false);
-      this.element.style.animation = "";
-      this.setState("eating");
-    }
-  },
 });

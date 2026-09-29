@@ -130,22 +130,22 @@
 
 @keyframes boltDraw {
   0% {
-    stroke-dashoffset: 640;
+    clip-path: inset(0 0 100% 0);
     opacity: 1;
   }
 
   42% {
-    stroke-dashoffset: 0;
+    clip-path: inset(0);
     opacity: 1;
   }
 
   68% {
-    stroke-dashoffset: 0;
+    clip-path: inset(0);
     opacity: 0.78;
   }
 
   100% {
-    stroke-dashoffset: 0;
+    clip-path: inset(0);
     opacity: 0;
   }
 }

@@ -52,7 +52,10 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 
 ### Sistema de peixe e rotina inteligente
 
-- HUD de estoque de peixes.
+- HUD de estoque de peixes, salvo no VS Code mesmo ao fechar e reabrir.
+- Cada peixe expira 24 horas depois de ser ganho; ganhar mais não renova os anteriores.
+- Compras, alimentação e jogos gastam os peixes mais antigos primeiro.
+- Sem consumo automático por fome por padrão; o presente inicial de 5 peixes é dado uma única vez.
 - Botões rápidos para comer, pescar e acessar os mini games.
 - Queda de peixe no cenário para coleta.
 - Prioridade automática para caça/comida quando necessário.
@@ -122,3 +125,100 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 | Propriedade                 | Padrão | O que faz                                                     |
 | --------------------------- | ------ | ------------------------------------------------------------- |
 | `pinguin.autoOpenOnStartup` | `true` | Abre o painel do pinguim automaticamente ao iniciar o VS Code |
+
+
+## Desenvolvimento das animações
+
+As 29 artes antes armazenadas em SVG agora usam camadas HTML e CSS. Os contornos
+estão em `css/modules/artwork.css`, com `clip-path: path(...)`, elipses, gradientes,
+máscaras CSS e 130 animações `@keyframes`. Não há SVG embutido, canvas ou imagens
+rasterizadas substituindo as poses. Pequenas diferenças de suavização de bordas,
+gradientes e texto podem ocorrer entre a renderização CSS e a referência original.
+
+- `src/artwork/artwork-templates.ts`: camadas de cada pose e suas dimensões originais.
+- `src/artwork/artwork.ts`: seleção, cache dos templates e ajuste ao tamanho disponível.
+  O observador de tamanho é desconectado quando o elemento sai da página.
+- `src/manifest.ts`: identificadores `css:idle`, `css:running`, etc. Apenas arquivos
+  reais passam pelo resolvedor de URIs da extensão. Substituições de imagens pelo
+  consumidor continuam suportadas.
+
+A lógica de comportamento, interações e deslocamento continua em TypeScript. As
+animações internas das poses são CSS, inclusive as mordidas no peixe e os movimentos
+da vara de pesca. Guarda-chuva, boneco de neve e raios também usam HTML/CSS.
+Os cenários PNG e os obstáculos de helicóptero em GIF continuam como arquivos.
+
+Para revisar as poses, execute `npm run dev` e abra `/artwork-preview.html`.
+A galeria permite mudar o tamanho, pausar e reiniciar as animações, incluindo as
+poses extras `pondering` e `happyJump`. Ela também respeita a preferência do sistema
+por movimento reduzido. A galeria é uma ferramenta de desenvolvimento e não é
+incluída na extensão empacotada.
+
+
+## Personalidade e movimento
+
+O pinguim usa uma IA comportamental local, sem API, conexão externa ou cobrança.
+Ela escolhe rotinas conforme energia, curiosidade, carinho, calma, proximidade do
+cursor, chuva e estoque de peixes. A memória da sessão evita repetir imediatamente
+a mesma rotina ou fala. Não é um modelo de linguagem nem um chat generativo.
+
+- Clique simples: carinho, com reações tímidas ou carinhosas conforme a afinidade.
+- Duplo clique: um salto de alegria.
+- Alimentação: use **Comer** ou os peixes no cenário; encostar o cursor não gasta peixe.
+- O sono recupera energia; brincar e caminhar consomem energia.
+- Rotinas têm uma sequência coerente: observar, explorar e descansar; preparar um
+  salto e comemorar; ou se acomodar, dormir e acordar.
+
+A caminhada tem aceleração, frenagem e velocidade independente da taxa de quadros.
+As passadas acompanham a velocidade. As trocas de pose e de direção são diretas,
+como no comportamento original, sem rotação interpolada, atraso ou efeitos extras
+entre ações. Uma interação nova cancela as reações pendentes, e a preferência por
+movimento reduzido é respeitada pelas animações internas das poses.
+
+Organização:
+
+- `src/personality/personality-brain.ts`: necessidades, humor, memória e decisão por pontuação.
+- `src/personality/routines.ts`: intenções, sequências e falas.
+- `src/services/behavior-selection-service.ts`: ligação entre contexto e plano de ação.
+- `src/motion/locomotion.ts`: deslocamento em pixels por segundo.
+- `src/penguin/personality.ts`: ligação com carinho, alimentação e atualização do pet.
+
+O painel de depuração existente mostra humor, necessidades e intenção atual.
+
+## Guarda-roupa e base para acessórios
+
+O botão **👕 Guarda-roupa** permite combinar **5 roupas e 8 acessórios de cabeça**, todos em HTML/CSS:
+Darth Vader, Batman, palhaço, patinho amarelo, moletom com raio, capacete viking
+com chifres, dois gorrinhos e fone de DJ. Cabeça e corpo são vendidos separadamente.
+Compras da coleção anterior são convertidas em peças da coleção nova sem custo.
+Cada peça custa **10 peixes**, descontados apenas ao clicar em **Comprar**.
+Experimentar é grátis; peças compradas podem ser vestidas novamente sem cobrança.
+As compras e o look são salvos localmente e acompanham o pet e o Runner.
+Na pose caveirinha, todos os acessórios ficam temporariamente ocultos.
+Cabeça e mangas usam os grupos animados do próprio desenho, com modelagens para
+frente, lado, costas e deitado. As trocas entre ações continuam diretas.
+
+O catálogo e o inventário ficam separados da renderização, com APIs para conceder,
+equipar e remover itens. Novas variações dos modelos existentes precisam apenas de uma entrada no catálogo. A loja usa o saldo de peixes do próprio jogo.
+O painel compacto mantém as duas categorias e seus botões visíveis sem rolagem
+em telas pequenas. Em painéis muito baixos, a prévia fica oculta para dar espaço
+aos controles.
+
+Veja [como criar peças, integrar a loja e ajustar encaixes](docs/accessories.md).
+Para abrir a galeria e experimentar todas as roupas e poses, execute
+`npm run dev:artwork` na pasta do projeto. O comando inicia o servidor e abre o navegador.
+Com `npm run dev` já rodando, acesse `http://localhost:5173/artwork-preview.html`
+(ou a porta indicada no terminal). Abrir o HTML diretamente por `file://` exibe
+as instruções de acesso, pois o navegador não executa os módulos TypeScript sozinho.
+
+## Executar o projeto em desenvolvimento
+
+No VS Code, abra a pasta do projeto, selecione **Executar Pinguim Pet** em
+**Executar e Depurar** e pressione **F5**. A tarefa **Pinguim: compilar** executa
+`npm run build` antes de iniciar, incluindo o código da extensão e da webview.
+Se a compilação falhar, corrija o erro mostrado no terminal antes de continuar.
+
+A janela de desenvolvimento usa `--disable-extensions` para isolar o pinguim das
+outras extensões instaladas. Essa opção vale para a sessão de teste; não desinstala
+extensões nem altera as preferências globais. O pinguim em desenvolvimento continua
+habilitado. Para testar apenas a interface no navegador, execute `npm run dev` e
+abra o endereço mostrado no terminal.

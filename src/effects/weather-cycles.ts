@@ -1,3 +1,4 @@
+import { createArtwork, setArtwork } from "../artwork/artwork.ts";
 import "./weather-space-events";
 
   const effects = (window.PenguinPetEffects = window.PenguinPetEffects || {});
@@ -161,11 +162,11 @@ import "./weather-space-events";
       (window.PenguinPet &&
         window.PenguinPet.actionStates &&
         window.PenguinPet.actionStates.snowman) ||
-      "assets/snowman.svg";
-    const snowman = document.createElement("img");
-    snowman.className = "snow-event-snowman";
-    snowman.src = snowmanImgSrc;
-    snowman.alt = "boneco de neve";
+      "css:snowman";
+    const snowman = createArtwork();
+    snowman.classList.add("snow-event-snowman");
+    setArtwork(snowman, snowmanImgSrc);
+    snowman.setAttribute("aria-label", "boneco de neve");
     snowman.draggable = false;
 
     const width = Math.round(68 + Math.random() * 20);

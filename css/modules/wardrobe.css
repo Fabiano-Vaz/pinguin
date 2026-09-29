@@ -1,0 +1,186 @@
+/* Accessories use the pose's own coordinate system and animation tree. */
+.css-artwork[data-wardrobe-overflow] .art-canvas { overflow: visible; }
+.css-artwork [data-wardrobe-hidden] { visibility: hidden; }
+.css-artwork .wardrobe-piece { position: absolute; pointer-events: none; }
+.css-artwork .wardrobe-surface { overflow: hidden; }
+.wardrobe-shirt, .wardrobe-sleeve {
+  position: absolute; inset: 0 0 auto; height: 79%;
+  background: linear-gradient(100deg, #0002, transparent 32%, #fff1 60%, #0002), var(--cloth-color);
+  border-radius: 0 0 45% 45% / 0 0 10% 10%;
+  box-shadow: inset 0 -4px #0002;
+}
+.wardrobe-collar {
+  position: absolute; width: 34%; height: 18%; left: 33%; top: -4%;
+  border-radius: 0 0 50% 50%; background: #0a0a0a;
+  border: 4px solid var(--cloth-accent); border-top: 0; box-sizing: border-box;
+}
+.wardrobe-sleeve { height: 40%; border-radius: 0; border-bottom: 3px solid var(--cloth-accent); box-sizing: border-box; }
+.wardrobe-sleeve--bottom { top: auto; bottom: 0; border-bottom: 0; border-top: 3px solid var(--cloth-accent); }
+.wardrobe-shirt--back .wardrobe-collar { height: 12%; }
+.wardrobe-shirt--lying .wardrobe-collar { width: 38%; left: 31%; }
+/* Traced torso + belly contour, in the side pose's native coordinates.
+   The actual front flipper stays visible; no synthetic wing/pocket overlay. */
+.wardrobe-side-surface { left: 0; top: 0; width: 475px; height: 525px; clip-path: path("M 313.97,420.82 L 318.93,412.89 L 324.94,400.24 L 329.55,386.39 L 331.34,379.02 L 333.84,363.42 L 334.56,355.19 L 334.90,337.90 L 333.78,319.56 L 332.66,309.99 L 329.31,290.10 L 326.24,275.75 L 325.89,270.84 L 322.95,261.61 L 318.82,250.68 L 317.17,247.23 L 315.54,245.99 L 315.73,244.26 L 314.91,241.81 L 310.07,233.52 L 303.89,235.01 L 296.07,236.20 L 284.91,236.52 L 274.45,235.23 L 267.88,233.54 L 261.64,231.24 L 255.75,228.38 L 250.21,224.98 L 245.03,221.10 L 240.22,216.77 L 235.78,212.05 L 229.86,204.30 L 226.41,198.77 L 222.91,191.98 L 212.97,193.78 L 200.51,197.28 L 191.08,201.03 L 182.02,205.69 L 173.25,211.31 L 160.39,221.65 L 141.42,240.53 L 131.33,249.35 L 123.43,255.34 L 114.59,261.34 L 89.04,276.85 L 82.95,281.92 L 80.02,285.65 L 78.54,289.24 L 78.46,292.76 L 79.21,295.07 L 81.50,298.40 L 85.20,301.61 L 90.32,304.70 L 96.85,307.66 L 106.65,311.40 L 108.15,313.32 L 108.29,316.32 L 105.59,332.41 L 102.65,354.75 L 100.88,361.63 L 98.84,366.46 L 95.37,371.85 L 90.69,376.77 L 84.67,381.45 L 74.21,388.18 L 71.31,390.68 L 98.94,400.69 L 110.90,404.53 L 134.52,411.25 L 146.19,414.12 L 169.27,418.93 L 180.69,420.87 L 203.31,423.82 L 214.51,424.85 L 236.75,426.00 L 247.79,426.14 L 269.72,425.54 L 291.49,423.81 L 313.15,420.96 L 313.97,420.82 Z"); }
+.wardrobe-side-surface--fishing { clip-path: path("M 142.66,222.01 L 131.62,234.34 L 122.31,247.24 L 114.56,260.52 L 108.19,273.99 L 100.88,294.16 L 95.71,313.77 L 92.11,332.22 L 87.24,363.21 L 84.81,374.56 L 82.78,380.19 L 80.29,383.97 L 73.68,388.57 L 71.31,390.68 L 98.94,400.69 L 110.90,404.53 L 134.52,411.25 L 157.77,416.69 L 169.27,418.93 L 192.03,422.50 L 214.51,424.85 L 225.66,425.57 L 247.79,426.14 L 258.78,425.98 L 280.62,424.81 L 302.33,422.52 L 313.97,420.82 L 318.92,412.90 L 322.10,406.72 L 327.42,393.47 L 329.55,386.39 L 332.77,371.36 L 333.84,363.42 L 334.91,346.68 L 334.52,328.86 L 332.66,310.00 L 329.31,290.10 L 326.24,275.75 L 326.04,271.56 L 321.19,256.73 L 316.92,246.89 L 315.90,246.27 L 313.46,246.49 L 313.02,245.95 L 148.90,216.09 L 142.66,222.01 Z"); }
+.wardrobe-shirt--side { height: 100%; border-radius: 0; box-shadow: none; }
+.wardrobe-shirt--side .wardrobe-collar { left: 220px; top: 190px; width: 96px; height: 48px; transform: rotate(25deg); border-width: 5px; background: #0c0c0c; }
+/* Sleeve on the original front flipper (running and Runner jump). */
+.wardrobe-side-sleeve { left: 0; top: 0; width: 475px; height: 525px; clip-path: path("M 326.346,274.75 C 329.838,280.4 335.0,321.728 335.0,344.032 L 335.0,362.625 L 347.001,363.959 C 399.947,369.846 404.27,350.937 361.226,301.745 C 347.387,285.93 320.297,264.964 326.346,274.75"); }
+.wardrobe-side-sleeve .wardrobe-sleeve { left: 315px; top: 260px; width: 95px; height: 58px; transform: rotate(10deg); transform-origin: top left; border-bottom-width: 5px; }
+/* The rear flipper is merged into the torso outline. Its cuff and exposed tip
+   are clipped by that exact outline, making a short sleeve visible in profile. */
+.wardrobe-rear-sleeve { position: absolute; left: 0; top: 0; width: 475px; height: 525px; background: #0c0c0c; clip-path: polygon(60px 263px, 130px 250px, 154px 290px, 142px 316px, 60px 318px); }
+.wardrobe-rear-sleeve::before { content: ""; position: absolute; inset: 0; background: var(--cloth-accent); clip-path: polygon(123px 245px, 134px 246px, 160px 290px, 147px 320px, 137px 320px, 148px 290px); }
+/* The fishing shoulder is a separate foreground layer in a different space. */
+.wardrobe-fishing-shoulder { left: 0; top: 0; width: 320px; height: 360px; clip-path: polygon(80px 141px, 110px 129px, 126px 132px, 140px 149px, 140px 175px, 80px 175px); }
+
+.wardrobe-side-neck { background: var(--cloth-color); }
+/* Costume details share one chest plane; the rig rotates/scales that plane. */
+.wardrobe-design { position: absolute; left: 20%; top: 25%; width: 60%; height: 66%; }
+.wardrobe-design i, .wardrobe-headwear i { position: absolute; display: block; box-sizing: border-box; }
+.wardrobe-shirt--side .wardrobe-design { left: 253px; top: 257px; width: 75px; height: 134px; transform: rotate(-10deg); }
+.wardrobe-shirt--lying .wardrobe-design { transform: scaleY(.7); transform-origin: top; }
+.wardrobe-shirt--back .wardrobe-design { display: none; }
+/* Vader: ribbed tunic, silver shoulder yoke, chest controls and utility belt. */
+[data-design="panel"] .wardrobe-shirt { background: repeating-linear-gradient(90deg,#0000 0 8%,#0004 9% 11%),var(--cloth-color); }
+[data-design="panel"] .wardrobe-collar { border-color: #9daab9; border-width: 6px; }
+.wardrobe-design--panel .costume-badge { inset: 12% 19% 28%; border: 3px solid #0d1420; border-radius: 8%; background: linear-gradient(90deg,#a6d0dc 0 19%,transparent 19% 27%,#ec545f 27% 46%,transparent 46% 54%,#8eeeaf 54% 73%,transparent 73% 81%,#d8e2eb 81%) 50% 25% / 80% 16% no-repeat, repeating-linear-gradient(90deg,#b8c9d5 0 17%,transparent 17% 29%) 50% 70% / 78% 28% no-repeat,#161d29; box-shadow: 0 3px 0 #ffffff25; }
+.wardrobe-design--panel .costume-trim { left: -33%; right: -33%; top: 82%; height: 16%; background: #101621; border-block: 2px solid #8194a0; }
+.wardrobe-design--panel .costume-detail { left: 39%; width: 22%; top: 80%; height: 20%; border: 3px solid #a6b9c7; border-radius: 10%; background: #454f60; }
+/* Batman: a shaped bat badge and golden belt, with a dark cape panel on the back. */
+.wardrobe-design--bat .costume-badge { left: 0; top: 4%; width: 100%; height: 45%; border-radius: 50%; background: #ffd63d; border: 3px solid #253040; }
+.wardrobe-design--bat .costume-badge::after { content: ""; position: absolute; inset: 10% 3%; background: #182030; clip-path: polygon(0 10%,20% 32%,33% 27%,41% 43%,43% 8%,50% 25%,57% 8%,59% 43%,67% 27%,80% 32%,100% 10%,90% 68%,74% 61%,63% 77%,50% 100%,37% 77%,26% 61%,10% 68%); }
+.wardrobe-design--bat .costume-trim { left: -33%; right: -33%; top: 79%; height: 18%; background: repeating-linear-gradient(90deg,#e6a927 0 17%,#ffda4e 17% 23%); border-block: 2px solid #674c22; }
+.wardrobe-design--bat .costume-detail { left: 39%; width: 22%; top: 76%; height: 24%; border: 3px solid #f8e992; background: #e6a927; border-radius: 15%; }
+[data-design="bat"] .wardrobe-sleeve { background: #252d40; }
+[data-design="bat"] .wardrobe-shirt--back, [data-design="panel"] .wardrobe-shirt--back { background: repeating-linear-gradient(100deg,#202735 0 14%,#353e4d 16% 18%,#202735 22% 31%); }
+/* Clown: split suit, polka dots, enormous bow and three pompom buttons. */
+[data-design="clown"] .wardrobe-shirt { background: radial-gradient(circle,#ffec5c 0 20%,transparent 23%) 0 0 / 27px 32px,linear-gradient(90deg,#8050dd 50%,#ed668b 50%); }
+[data-design="clown"] .wardrobe-collar { border-color: #fff9e3; border-width: 8px; }
+.wardrobe-design--clown .costume-badge { left: 2%; top: 0; width: 96%; height: 32%; background: #ffda40; clip-path: polygon(0 0,45% 30%,55% 30%,100% 0,100% 100%,55% 70%,45% 70%,0 100%); }
+.wardrobe-design--clown .costume-detail { left: 39%; top: 9%; width: 22%; height: 16%; border-radius: 50%; background: #e95163; }
+.wardrobe-design--clown .costume-trim { left: 39%; top: 43%; width: 22%; height: 16%; background: #f7f8f2; border-radius: 50%; box-shadow: 0 25px #ffde48,0 50px #71e4d5; }
+/* Rubber duck: orange bib edging and an actual little duck on the chest. */
+[data-design="duck"] .wardrobe-shirt { background: linear-gradient(100deg,#efb721,transparent 30%,#fff3 60%,#edae2422),var(--cloth-color); }
+.wardrobe-design--duck .costume-badge { left: 20%; top: 40%; width: 65%; height: 43%; border-radius: 20% 20% 55% 55%; background: #fff6b0; border-bottom: 4px solid #eaa72d; transform: rotate(-8deg); }
+.wardrobe-design--duck .costume-detail { left: 23%; top: 12%; width: 45%; height: 47%; border-radius: 50%; background: #fff6b0; }
+.wardrobe-design--duck .costume-detail::after { content: ""; position: absolute; left: 27%; top: 30%; width: 15%; height: 16%; border-radius: 50%; background: #293244; }
+.wardrobe-design--duck .costume-extra { left: 2%; top: 35%; width: 35%; height: 17%; background: #f28c31; border-radius: 70% 0 0 60%; }
+.wardrobe-design--duck .costume-trim { left: 51%; top: 49%; width: 26%; height: 20%; border-radius: 50%; border-bottom: 3px solid #e7b448; transform: rotate(-20deg); z-index: 1; }
+/* A warm sporty top that also pairs with the headphones and winter hats. */
+.wardrobe-design--bolt .costume-badge { left: 32%; top: 5%; width: 38%; height: 52%; background: var(--cloth-accent); clip-path: polygon(40% 0,100% 0,65% 35%,100% 35%,10% 100%,35% 51%,0 51%); }
+.wardrobe-design--bolt .costume-trim { left: 5%; right: 5%; top: 68%; height: 30%; border: 3px solid #126a7466; border-radius: 10% 10% 40% 40%; background: #fff2; }
+.wardrobe-design--bolt .costume-detail { left: 19%; top: -23%; width: 3%; height: 41%; background: #fff6d7; box-shadow: 45px 0 #fff6d7; }
+/* Headwear is attached to the animated head, with distinct side/back silhouettes. */
+.wardrobe-headwear { --head-shine: linear-gradient(100deg,#0003,transparent 42%,#fff2 65%,#0003); }
+.headwear-crown { inset: 0; border-radius: 50% 50% 15% 15% / 90% 90% 20% 20%; background: var(--head-shine),var(--cloth-color); }
+.wardrobe-headwear--helmet .headwear-crown { left: -9%; right: -9%; top: -6%; bottom: -58%; border-radius: 50% 50% 8% 8% / 70% 70% 12% 12%; clip-path: polygon(10% 0,90% 0,100% 100%,68% 86%,63% 55%,37% 55%,32% 86%,0 100%); }
+.wardrobe-headwear--helmet .headwear-band { left: 44%; top: -4%; width: 12%; height: 91%; background: linear-gradient(90deg,#d3deeb33,#788fa066,#0c152055); border-inline: 1px solid #ffffff20; border-radius: 45% 45% 0 0; }
+.wardrobe-headwear--helmet .headwear-left, .wardrobe-headwear--helmet .headwear-right { top: 79%; height: 86%; width: 22%; background: #252e3b; border-bottom: 3px solid #8294a4; }
+.wardrobe-headwear--helmet .headwear-left { left: -10%; transform: skewX(-15deg); }
+.wardrobe-headwear--helmet .headwear-right { right: -10%; transform: skewX(15deg); }
+.wardrobe-headwear--helmet.wardrobe-cap--side .headwear-crown { right: -2%; left: -16%; clip-path: polygon(10% 0,90% 0,100% 78%,80% 74%,77% 50%,58% 53%,55% 100%,0 100%); }
+.wardrobe-headwear--helmet.wardrobe-cap--side .headwear-right { display: none; }
+.wardrobe-headwear--helmet.wardrobe-cap--side .headwear-left { width: 46%; left: -15%; }
+.wardrobe-headwear--helmet.wardrobe-cap--side .headwear-band { left: 65%; }
+.wardrobe-headwear--helmet.wardrobe-cap--back .headwear-crown { clip-path: none; bottom: -58%; }
+.wardrobe-headwear--cowl .headwear-crown { left: -5%; right: -5%; bottom: -55%; border-radius: 48% 48% 15% 15%; clip-path: polygon(0 0,100% 0,100% 100%,82% 90%,75% 51%,57% 67%,43% 67%,25% 51%,18% 90%,0 100%); }
+.wardrobe-headwear--cowl .headwear-left, .wardrobe-headwear--cowl .headwear-right { top: -69%; height: 110%; width: 26%; background: var(--cloth-color); clip-path: polygon(0 0,100% 80%,90% 100%,0 100%); }
+.wardrobe-headwear--cowl .headwear-left { left: -4%; }
+.wardrobe-headwear--cowl .headwear-right { right: -4%; transform: scaleX(-1); }
+.wardrobe-headwear--cowl.wardrobe-cap--side .headwear-left { left: 5%; opacity: .8; }
+.wardrobe-headwear--cowl.wardrobe-cap--side .headwear-right { right: 13%; }
+.wardrobe-headwear--cowl.wardrobe-cap--back .headwear-crown { clip-path: none; }
+/* Big candy-coloured curls instead of a recoloured cap. */
+.wardrobe-headwear--wig .headwear-crown { top: -22%; left: -8%; right: -8%; bottom: -3%; border-radius: 45%; background: radial-gradient(ellipse at 20% 52%,#ffbc3d 0 22%,transparent 24%),radial-gradient(ellipse at 52% 35%,#ee6650 0 32%,transparent 34%),radial-gradient(ellipse at 83% 56%,#ff963d 0 24%,transparent 26%); }
+.wardrobe-headwear--wig .headwear-left, .wardrobe-headwear--wig .headwear-right { top: 29%; width: 40%; height: 155%; border-radius: 48%; background: radial-gradient(circle at 28% 30%,#ffb743 0 22%,transparent 25%),radial-gradient(circle at 72% 46%,#f1676d 0 32%,transparent 35%),radial-gradient(circle at 40% 76%,#ef8043 0 31%,transparent 34%); }
+.wardrobe-headwear--wig .headwear-left { left: -28%; }
+.wardrobe-headwear--wig .headwear-right { right: -28%; transform: scaleX(-1); }
+.wardrobe-headwear--wig.wardrobe-cap--side .headwear-right { display: none; }
+.wardrobe-headwear--wig.wardrobe-cap--back .headwear-crown { bottom: -110%; background: radial-gradient(circle at 25% 35%,#ffb743 0 24%,transparent 26%),radial-gradient(circle at 75% 65%,#ed5d60 0 30%,transparent 32%),#f18343; }
+/* Viking helmet: curved ivory horns and a riveted steel band. */
+.wardrobe-headwear--viking .headwear-left, .wardrobe-headwear--viking .headwear-right { top: -83%; width: 46%; height: 151%; background: linear-gradient(110deg,#d5b67c,#fff1c6 65%); clip-path: polygon(0 0,28% 20%,35% 54%,69% 68%,100% 67%,95% 100%,56% 94%,20% 74%,7% 41%); }
+.wardrobe-headwear--viking .headwear-left { left: -34%; }
+.wardrobe-headwear--viking .headwear-right { right: -34%; transform: scaleX(-1); }
+.wardrobe-headwear--viking .headwear-band { left: -5%; right: -5%; top: 77%; height: 30%; background: radial-gradient(circle,#e7f2f6 0 22%,transparent 28%) 0 50% / 17% 100%,#546a7c; border-block: 2px solid #324555; border-radius: 15%; }
+.wardrobe-headwear--viking .headwear-badge { left: 46%; width: 8%; top: 0; height: 89%; border-inline: 1px solid #ffffff66; background: #bed0d6; }
+.wardrobe-headwear--viking.wardrobe-cap--side .headwear-right { right: 3%; width: 30%; top: -57%; height: 110%; z-index: -1; }
+.wardrobe-headwear--viking.wardrobe-cap--side .headwear-badge { left: 67%; }
+/* Ribbed wool, contrasting folded cuff and a soft pompom. */
+.wardrobe-headwear--beanie .headwear-crown { top: -35%; bottom: -5%; background: repeating-linear-gradient(90deg,#fff2 0 3%,transparent 3% 11%),var(--head-shine),var(--cloth-color); border-radius: 55% 55% 10% 10%; }
+.wardrobe-headwear--beanie .headwear-band { left: -6%; right: -6%; top: 55%; height: 58%; background: repeating-linear-gradient(90deg,#0001 0 3%,transparent 3% 10%),var(--cloth-color); border-radius: 15%; box-shadow: inset 0 3px #fff3,0 3px #0003; }
+.wardrobe-headwear--beanie .headwear-top { left: 38%; top: -80%; width: 28%; height: 76%; background: radial-gradient(circle at 38% 30%,#fff7,transparent 65%),var(--cloth-accent); border-radius: 50%; box-shadow: 2px 2px #0002; }
+.wardrobe-headwear--beanie .headwear-badge { left: 41%; top: 67%; width: 18%; height: 32%; border-radius: 15%; background: var(--cloth-accent); }
+.wardrobe-headwear--beanie.wardrobe-cap--side .headwear-top { left: 23%; }
+.wardrobe-headwear--beanie.wardrobe-cap--side .headwear-badge { left: 66%; }
+.wardrobe-headwear--beanie.wardrobe-cap--back .headwear-badge { display: none; }
+/* The open arch preserves the penguin's hair. Cups sit beside the face. */
+.wardrobe-headwear--headphones .headwear-crown { inset: -12% -14% -152%; background: transparent; border: 9px solid var(--cloth-color); border-bottom: 0; border-radius: 50% 50% 0 0; box-shadow: inset 0 4px var(--cloth-accent); }
+.wardrobe-headwear--headphones .headwear-left, .wardrobe-headwear--headphones .headwear-right { top: 109%; height: 115%; width: 25%; background: linear-gradient(90deg,#242b3e 0 22%,var(--cloth-color) 25% 80%,var(--cloth-accent) 84%); border: 3px solid #292e47; border-radius: 35%; z-index: 1; }
+.wardrobe-headwear--headphones .headwear-left { left: -21%; }
+.wardrobe-headwear--headphones .headwear-right { right: -21%; transform: scaleX(-1); }
+.wardrobe-headwear--headphones.wardrobe-cap--side .headwear-right { display: none; }
+.wardrobe-headwear--headphones.wardrobe-cap--side .headwear-left { left: 8%; width: 31%; }
+.wardrobe-headwear--headphones.wardrobe-cap--side .headwear-crown { left: 12%; right: 0; border-right-width: 4px; }
+/* A tiny rubber duck hat has its own face and orange bill. */
+.wardrobe-headwear--duck .headwear-crown { top: -13%; bottom: -3%; border-radius: 48% 48% 22% 22%; }
+.wardrobe-headwear--duck .headwear-band { left: 21%; top: 76%; width: 58%; height: 45%; border-radius: 50%; background: var(--cloth-accent); border-bottom: 3px solid #b96821; }
+.wardrobe-headwear--duck .headwear-left, .wardrobe-headwear--duck .headwear-right { top: 29%; width: 9%; height: 23%; background: #252a36; border-radius: 50%; z-index: 1; }
+.wardrobe-headwear--duck .headwear-left { left: 29%; }
+.wardrobe-headwear--duck .headwear-right { right: 29%; }
+.wardrobe-headwear--duck .headwear-top { left: 45%; top: -36%; width: 12%; height: 40%; background: var(--cloth-color); border-radius: 80% 0 0 0; transform: rotate(20deg); }
+.wardrobe-headwear--duck.wardrobe-cap--side .headwear-band { left: 67%; width: 53%; }
+.wardrobe-headwear--duck.wardrobe-cap--side .headwear-left { left: 66%; }
+.wardrobe-headwear--duck.wardrobe-cap--side .headwear-right, .wardrobe-headwear--duck.wardrobe-cap--back .headwear-left, .wardrobe-headwear--duck.wardrobe-cap--back .headwear-right, .wardrobe-headwear--duck.wardrobe-cap--back .headwear-band { display: none; }
+
+.wardrobe-toggle { position: fixed; top: 12px; right: 12px; z-index: 1100; border: 1px solid #ffffff40; border-radius: 10px; padding: 9px 12px; color: #fff; background: #142532df; cursor: pointer; font: 600 12px system-ui, sans-serif; }
+/* Compact wardrobe: both categories and purchase actions fit a small sidebar. */
+.wardrobe-dialog {
+  position: fixed; inset: 6px; margin: auto; padding: 0;
+  width: min(340px, calc(100% - 12px)); min-width: 0;
+  max-width: calc(100% - 12px); max-height: calc(100% - 12px);
+  max-height: calc(100dvh - 12px); box-sizing: border-box;
+  border: 1px solid #72919d; border-radius: 12px; overflow: hidden;
+  color: #203644; background: #f5fafc; font: 12px system-ui, sans-serif;
+}
+.wardrobe-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.wardrobe-dialog::backdrop { background: #06182380; }
+.wardrobe-dialog :where(header, footer, label, select, button, p, .wardrobe-content, .wardrobe-item, .wardrobe-overview, .wardrobe-summary) { min-width: 0; box-sizing: border-box; }
+.wardrobe-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 5px 8px; border-bottom: 1px solid #d4e2e9; }
+.wardrobe-dialog h2 { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.wardrobe-dialog p { margin: 0; line-height: 1.3; overflow-wrap: anywhere; }
+.wardrobe-content { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 8px; overflow: auto; overscroll-behavior: contain; }
+.wardrobe-overview { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.wardrobe-dialog .wardrobe-preview { flex: 0 0 auto; width: clamp(44px, 20dvh, 72px); height: clamp(44px, 20dvh, 72px); margin: 0; border-radius: 12px; background: #dcebf1; overflow: hidden; }
+.wardrobe-summary { display: grid; gap: 4px; }
+.wardrobe-price { font-size: 11px; color: #526a78; }
+.wardrobe-balance { font-weight: 700; }
+.wardrobe-item { display: grid; grid-template-columns: minmax(0, 1fr) 72px; align-items: end; gap: 6px; margin: 0; }
+.wardrobe-dialog label { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; font-weight: 600; font-size: 11px; }
+.wardrobe-dialog select { display: block; width: 100%; max-width: 100%; height: 28px; padding: 3px 5px; border-radius: 6px; border: 1px solid #92aab7; color: inherit; background: white; font: 12px system-ui, sans-serif; text-overflow: ellipsis; }
+.wardrobe-dialog button { min-height: 28px; padding: 4px 6px; border: 0; border-radius: 6px; color: white; background: #245f78; cursor: pointer; font: inherit; white-space: nowrap; }
+.wardrobe-dialog button:disabled { background: #dbe6eb; color: #506572; cursor: default; }
+.wardrobe-dialog .wardrobe-close { flex: 0 0 26px; width: 26px; height: 26px; min-height: 26px; padding: 0; font-size: 20px; }
+.wardrobe-footer { padding: 5px 8px; border-top: 1px solid #d4e2e9; background: #edf5f8; }
+.wardrobe-dialog .wardrobe-status { font-size: 10px; }
+.wardrobe-toggle:focus-visible, .wardrobe-dialog :focus-visible { outline: 3px solid #eebc60; outline-offset: -3px; }
+@media (max-width: 220px) {
+  .wardrobe-dialog h2 { font-size: 12px; }
+  .wardrobe-item { grid-template-columns: minmax(0, 1fr) 62px; gap: 4px; }
+  .wardrobe-dialog button { font-size: 11px; padding-inline: 3px; }
+  .wardrobe-overview { gap: 8px; }
+  .wardrobe-content { gap: 6px; }
+  .wardrobe-dialog .wardrobe-preview { width: clamp(36px, 17dvh, 60px); height: clamp(36px, 17dvh, 60px); }
+}
+@media (max-height: 220px) {
+  .wardrobe-dialog .wardrobe-preview { display: none; }
+  .wardrobe-content { padding: 4px 8px; gap: 4px; }
+  .wardrobe-summary p { font-size: 10px; white-space: nowrap; }
+  .wardrobe-summary { display: flex; width: 100%; justify-content: space-between; gap: 4px; align-items: center; }
+  .wardrobe-overview { display: block; }
+  .wardrobe-header { padding-block: 2px; }
+  .wardrobe-dialog .wardrobe-close { min-height: 24px; height: 24px; flex-basis: 24px; width: 24px; }
+  .wardrobe-dialog select, .wardrobe-item button { min-height: 26px; height: 26px; }
+  .wardrobe-footer { padding-block: 3px; }
+}
+body.runner-mode .wardrobe-toggle, body.memory-mode .wardrobe-toggle { display: none; }

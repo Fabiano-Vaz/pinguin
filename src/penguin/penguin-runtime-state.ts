@@ -1,3 +1,4 @@
+import { setArtwork } from "../artwork/artwork.ts";
 import { DebugPanelComponent } from "./components/debug-panel-component";
 
 const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
@@ -330,6 +331,10 @@ modules.penguinRuntimeState = ({ actionStates, runtime }) => ({
       targetText: `${tx}, ${ty}`,
       speedText: speed,
       motionType,
+      personalityText: this.personality ? (() => {
+        const p = this.personality.snapshot;
+        return `${p.mood} · energia ${Math.round(p.energy)} · curiosidade ${Math.round(p.curiosity)} · carinho ${Math.round(p.affection)} · calma ${Math.round(p.calm)} · ${p.intention}`;
+      })() : "",
       flowText: String(this.behaviorFlowToken || 0),
       fishText: String(fishStock),
       flags: {
@@ -440,7 +445,7 @@ modules.penguinRuntimeState = ({ actionStates, runtime }) => ({
     this.unlockVisualSprite();
     this.element.style.animation = "";
     this.currentState = nextState;
-    this.img.src = stateAsset;
+    setArtwork(this.img, stateAsset);
     this.applyTransform(this.isWalkingAway ? 1 : undefined);
     return true;
   },

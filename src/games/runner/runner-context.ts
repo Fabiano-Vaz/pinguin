@@ -1,3 +1,4 @@
+import { createArtwork, setArtwork } from "../../artwork/artwork.ts";
 import "./runner-debug-tools";
 import "./runner-assets";
 import {
@@ -26,20 +27,20 @@ const assetsFactory: RunnerAssetsFactory =
     ? runnerModules.createRunnerAssets({ actionStates })
     : {};
 const sprites = assetsFactory.sprites || {
-  running: "assets/pinguin correndo.svg",
-  crouching: "assets/pinguin correndo abaixado.svg",
-  jumping: "assets/trace.svg",
-  front: "assets/pinguin.svg",
-  crying: "assets/pinguin chorando.svg",
-  angry: "assets/pinguin com raiva.svg",
-  flying: "assets/pinguin voando.svg",
-  caveirinha: "assets/pinguin caveirinha.svg",
+  running: "css:running",
+  crouching: "css:runningCrouched",
+  jumping: "css:trace",
+  front: "css:default",
+  crying: "css:crying",
+  angry: "css:angry",
+  flying: "css:flying",
+  caveirinha: "css:caveirinha",
 };
 const runnerBackgroundDarkBImage =
   assetsFactory.runnerBackgroundDarkBImage || "assets/backgroung-darkB.png";
 const runnerMoonImage = assetsFactory.runnerMoonImage || "assets/lua.png";
 const snowmanObstacleImage =
-  assetsFactory.snowmanObstacleImage || "assets/snowman.svg";
+  assetsFactory.snowmanObstacleImage || "css:snowman";
 const helicopterVariants = Array.isArray(assetsFactory.helicopterVariants)
   ? assetsFactory.helicopterVariants
   : [
@@ -150,9 +151,9 @@ hint.className = "runner-hint";
 hint.textContent = "Space/↑/W pular | ↓/S abaixar | Esc sair";
 const message = document.createElement("div");
 message.className = "runner-message";
-const penguinEl = document.createElement("img");
-penguinEl.className = "runner-penguin";
-penguinEl.src = sprites.running;
+const penguinEl = createArtwork();
+penguinEl.classList.add("runner-penguin");
+setArtwork(penguinEl, sprites.running);
 penguinEl.draggable = false;
 let currentPenguinSpriteState = "running";
 const ground = document.createElement("div");
@@ -236,7 +237,7 @@ const LOSS_REACTION_STATES = ["crying", "angry", "flying", "caveirinha"];
 const setPenguinSprite = (state) => {
   const nextState = sprites[state] ? state : "running";
   if (currentPenguinSpriteState === nextState) return;
-  penguinEl.src = sprites[nextState];
+  setArtwork(penguinEl, sprites[nextState]);
   currentPenguinSpriteState = nextState;
 };
 const getPenguinHeight = () =>

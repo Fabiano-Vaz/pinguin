@@ -78,7 +78,7 @@ const withMockTimers = (run) => {
   }
 };
 
-withMockTimers(() => {
+withMockTimers(({ timeoutMap, runTimeout }) => {
   const body = createMockElement("body");
   let hasUneatenFish = false;
 
@@ -154,10 +154,79 @@ withMockTimers(() => {
   assert.equal(runtime.fishStock, 3);
   assert.equal(document.body.classList.contains("fish-cursor-enabled"), true);
 
+  const balances = [];
+  const unsubscribe = economy.subscribeFishStock(() => balances.push(economy.getFishStock()));
+  economy.addFishStock(10);
+  economy.consumeFishStock(10);
+  assert.deepEqual(balances, [13, 3]);
+  unsubscribe();
+  economy.addFishStock(1);
+  assert.deepEqual(balances, [13, 3]);
+
+  const fittingRuntime = { isWardrobeOpen: true };
+  const fittingEconomy = window.PenguinPetModules.createFishEconomy({
+    runtime: fittingRuntime,
+    settings: { initialFishStock: 20, naturalConsumeEnabled: true, naturalConsumeMinMs: 100, naturalConsumeMaxMs: 100 },
+  });
+  fittingEconomy.initialize();
+  let timer = Array.from(timeoutMap.entries()).find(([, value]) => value.delay === 100);
+  runTimeout(timer[0]);
+  assert.equal(fittingEconomy.getFishStock(), 20, "Browsing must pause automatic consumption");
+  fittingRuntime.isWardrobeOpen = false;
+  timer = Array.from(timeoutMap.entries()).filter(([, value]) => value.delay === 100).pop();
+  runTimeout(timer[0]);
+  assert.equal(fittingEconomy.getFishStock(), 19, "Consumption resumes after closing");
+  fittingEconomy.dispose();
+
+  const { FISH_LIFETIME_MS } = require("../src/runtime/fish-stock-ledger.ts");
+  let now = 100000;
+  let saved;
+  const storage = {
+    load: () => saved,
+    save: (value) => { saved = JSON.parse(JSON.stringify(value)); },
+  };
+  const createPersistent = () => window.PenguinPetModules.createFishEconomy({
+    runtime: {}, storage, now: () => now,
+  });
+  let persistent = createPersistent();
+  persistent.initialize();
+  assert.equal(persistent.getFishStock(), 5);
+  assert.equal(saved.batches[0].expiresAt, now + FISH_LIFETIME_MS);
+  const firstExpiry = saved.batches[0].expiresAt;
+  now += 3600000;
+  persistent.addFishStock(10);
+  assert.equal(persistent.consumeFishStock(3), true);
+  assert.deepEqual(saved.batches.map((batch) => batch.amount), [2, 10]);
+  persistent.dispose();
+  persistent = createPersistent();
+  persistent.initialize();
+  assert.equal(persistent.getFishStock(), 12, "Reopening restores earned and spent fish");
+  assert.equal(saved.batches[0].expiresAt, firstExpiry, "Reopening never renews expiration");
+  const expirationBalances = [];
+  persistent.subscribeFishStock(() => expirationBalances.push(persistent.getFishStock()));
+  now = firstExpiry;
+  assert.equal(persistent.getFishStock(), 10, "A read after suspension removes expired fish");
+  assert.deepEqual(expirationBalances, [10]);
+  assert.equal(persistent.consumeFishStock(11), false);
+  assert.equal(persistent.consumeFishStock(1), true);
+  now += 3600000;
+  for (const [id, entry] of Array.from(timeoutMap.entries())) {
+    if (entry.delay === 60000) runTimeout(id);
+  }
+  assert.equal(expirationBalances.at(-1), 0, "The expiration timer notifies HUD and wardrobe");
+  assert.deepEqual(saved.batches, []);
+  persistent.dispose();
+  persistent = createPersistent();
+  persistent.initialize();
+  assert.equal(persistent.getFishStock(), 0, "An empty saved balance never grants welcome fish again");
+  assert.equal(persistent.consumeFishStock(1), false);
+  persistent.dispose();
+
   hasUneatenFish = false;
   economy.complainNoFishOnClick();
   assert.equal(stateLog.includes("angry"), true);
   assert.equal(speechLog.length > 0, true);
+  economy.dispose();
 });
 
 console.log("fish economy tests passed");

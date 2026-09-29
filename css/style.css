@@ -1,3 +1,5 @@
+@import "./modules/artwork.css";
+@import "./modules/wardrobe.css";
 @import "./modules/tokens.css";
 @import "./modules/animations.css";
 @import "./modules/ui.css";

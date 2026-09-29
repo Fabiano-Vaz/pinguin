@@ -18,6 +18,7 @@ type DebugPanelSnapshot = {
   targetText: string;
   speedText: string;
   motionType: string;
+  personalityText?: string;
   flowText: string;
   fishText: string;
   flags?: DebugFlags;
@@ -150,6 +151,7 @@ export class DebugPanelComponent {
       `  <div><span>flow</span><code>${escapeHtml(snapshot.flowText)}</code></div>`,
       `  <div><span>fish</span><code>${escapeHtml(snapshot.fishText)}</code></div>`,
       `</div>`,
+      `<div class="penguin-debug-section"><div class="penguin-debug-label">Personalidade</div><div class="penguin-debug-value">${escapeHtml(snapshot.personalityText || "—")}</div></div>`,
       `<div class="penguin-debug-flags">`,
       `  <span>moving ${boolBadge(Boolean(snapshot.flags?.moving))}</span>`,
       `  <span>aiLocked ${boolBadge(Boolean(snapshot.flags?.aiLocked))}</span>`,

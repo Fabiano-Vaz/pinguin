@@ -1,3 +1,4 @@
+import { advanceTravel } from "../motion/locomotion.ts";
 export {};
 
 const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
@@ -37,6 +38,7 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
     );
     this.lastUpdateTime = now;
     try {
+      this.updatePersonality?.(dtSeconds);
       if (this.isCaveirinhaMode) {
         this.customMotion = null;
         this.isMoving = false;
@@ -134,6 +136,8 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
       }
 
       if (this.customMotion) {
+        this.velocityX = 0;
+        this.velocityY = 0;
         this.updateCustomMotion(dtSeconds);
         if (this.customMotion && this.customMotion.type === "walkAwayExit") {
           this.y = this.clampY(this.y, false);
@@ -148,17 +152,13 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
         this.element.style.top = this.y + "px";
         this.updateBubblePosition();
         this.updateUmbrellaPosition();
-        this.handleMouseProximity();
+        this.handleMouseProximity(dtSeconds);
         this.renderDebugPanel(now);
         requestAnimationFrame((ts) => this.update(ts));
         return;
       }
 
       this.handleFoodHunt();
-
-      const dx = this.targetX - this.x;
-      const dy = this.targetY - this.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (
         this.isChasing &&
@@ -170,30 +170,39 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
         this.targetY = this.clampY(runtime.mouseY - halfPenguinSize);
       }
 
+      const dx = this.targetX - this.x;
+      const dy = this.targetY - this.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
       let movedThisFrame = false;
 
-      if (distance > 5) {
-        this.x += (dx / distance) * this.speed;
-        this.y += (dy / distance) * this.speed;
-        movedThisFrame = true;
+      if (distance > 0.6) {
+        const travel = advanceTravel(this.x, this.y, this.targetX, this.targetY,
+          this.velocityX || 0, this.velocityY || 0, this.speed * 60, dtSeconds);
+        this.x = travel.x;
+        this.y = travel.y;
+        this.velocityX = travel.velocityX;
+        this.velocityY = travel.velocityY;
+        movedThisFrame = !travel.arrived;
+        this.isMoving = !travel.arrived;
 
-        if (this.currentState !== "jumping" && this.currentState !== "flying") {
-          if (!this.isWalkingAway) {
-            this.setState("running");
-          }
+        if (movedThisFrame && this.currentState !== "jumping" && this.currentState !== "flying" && !this.isWalkingAway) {
+          this.setState("running");
         }
-
-        if (dx < 0 && this.facingRight) {
-          this.facingRight = false;
-          this.applyTransform();
-        } else if (dx > 0 && !this.facingRight) {
-          this.facingRight = true;
-          this.applyTransform();
+        // Use actual velocity so a reversal visibly brakes before changing direction.
+        if (Math.abs(travel.velocityX) > 8) this.facingRight = travel.velocityX > 0;
+        if (travel.arrived) {
+          this.allowAirMovement = false;
+          this.setState("idle");
         }
-      } else if (this.isMoving) {
-        this.isMoving = false;
-        this.allowAirMovement = false;
-        this.setState("idle");
+      } else {
+        this.velocityX = 0;
+        this.velocityY = 0;
+        if (this.isMoving) {
+          this.isMoving = false;
+          this.allowAirMovement = false;
+          this.setState("idle");
+        }
       }
 
       if (
@@ -217,9 +226,9 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
       this.applyTransform(this.isWalkingAway ? 1 : undefined);
       this.updateBubblePosition();
       this.updateUmbrellaPosition();
-      this.applyCursorEatingState();
+      this.updateWalkCadence?.();
       this.recoverInvalidPose();
-      this.handleMouseProximity();
+      this.handleMouseProximity(dtSeconds);
       this.renderDebugPanel(now);
 
       requestAnimationFrame((ts) => this.update(ts));
@@ -358,7 +367,9 @@ modules.penguinRuntimeUpdate = ({ runtime, halfPenguinSize, penguinSize }) => ({
     if (
       this.aiLocked &&
       Array.isArray(this.stepQueue) &&
-      this.stepQueue.length === 0
+      this.stepQueue.length === 0 &&
+      !this.activeStep && !this.isFishingActive && !this.isFullBellySequenceActive &&
+      !this.customMotion && !this.isDragging && this.currentState !== "sleeping"
     ) {
       if (!this.aiLockedStuckSince) {
         this.aiLockedStuckSince = now;

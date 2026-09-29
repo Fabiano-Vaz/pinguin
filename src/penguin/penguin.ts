@@ -1,3 +1,6 @@
+import { PersonalityBrain } from "../personality/personality-brain.ts";
+import { createPersonalityMethods } from "./personality.ts";
+import { createArtwork, setArtwork } from "../artwork/artwork.ts";
 import "./penguin-runtime-state";
 import "./penguin-runtime-update";
 import { PenguinStateService } from "../services/penguin-state-service";
@@ -16,10 +19,6 @@ const {
   BUBBLE_INTERVAL_JITTER_MS,
   BUBBLE_SHOW_CHANCE,
   EMOTION_DURATION_MULTIPLIER,
-  PRELUDE_EMOTIONS,
-  PRELUDE_EMOTION_DURATION_MS,
-  PRELUDE_IDLE_DURATION_MS,
-  PRELUDE_CHANCE,
   BEHAVIOR_DELAY_MIN_MS,
   BEHAVIOR_DELAY_VARIATION_MS,
   STEP_TRANSITION_DELAY_MS,
@@ -37,7 +36,6 @@ const motionConfig = petConfig.motion || constants.motion || {};
 
 const actionStates = pet.actionStates || {};
 const phrases = pet.phrases || {};
-const behaviors = pet.behaviors || [];
 const runtime = pet.runtime || {
   mouseX: window.innerWidth / 2,
   mouseY: window.innerHeight / 2,
@@ -55,17 +53,20 @@ class Penguin {
   constructor() {
     this.element = document.createElement("div");
     this.element.className = "penguin";
-    this.img = document.createElement("img");
+    this.img = createArtwork();
     this.img.draggable = false;
     this.element.appendChild(this.img);
+    this.personality = new PersonalityBrain();
+    this.velocityX = 0;
+    this.velocityY = 0;
 
-    this.umbrellaEl = document.createElement("img");
-    this.umbrellaEl.className = "penguin-umbrella";
+    this.umbrellaEl = createArtwork();
+    this.umbrellaEl.classList.add("penguin-umbrella");
     this.umbrellaEl.draggable = false;
-    this.umbrellaEl.src =
-      window.PENGUIN_ASSETS && window.PENGUIN_ASSETS.umbrella
-        ? window.PENGUIN_ASSETS.umbrella
-        : "assets/umbrella.svg";
+    setArtwork(
+      this.umbrellaEl,
+      window.PENGUIN_ASSETS?.umbrella || "css:umbrella",
+    );
     document.body.appendChild(this.umbrellaEl);
 
     document.body.appendChild(this.element);
@@ -200,7 +201,6 @@ class Penguin {
 const deps = {
   actionStates,
   phrases,
-  behaviors,
   runtime,
   createClickEffect,
   penguinSize,
@@ -210,10 +210,6 @@ const deps = {
   BUBBLE_INTERVAL_JITTER_MS,
   BUBBLE_SHOW_CHANCE,
   EMOTION_DURATION_MULTIPLIER,
-  PRELUDE_EMOTIONS,
-  PRELUDE_EMOTION_DURATION_MS,
-  PRELUDE_IDLE_DURATION_MS,
-  PRELUDE_CHANCE,
   BEHAVIOR_DELAY_MIN_MS,
   BEHAVIOR_DELAY_VARIATION_MS,
   STEP_TRANSITION_DELAY_MS,
@@ -230,6 +226,7 @@ const deps = {
 
 Object.assign(
   Penguin.prototype,
+  createPersonalityMethods(deps),
   modules.state ? modules.state(deps) : {},
   modules.speech ? modules.speech(deps) : {},
   modules.motion ? modules.motion(deps) : {},

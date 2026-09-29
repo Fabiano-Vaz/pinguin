@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poses do pinguim — HTML e CSS</title>
+  <link rel="stylesheet" href="./css/modules/artwork.css">
+  <link rel="stylesheet" href="./css/modules/wardrobe.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #edf3f7; color: #193244; font: 15px system-ui, sans-serif; }
+    header { padding: 28px; background: #fff; border-bottom: 1px solid #ccdbe5; }
+    h1 { margin: 0 0 8px; font-size: 25px; }
+    p { margin: 0 0 20px; }
+    .controls { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+    label { display: flex; align-items: center; gap: 8px; }
+    button { padding: 8px 16px; border: 1px solid #708c9d; border-radius: 8px; background: #fff; color: inherit; cursor: pointer; }
+    main { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; padding: 24px; }
+    article { min-width: 0; display: grid; justify-items: center; align-content: center; padding: 20px; background: #d5e4ee; border: 1px solid #b9cfde; border-radius: 16px; }
+    h2 { font-size: 15px; margin: 12px 0 0; font-weight: 600; }
+    .css-artwork { width: var(--preview-size, 160px); height: var(--preview-size, 160px); max-width: 100%; }
+    .flipped .css-artwork { transform: scaleX(-1); }
+    .preview-help { margin: 24px; padding: 20px; border: 1px solid #b9cfde; border-radius: 12px; background: #fff; }
+    .preview-help p { margin: 8px 0; }
+    .preview-help a { display: inline-block; padding: 10px 16px; margin-top: 8px; background: #245f78; color: #fff; border-radius: 8px; text-decoration: none; }
+    .preview-help code { display: inline-block; padding: 4px 8px; background: #edf3f7; border-radius: 4px; }
+    .file-preview .controls, .file-preview #poses { display: none; }
+    .paused .art-layer { animation-play-state: paused !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Poses do pinguim</h1>
+    <p>Todos os desenhos e movimentos das poses em HTML e CSS.</p>
+    <div class="controls">
+      <label>Tamanho <input id="size" type="range" min="68" max="260" value="160"><output id="size-value">160 px</output></label>
+      <button id="pause" type="button" aria-pressed="false">Pausar animações</button>
+      <label>Roupa <select id="shirt"></select></label>
+      <label>Cabeça <select id="cap"></select></label>
+      <button id="flip" type="button" aria-pressed="false">Espelhar</button>
+      <button id="restart" type="button">Reiniciar animações</button>
+    </div>
+  </header>
+  <section id="preview-help" class="preview-help" hidden>
+    <h2>Abra a prévia pelo servidor local</h2>
+    <p>Esta galeria precisa do servidor do projeto para carregar o pinguim e as roupas.</p>
+    <p>No terminal da pasta do projeto, execute <code>npm run dev:artwork</code>.</p>
+    <p>O comando abre a galeria no navegador. Se o servidor já estiver ligado, use o botão abaixo.</p>
+    <a href="http://localhost:5173/artwork-preview.html">Abrir galeria de roupas</a>
+  </section>
+  <noscript><p class="preview-help">Ative o JavaScript para visualizar o pinguim e experimentar as roupas.</p></noscript>
+  <main id="poses"></main>
+  <script>
+    if (location.protocol === "file:") {
+      document.documentElement.classList.add("file-preview");
+      document.getElementById("preview-help").hidden = false;
+    }
+  </script>
+  <script type="module">
+    if (location.protocol !== "file:") import("/src/artwork/preview.ts");
+  </script>
+</body>
+</html>

@@ -1,33 +1,7 @@
+import { setArtwork } from "../../artwork/artwork.ts";
 export const createSocialMethods = ({ phrases }) => ({
   triggerLoveMoment() {
-    this.aiLocked = true;
-    this.stepQueue = [];
-    this.isChasing = false;
-    this.element.style.animation = "";
-    this.setState("shy");
-    const loveList =
-      Array.isArray(phrases && phrases.shy) && phrases.shy.length > 0
-        ? phrases.shy
-        : Array.isArray(phrases && phrases.dropped) &&
-            phrases.dropped.length > 0
-          ? phrases.dropped
-          : Array.isArray(phrases && phrases.angry)
-            ? phrases.angry
-            : [];
-    if (loveList.length > 0) {
-      this.showSpeech(loveList[Math.floor(Math.random() * loveList.length)]);
-    }
-
-    setTimeout(() => {
-      if (!this.isMoving && !this.isDragging) this.setState("idle");
-
-      if (this.foodTargets.length > 0) {
-        this.tryStartFoodHunt();
-      } else {
-        this.aiLocked = false;
-        this.scheduleNextBehavior();
-      }
-    }, this.scaleEmotionDuration(2200));
+    this.reactToAffection();
   },
 
   onScreenClick() {
@@ -53,6 +27,8 @@ export const createSocialMethods = ({ phrases }) => ({
   startRantMode() {
     if (this.isDragging || this.isRanting) return;
 
+    this.invalidateBehaviorFlow();
+    this.reactPersonality?.("overwhelmed");
     this.isRanting = true;
     if (typeof this.setActivityMode === "function") {
       this.setActivityMode("ranting", "rant:start", { force: true });
@@ -79,12 +55,12 @@ export const createSocialMethods = ({ phrases }) => ({
 
     const rantStepMs = 1000;
     rantLines.forEach((line, index) => {
-      setTimeout(() => {
-        this.showSpeech(line, 900, false);
+      this.setManagedTimeout("behavior_step", `rant-line-${index}`, () => {
+        this.showSpeech(line, 1100, false);
       }, index * rantStepMs);
     });
 
-    setTimeout(
+    this.setManagedTimeout("behavior_step", "rant-finish",
       () => {
         this.element.style.animation = "";
         if (!this.isMoving) this.setState("idle");
@@ -131,12 +107,12 @@ export const createSocialMethods = ({ phrases }) => ({
     const holdCruzeiroMs = 3000;
     const jumpDurationMs = 1800;
 
-    // Fase 1: exibe o SVG do Cruzeiro por 3 segundos
+    // Fase 1: exibe a pose do Cruzeiro por 3 segundos
     // Mantém lock por toda a sequência para impedir qualquer estado intermediário (idle/full/sleeping)
     if (typeof this.hideUmbrella === "function") this.hideUmbrella();
     this.lockVisualSprite(cruzeirSrc, holdCruzeiroMs + jumpDurationMs + 1200);
     this.currentState = "cruzeiro";
-    if (this.img) this.img.src = cruzeirSrc;
+    if (this.img) setArtwork(this.img, cruzeirSrc);
     this.applyTransform();
     if (line) this.showSpeech(line, 2800, false);
 
@@ -144,7 +120,7 @@ export const createSocialMethods = ({ phrases }) => ({
     // (sem depender de setState, que pode ser bloqueado por regras de full/sleep)
     const startJumpPhase = () => {
       this.currentState = "jumping";
-      if (jumpSrc && this.img) this.img.src = jumpSrc;
+      if (jumpSrc && this.img) setArtwork(this.img, jumpSrc);
       this.element.style.animation =
         "jumping 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite";
       this.applyTransform();
@@ -184,16 +160,4 @@ export const createSocialMethods = ({ phrases }) => ({
     }
   },
 
-  insertWalkBetweenEmotionSteps(currentStep) {
-    if (!currentStep || currentStep.type !== "act") return;
-    if (currentStep.state === "idle") return;
-    if (this.stepQueue.length === 0) return;
-
-    const nextStep = this.stepQueue[0];
-    if (!nextStep || nextStep.type !== "act" || nextStep.state === "idle") {
-      return;
-    }
-
-    this.stepQueue.unshift({ type: "walkShort" });
-  },
 });

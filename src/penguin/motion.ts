@@ -9,6 +9,24 @@ export {};
     phrases,
     motion,
   }) => ({
+    updateWalkCadence() {
+      if (this.currentState !== "running" || this.img.dataset.pose !== "running") {
+        this.gaitCanvas = null;
+        this.gaitAnimations = [];
+        return;
+      }
+      const canvas = this.img.firstElementChild;
+      if (this.gaitCanvas !== canvas) {
+        this.gaitCanvas = canvas;
+        this.gaitAnimations = canvas.getAnimations({ subtree: true });
+        this.gaitRate = 0;
+      }
+      const rate = Math.max(0.35, Math.min(1.8, Math.hypot(this.velocityX || 0, this.velocityY || 0) / 90));
+      if (Math.abs(rate - (this.gaitRate || 0)) < 0.06) return;
+      this.gaitRate = rate;
+      for (const animation of this.gaitAnimations) animation.updatePlaybackRate(rate);
+    },
+
     startJumpArc(targetX, targetY) {
       if (this.isJumpLocked) return;
       if (typeof this.blowAwayUmbrella === "function") {
@@ -96,8 +114,8 @@ export {};
       if (this.customMotion.type === "jumpVertical") {
         const motion = this.customMotion;
         this.x = motion.startX;
+        this.y += motion.vy * dtSeconds + 0.5 * motion.gravity * dtSeconds * dtSeconds;
         motion.vy += motion.gravity * dtSeconds;
-        this.y += motion.vy * dtSeconds;
 
         if (this.y >= motion.targetY && motion.vy > 0) {
           this.y = motion.targetY;
@@ -295,7 +313,8 @@ export {};
     },
 
     moveToPosition(tx, ty, speed, allowAir = false) {
-      this.targetX = tx - halfPenguinSize;
+      if (!this.isMoving) { this.velocityX = 0; this.velocityY = 0; }
+      this.targetX = Math.max(0, Math.min(tx - halfPenguinSize, window.innerWidth - penguinSize));
       this.allowAirMovement = allowAir;
       this.targetY =
         typeof ty === "number"

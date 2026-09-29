@@ -88,13 +88,13 @@ window.PenguinPet.phrases = {
   ],
 
   thinking: [
-    "deixa eu pensar...",
-    "ideia vindo...",
-    "tô bolando aqui",
-    "peraí que tá quase",
+    "meu coração faz plim quando você chega ♡",
+    "companhia boa aquece até patinha gelada",
+    "tô distribuindo carinho. aceita?",
+    "você, eu e um peixinho: plano perfeito",
   ],
 
-  ating: [
+  eating: [
     "peixim fresquinho, delícia!",
     "nham nham nham ✨",
     "obrigado pelo peixe!",
@@ -146,10 +146,9 @@ window.PenguinPet.phrases = {
   ],
 
   rant: [
-    "para de me clicar tanto!",
-    "ei, tá me perturbando...",
-    "assim eu fico nervoso",
-    "respeita o pinguim!",
+    "ei ei, uma patinha de cada vez!",
+    "modo liquidificador de pinguim: desativar, por favor",
+    "pausa pro fofinho respirar... pronto, passou",
   ],
   fishLow: [
     "tô comendo pouco, hein...",
@@ -195,93 +194,5 @@ window.PenguinPet.phrases = {
     "estrela, me ajuda aí",
   ],
 
-  cruzeiro: ["É O CRUZEIRO, PORRA!", "dale zêrooo!", "vai, rapaz!"],
+  cruzeiro: ["é o Cruzeiro, meu povo!", "dale zêrooo!", "vai, rapaz!"],
 };
-
-window.PenguinPet.behaviors = [
-  // Apenas fica parado por um bom tempo
-  () => [{ type: "act", state: "idle", duration: 6000 }],
-  // Parado, depois olha pra trás discretamente
-  () => [
-    { type: "act", state: "idle", duration: 4000 },
-    { type: "act", state: "turningBack", duration: 1800 },
-  ],
-  // Caminha um pouco e para
-  () => [{ type: "walkShort" }],
-  // Caminha, pensa e fica parado
-  () => [{ type: "walk" }, { type: "act", state: "thinking", duration: 2500 }],
-  // Soneca curta
-  () => [
-    { type: "walkShort" },
-    { type: "act", state: "sleeping", duration: 25000 },
-  ],
-  // Soneca longa
-  () => [
-    { type: "walk" },
-    { type: "act", state: "sleeping", duration: 50000 },
-    { type: "walkShort" },
-  ],
-  // Soneca muito longa (comportamento mais comum de dia)
-  () => [
-    { type: "walkShort" },
-    { type: "act", state: "sleeping", duration: 75000 },
-  ],
-  // Coça a cabeça e continua
-  () => [
-    { type: "walk" },
-    { type: "act", state: "scratching", duration: 2000 },
-    { type: "walkShort" },
-  ],
-  // Vai até a borda e espreita
-  () => [
-    { type: "walkEdge" },
-    { type: "act", state: "peeking", duration: 2200 },
-  ],
-  // Dança de leve e para
-  () => [
-    { type: "walkShort" },
-    {
-      type: "sequence",
-      steps: [
-        {
-          state: "dancing",
-          duration: 1200,
-          anim: "dance 1.05s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite",
-        },
-        { state: "default", duration: 500 },
-      ],
-    },
-  ],
-  // Acena discretamente
-  () => [
-    { type: "walkShort" },
-    { type: "act", state: "waving", duration: 1600 },
-  ],
-  // Caminha rápido, para e olha em volta
-  () => [
-    { type: "walkFast" },
-    { type: "act", state: "peeking", duration: 2000 },
-  ],
-  // Voo curto e volta
-  () => [{ type: "flyMove", duration: 1600 }, { type: "walkShort" }],
-  // Olha pra trás e dorme
-  () => [
-    { type: "walkFast" },
-    { type: "act", state: "turningBack", duration: 2000 },
-    { type: "act", state: "sleeping", duration: 35000 },
-  ],
-  // Apenas fica parado por muito tempo
-  () => [{ type: "act", state: "idle", duration: 10000 }],
-  // Vai até a borda e dorme lá
-  () => [
-    { type: "walkEdge" },
-    { type: "act", state: "sleeping", duration: 45000 },
-    { type: "walkShort" },
-  ],
-  // Sessao de pesca: 30s rendendo peixes ao longo do tempo
-  () => [
-    { type: "walkEdge" },
-    { type: "act", state: "fishing", duration: 15000 },
-    { type: "walkShort" },
-  ],
-];

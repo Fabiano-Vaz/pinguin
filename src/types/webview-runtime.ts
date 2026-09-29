@@ -4,6 +4,8 @@ export interface PenguinRuntime {
   addFishStock?: (amount: number) => number;
   consumeFishStock?: (amount: number) => boolean;
   getFishStock?: () => number;
+  subscribeFishStock?: (listener: () => void) => () => void;
+  isWardrobeOpen?: boolean;
   fishStock?: number;
   isFishCursorEnabled?: boolean;
   setFishCursorEnabled?: (enabled: boolean) => void;
@@ -131,7 +133,7 @@ export interface RunnerElements {
   hud: HTMLDivElement;
   hint: HTMLDivElement;
   message: HTMLDivElement;
-  penguinEl: HTMLImageElement;
+  penguinEl: HTMLElement;
   ground: HTMLDivElement;
   debugCollisionDot: HTMLDivElement;
   debugHitboxLayer: HTMLDivElement;

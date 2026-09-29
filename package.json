@@ -2,7 +2,7 @@
   "name": "pinguin-pet",
   "displayName": "Penguin Pet",
   "description": "Um pinguim animado que anda no VS Code enquanto o editor estiver aberto.",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "publisher": "Pingocode",
   "icon": "icon.png",
   "engines": {
@@ -31,7 +31,8 @@
     "lint:webview": "npm run test",
     "lint": "npm run lint:extension && npm run lint:webview",
     "test": "node --experimental-strip-types tests/run-tests.ts",
-    "test:core": "node --experimental-strip-types tests/penguin-core.test.ts"
+    "test:core": "node --experimental-strip-types tests/penguin-core.test.ts",
+    "dev:artwork": "vite --host 127.0.0.1 --open /artwork-preview.html"
   },
   "devDependencies": {
     "@vscode/vsce": "^3.6.1",

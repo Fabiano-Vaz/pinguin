@@ -9,8 +9,8 @@ const {
 
 {
   const built = buildAssetPaths((fileName) => `/static/${fileName}`);
-  assert.equal(built.idle, "/static/pinguin sentado balançando os pezinhos.svg");
-  assert.equal(built.flying, "/static/pinguin voando.svg");
+  assert.equal(built.idle, "css:idle");
+  assert.equal(built.flying, "css:flying");
 }
 
 {
@@ -22,7 +22,7 @@ const {
 
   assert.equal(actionStates.idle, "assets/custom-idle.svg");
   assert.equal(actionStates.flying, "assets/custom-flying.svg");
-  assert.equal(actionStates.default, "assets/pinguin.svg");
+  assert.equal(actionStates.default, "css:default");
   assert.equal(typeof actionStates.invalid, "undefined");
 }
 

@@ -1,3 +1,5 @@
+import { mountWardrobePanel } from "../wardrobe/wardrobe-panel.ts";
+
   const bootstrapPetApp = () => {
     const pet = window.PenguinPet || {};
     const constants = pet.constants || {};
@@ -41,6 +43,12 @@
     if (fishEconomy && typeof fishEconomy.initialize === "function") {
       fishEconomy.initialize();
     }
+
+    mountWardrobePanel({
+      balance: () => runtime.getFishStock?.() ?? 0,
+      spend: (amount) => runtime.consumeFishStock?.(amount) ?? false,
+      subscribe: (listener) => runtime.subscribeFishStock?.(listener) || (() => {}),
+    }, (open) => { runtime.isWardrobeOpen = open; });
 
     const environmentEvents =
       typeof modules.createEnvironmentEvents === "function"

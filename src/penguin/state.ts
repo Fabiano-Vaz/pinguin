@@ -1,3 +1,4 @@
+import { setArtwork } from "../artwork/artwork.ts";
 export {};
 
 const modules = (window.PenguinPetModules = window.PenguinPetModules || {});
@@ -59,7 +60,7 @@ modules.state = ({ actionStates }) => ({
       actionStates[state] || actionStates.default || actionStates.idle;
     if (!stateAsset) return;
     this.currentState = state;
-    this.img.src = stateAsset;
+    setArtwork(this.img, stateAsset);
     if (
       (state === "sleeping" || state === "full" || state === "deadLying") &&
       typeof this.hideUmbrella === "function"
@@ -77,7 +78,7 @@ modules.state = ({ actionStates }) => ({
     this.setState(normalizedState);
 
     if (requestedState === "default" && actionStates.default) {
-      this.img.src = actionStates.default;
+      setArtwork(this.img, actionStates.default);
     }
   },
 
@@ -85,7 +86,7 @@ modules.state = ({ actionStates }) => ({
     if (typeof src !== "string" || src.trim().length === 0) return;
     const duration = Number.isFinite(durationMs) ? Math.max(0, durationMs) : 0;
     this.visualLockUntil = Date.now() + duration;
-    this.img.src = src;
+    setArtwork(this.img, src);
   },
 
   unlockVisualSprite() {

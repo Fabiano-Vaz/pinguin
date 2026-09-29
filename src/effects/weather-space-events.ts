@@ -56,7 +56,7 @@
         const assets = window.PenguinPet && window.PenguinPet.actionStates
           ? window.PenguinPet.actionStates
           : {};
-        const turningBackSrc = assets.turningBack || "assets/pinguin de costas.svg";
+        const turningBackSrc = assets.turningBack || "css:turningBack";
         penguin.lockVisualSprite(turningBackSrc, 2000);
       }
       if (typeof penguin.showSpeech === "function") {

@@ -89,6 +89,9 @@ modules.interactionsPointer = ({
       return;
     }
     e.preventDefault();
+    this.invalidateBehaviorFlow();
+    this.velocityX = 0;
+    this.velocityY = 0;
     runtime.lastPenguinInteractionAt = Date.now();
     this.isDragging = true;
     this.clearPendingDropReaction();

@@ -16,8 +16,12 @@ export const createActAction = () => ({
     }
 
     this.element.style.animation = "";
+    this.isMoving = false;
+    this.targetX = this.x;
+    this.targetY = this.y;
     this.setState(step.state);
-    this.speak();
+    if (step.line) this.sayPersonality?.(step.line);
+    else if (!step.quiet) this.speak();
     if (step.anim) this.element.style.animation = step.anim;
 
     setStepTimeout(
@@ -25,8 +29,8 @@ export const createActAction = () => ({
       () => {
         if (!isFlowActive()) return;
         this.element.style.animation = "";
-        if (!this.isMoving) this.setState("idle");
-        this.insertWalkBetweenEmotionSteps(step);
+        // The next planned action owns its transition; avoid a one-frame idle flash.
+        if (!this.stepQueue.length && !this.isMoving) this.setState("idle");
         this.runNextStep();
       },
       actDuration,

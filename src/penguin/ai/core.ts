@@ -38,10 +38,20 @@ export const createCoreMethods = ({
   invalidateBehaviorFlow() {
     this.behaviorFlowToken = (this.behaviorFlowToken || 0) + 1;
     this.activeStep = null;
+    this.isRanting = false;
     if (typeof this.clearManagedContext === "function") {
       this.clearManagedContext("behavior_step");
+      this.clearManagedContext("reaction");
     }
     return this.behaviorFlowToken;
+  },
+
+  scheduleReaction(callback, delayMs) {
+    const token = this.behaviorFlowToken;
+    const key = `reaction-${this.reactionSequence = (this.reactionSequence || 0) + 1}`;
+    return this.setManagedTimeout("reaction", key, () => {
+      if (this.isBehaviorFlowActive(token)) callback();
+    }, delayMs);
   },
 
   isBehaviorFlowActive(token) {

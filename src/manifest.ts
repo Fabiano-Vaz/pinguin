@@ -1,40 +1,42 @@
 type AssetMap = Record<string, string>;
 
 export const ASSET_FILES: AssetMap = {
-  idle: "pinguin sentado balançando os pezinhos.svg",
-  default: "pinguin.svg",
-  running: "pinguin correndo.svg",
-  runningCrouched: "pinguin correndo abaixado.svg",
-  jumping: "pinguin voando.svg",
-  dancing: "pinguin dançando.svg",
-  sleeping: "pinguin dormindo.svg",
-  scared: "pinguin assustado.svg",
-  crying: "pinguin chorando.svg",
-  beaten: "pinguin apanhando.svg",
-  angry: "pinguin com raiva.svg",
-  scratching: "pinguin coçando a cabecinha.svg",
-  waving: "pinguin dando tchau.svg",
-  shy: "pinguin envergonhado.svg",
-  peeking: "pinguin espiando curioso.svg",
-  laughing: "pinguin gargalhando.svg",
-  thinking: "pinguin-apaixonado.svg",
-  eating: "pinguin comendo peixe.svg",
-  full: "pinguim cheio.svg",
-  fishing: "pinguin pescando no gelo.svg",
-  flying: "pinguin voando.svg",
-  turningBack: "pinguin de costas.svg",
-  umbrella: "umbrella.svg",
-  caveirinha: "pinguin caveirinha.svg",
-  deadLying: "pinguin mortinho deitado no chão.svg",
-  trace: "trace.svg",
+  idle: "css:idle",
+  default: "css:default",
+  running: "css:running",
+  runningCrouched: "css:runningCrouched",
+  jumping: "css:flying",
+  dancing: "css:dancing",
+  sleeping: "css:sleeping",
+  scared: "css:scared",
+  crying: "css:crying",
+  beaten: "css:beaten",
+  angry: "css:angry",
+  scratching: "css:scratching",
+  waving: "css:waving",
+  shy: "css:shy",
+  peeking: "css:peeking",
+  laughing: "css:laughing",
+  thinking: "css:thinking",
+  eating: "css:eating",
+  full: "css:full",
+  fishing: "css:fishing",
+  flying: "css:flying",
+  turningBack: "css:turningBack",
+  umbrella: "css:umbrella",
+  caveirinha: "css:caveirinha",
+  deadLying: "css:deadLying",
+  trace: "css:trace",
   runnerBackground: "backgroung.png",
   runnerBackgroundDark: "backgroung-dark.png",
   runnerBackgroundDarkB: "backgroung-darkB.png",
   moon: "lua.png",
   plane: "plane.gif",
   helicopterB: "helicopterB.gif",
-  snowman: "snowman.svg",
-  cruzeiro: "pinguim cruzeiro.svg",
+  snowman: "css:snowman",
+  cruzeiro: "css:cruzeiro",
+  pondering: "css:pondering",
+  happyJump: "css:happyJump",
 };
 
 export const DEFAULT_CONFIG = {
@@ -71,7 +73,7 @@ export const buildAssetPaths = (
 
   const assets: AssetMap = {};
   for (const [state, fileName] of Object.entries(ASSET_FILES)) {
-    assets[state] = resolve(fileName, state);
+    assets[state] = fileName.startsWith("css:") ? fileName : resolve(fileName, state);
   }
   return assets;
 };

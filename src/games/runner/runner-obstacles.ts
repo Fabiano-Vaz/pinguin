@@ -1,3 +1,4 @@
+import { createArtwork, setArtwork } from "../../artwork/artwork.ts";
 export {};
 
 import {
@@ -194,10 +195,10 @@ if (runner) {
       el.style.border = "none";
       el.style.boxShadow = "none";
 
-      const snowmanImg = document.createElement("img");
-      snowmanImg.className = "runner-snowman";
-      snowmanImg.src = snowmanObstacleImage;
-      snowmanImg.alt = "snowman";
+      const snowmanImg = createArtwork();
+      snowmanImg.classList.add("runner-snowman");
+      setArtwork(snowmanImg, snowmanObstacleImage);
+      snowmanImg.setAttribute("aria-label", "snowman");
       snowmanImg.draggable = false;
       el.appendChild(snowmanImg);
       return;

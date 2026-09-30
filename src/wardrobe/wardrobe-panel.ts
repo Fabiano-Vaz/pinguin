@@ -1,6 +1,6 @@
 import { createArtwork } from "../artwork/artwork.ts";
 import { ACCESSORY_PRICE, getWardrobe, WardrobeStore, type FishWallet } from "./wardrobe-store.ts";
-import type { AccessorySlot } from "./catalog.ts";
+import type { Accessory, AccessorySlot } from "./catalog.ts";
 
 export function mountWardrobePanel(wallet: FishWallet, onOpenChange: (open: boolean) => void = () => {}) {
   const store = getWardrobe();
@@ -49,13 +49,25 @@ export function mountWardrobePanel(wallet: FishWallet, onOpenChange: (open: bool
   status.setAttribute("role", "status");
   summary.append(balance, subtitle);
   footer.append(status);
-  const rows: { slot: AccessorySlot; select: HTMLSelectElement; button: HTMLButtonElement }[] = [];
+  type WardrobeRow = {
+    slot: AccessorySlot;
+    options: (Accessory | undefined)[];
+    index: number;
+    selection: HTMLOutputElement;
+    button: HTMLButtonElement;
+  };
+  const rows: WardrobeRow[] = [];
+  const selectedItem = (row: WardrobeRow) => row.options[row.index];
   const refresh = () => {
     const fish = wallet.balance();
-    balance.textContent = `Saldo: ${fish} 🐟`;
-    for (const { slot, select, button } of rows) {
-      const item = store.getItem(select.value);
+    balance.textContent = "Saldo: " + fish + " 🐟";
+    for (const row of rows) {
+      const { slot, button } = row;
+      const item = selectedItem(row);
       const equipped = store.snapshot.equipped[slot];
+      row.selection.textContent = item
+        ? item.name.replace(/^(Camiseta|Boné) /, "").replace(/^./, (letter) => letter.toLocaleUpperCase("pt-BR"))
+        : slot === "body" ? "Sem roupa" : "Sem acessório";
       if (!item) {
         button.textContent = equipped ? "Retirar" : "—";
         button.disabled = !equipped;
@@ -66,44 +78,72 @@ export function mountWardrobePanel(wallet: FishWallet, onOpenChange: (open: bool
         button.textContent = "Comprar";
         button.disabled = fish < ACCESSORY_PRICE;
       }
-      button.setAttribute("aria-label", item ? `${button.textContent}: ${item.name}${store.owns(item.id) ? "" : ` por ${ACCESSORY_PRICE} peixes`}` : `Retirar ${slot === "body" ? "roupa" : "acessório"}`);
-      button.title = item && !store.owns(item.id) && fish < ACCESSORY_PRICE ? `Você precisa de ${ACCESSORY_PRICE} peixes.` : "";
+      const priceLabel = item && !store.owns(item.id) ? " por " + ACCESSORY_PRICE + " peixes" : "";
+      button.setAttribute("aria-label", item ? button.textContent + ": " + item.name + priceLabel : "Retirar " + (slot === "body" ? "roupa" : "acessório"));
+      button.title = item && !store.owns(item.id) && fish < ACCESSORY_PRICE ? "Você precisa de " + ACCESSORY_PRICE + " peixes." : "";
     }
+  };
+  const applyPreview = (row: WardrobeRow, announce = true) => {
+    const item = selectedItem(row);
+    if (item) fittingRoom.equip(item.id);
+    else fittingRoom.unequip(row.slot);
+    if (announce) status.textContent = "Prévia grátis, sem cobrança.";
+    refresh();
   };
   for (const [slot, name] of [["body", "Roupa"], ["head", "Cabeça"]] as const) {
     const row = document.createElement("div");
     row.className = "wardrobe-item";
-    const label = document.createElement("label");
-    label.textContent = name;
-    const select = document.createElement("select");
-    select.name = slot;
     const items = store.catalog.filter((item) => item.slot === slot);
-    select.append(new Option("Sem", ""), ...items.map((item) => new Option(item.name.replace(/^(Camiseta|Boné) /, "").replace(/^./, (letter) => letter.toLocaleUpperCase("pt-BR")), item.id)));
-    label.append(select);
+    const category = document.createElement("span");
+    category.className = "wardrobe-category";
+    category.textContent = name;
+    const navigator = document.createElement("div");
+    navigator.className = "wardrobe-navigator";
+    navigator.setAttribute("role", "group");
+    navigator.setAttribute("aria-label", "Escolher " + name.toLocaleLowerCase("pt-BR"));
+    const previous = document.createElement("button");
+    previous.type = "button";
+    previous.className = "wardrobe-nav wardrobe-nav--previous";
+    previous.textContent = "‹";
+    previous.dataset.wardrobeNav = slot;
+    previous.dataset.direction = "previous";
+    previous.setAttribute("aria-label", name + " anterior");
+    const selection = document.createElement("output");
+    selection.className = "wardrobe-selection";
+    selection.setAttribute("aria-live", "polite");
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "wardrobe-nav wardrobe-nav--next";
+    next.textContent = "›";
+    next.dataset.wardrobeNav = slot;
+    next.dataset.direction = "next";
+    next.setAttribute("aria-label", "Próxima " + name.toLocaleLowerCase("pt-BR"));
+    navigator.append(previous, selection, next);
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.slot = slot;
-    select.addEventListener("change", () => {
-      if (select.value) fittingRoom.equip(select.value);
-      else fittingRoom.unequip(slot);
-      status.textContent = "Prévia grátis, sem cobrança.";
-      refresh();
-    });
+    const wardrobeRow: WardrobeRow = { slot, options: [undefined, ...items], index: 0, selection, button };
+    const navigate = (direction: number) => {
+      wardrobeRow.index = (wardrobeRow.index + direction + wardrobeRow.options.length) % wardrobeRow.options.length;
+      applyPreview(wardrobeRow);
+    };
+    previous.addEventListener("click", () => navigate(-1));
+    next.addEventListener("click", () => navigate(1));
     button.addEventListener("click", () => {
-      const id = select.value;
-      if (!id) { store.unequip(slot); status.textContent = "Acessório retirado."; }
+      const item = selectedItem(wardrobeRow);
+      if (!item) { store.unequip(slot); status.textContent = "Acessório retirado."; }
       else {
-        const result = store.purchase(id, wallet);
-        if (result === "insufficient") status.textContent = `Você precisa de ${ACCESSORY_PRICE} peixes.`;
+        const result = store.purchase(item.id, wallet);
+        if (result === "insufficient") status.textContent = "Você precisa de " + ACCESSORY_PRICE + " peixes.";
         else if (result === "purchased" || result === "owned") {
-          store.equip(id);
+          store.equip(item.id);
           status.textContent = result === "purchased" ? "Comprado e vestido!" : "Prontinho! Já estou usando.";
         }
       }
       refresh();
     });
-    rows.push({ slot, select, button });
-    row.append(label, button);
+    rows.push(wardrobeRow);
+    row.append(category, navigator, button);
     content.append(row);
   }
   dialog.append(header, content, footer);
@@ -115,10 +155,11 @@ export function mountWardrobePanel(wallet: FishWallet, onOpenChange: (open: bool
   }
   for (const event of ["keydown", "keyup"]) dialog.addEventListener(event, (event) => event.stopPropagation());
   toggle.addEventListener("click", () => {
-    for (const { slot, select } of rows) {
-      select.value = store.snapshot.equipped[slot] || "";
-      if (select.value) fittingRoom.equip(select.value);
-      else fittingRoom.unequip(slot);
+    for (const row of rows) {
+      const equipped = store.snapshot.equipped[row.slot];
+      const equippedIndex = row.options.findIndex((item) => item?.id === equipped);
+      row.index = equippedIndex >= 0 ? equippedIndex : 0;
+      applyPreview(row, false);
     }
     status.textContent = "Experimente uma peça.";
     refresh();

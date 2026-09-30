@@ -1,6 +1,6 @@
 export type AccessorySlot = "head" | "body";
-export const headKinds = ["helmet", "cowl", "wig", "viking", "beanie", "headphones", "duck"] as const;
-export const accessoryMotifs = ["panel", "bat", "clown", "duck", "bolt", "none"] as const;
+export const headKinds = ["helmet", "cowl", "wig", "viking", "beanie", "headphones", "duck", "ninja", "anya"] as const;
+export const accessoryMotifs = ["panel", "bat", "clown", "duck", "bolt", "minion", "cruzeiro", "naruto", "none"] as const;
 export type Accessory = Readonly<{
   id: string;
   name: string;
@@ -19,6 +19,11 @@ export const accessoryCatalog: readonly Accessory[] = Object.freeze([
   { id: "suit-clown", name: "Palhaço Pipoquinha", slot: "body", kind: "tshirt", color: "#7b4ddd", accent: "#ffe457", motif: "clown" },
   { id: "suit-duck", name: "Patinho de borracha", slot: "body", kind: "tshirt", color: "#ffdc42", accent: "#f69a32", motif: "duck" },
   { id: "suit-bolt", name: "Moletom turbo", slot: "body", kind: "tshirt", color: "#35b8b2", accent: "#fcec80", motif: "bolt" },
+  { id: "tee-minion", name: "Camiseta Minion", slot: "body", kind: "tshirt", color: "#ffdc40", accent: "#3983c8", motif: "minion" },
+  { id: "tee-cruzeiro", name: "Camiseta Cruzeiro", slot: "body", kind: "tshirt", color: "#1559bd", accent: "#ffffff", motif: "cruzeiro" },
+  { id: "tee-naruto", name: "Camiseta Naruto", slot: "body", kind: "tshirt", color: "#f88728", accent: "#303743", motif: "naruto" },
+  { id: "wig-anya", name: "Peruca da Anya", slot: "head", kind: "anya", color: "#f5a4b7", accent: "#e8bd65", motif: "none" },
+  { id: "hair-naruto", name: "Naruto: cabelo e bandana", slot: "head", kind: "ninja", color: "#ffda43", accent: "#283448", motif: "none" },
   { id: "helmet-vader", name: "Capacete do Vader", slot: "head", kind: "helmet", color: "#252a35", accent: "#8898aa", motif: "none" },
   { id: "cowl-batman", name: "Máscara do Batman", slot: "head", kind: "cowl", color: "#252d40", accent: "#53637c", motif: "none" },
   { id: "wig-clown", name: "Peruca de circo", slot: "head", kind: "wig", color: "#f0704a", accent: "#ffdc49", motif: "none" },

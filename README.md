@@ -186,9 +186,11 @@ O painel de depuração existente mostra humor, necessidades e intenção atual.
 
 ## Guarda-roupa e base para acessórios
 
-O botão **👕 Guarda-roupa** permite combinar **5 roupas e 8 acessórios de cabeça**, todos em HTML/CSS:
+O botão **👕 Guarda-roupa** permite combinar **8 roupas e 10 acessórios de cabeça**, todos em HTML/CSS:
 Darth Vader, Batman, palhaço, patinho amarelo, moletom com raio, capacete viking
-com chifres, dois gorrinhos e fone de DJ. Cabeça e corpo são vendidos separadamente.
+com chifres, dois gorrinhos e fone de DJ. A coleção também inclui camisetas de
+Minion, Cruzeiro e Naruto, além do cabelo loiro com bandana do Naruto
+e da peruca rosa da Anya de Spy × Family, com enfeites pretos e dourados. Cabeça e corpo são vendidos separadamente.
 Compras da coleção anterior são convertidas em peças da coleção nova sem custo.
 Cada peça custa **10 peixes**, descontados apenas ao clicar em **Comprar**.
 Experimentar é grátis; peças compradas podem ser vestidas novamente sem cobrança.
@@ -199,9 +201,9 @@ frente, lado, costas e deitado. As trocas entre ações continuam diretas.
 
 O catálogo e o inventário ficam separados da renderização, com APIs para conceder,
 equipar e remover itens. Novas variações dos modelos existentes precisam apenas de uma entrada no catálogo. A loja usa o saldo de peixes do próprio jogo.
-O painel compacto mantém as duas categorias e seus botões visíveis sem rolagem
+O painel compacto mantém as duas categorias, suas setas e os botões visíveis sem rolagem
 em telas pequenas. Em painéis muito baixos, a prévia fica oculta para dar espaço
-aos controles.
+à navegação.
 
 Veja [como criar peças, integrar a loja e ajustar encaixes](docs/accessories.md).
 Para abrir a galeria e experimentar todas as roupas e poses, execute

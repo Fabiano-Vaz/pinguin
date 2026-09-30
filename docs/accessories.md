@@ -12,9 +12,9 @@ as 27 poses do pinguim; 26 recebem acessórios e a caveirinha fica sem roupa.
 A galeria tem inventário de teste separado e não libera produtos no jogo.
 
 O painel usa um layout compacto: prévia pequena com saldo/preço ao lado e botões
-na mesma linha dos seletores. Roupa e acessório ficam visíveis sem rolagem nos painéis
+na mesma linha dos navegadores com setas. Roupa e acessório ficam visíveis sem rolagem nos painéis
 pequenos testados, a partir de 180 × 180 px. Em alturas de até 220 px, a prévia
-decorativa fica oculta para priorizar as opções e as compras. Enquanto o painel
+decorativa fica oculta para priorizar as setas e as compras. Enquanto o painel
 está aberto, o consumo automático de peixes por fome fica pausado.
 
 ## Organização
@@ -31,10 +31,10 @@ está aberto, o consumo automático de peixes por fome fica pausado.
 
 ## Coleção divertida
 
-São cinco roupas (Darth Vader, Batman, Palhaço Pipoquinha, Patinho de borracha e
-Moletom turbo) e oito acessórios: capacete do Vader, máscara do Batman, peruca de
+São oito roupas (Darth Vader, Batman, Palhaço Pipoquinha, Patinho de borracha,
+Moletom turbo, Minion, Cruzeiro e Naruto) e dez acessórios: capacete do Vader, máscara do Batman, peruca de
 circo, capacete viking, gorrinhos framboesa e aurora, fone DJ do iceberg e chapéu de
-patinho. Todas as combinações entre os dois slots são permitidas.
+patinho, peruca rosa da Anya com enfeites pretos e dourados, mais o cabelo loiro com bandana do Naruto (uma única peça de cabeça). Todas as combinações entre os dois slots são permitidas.
 
 As seis peças da coleção anterior são convertidas por `legacyAccessoryIds` ao
 restaurar uma compra v2: oceano → Vader, carinho → palhaço, camiseta menta → Batman,
@@ -53,12 +53,12 @@ Adicione um produto ao `accessoryCatalog`. Não é necessário desenhar cada pos
   kind: "tshirt",
   color: "#9274c4",
   accent: "#fff1ff",
-  motif: "bolt", // "panel", "bat", "clown", "duck", "bolt" ou "none"
+  motif: "bolt", // "panel", "bat", "clown", "duck", "bolt", "minion", "cruzeiro", "naruto" ou "none"
 }
 ```
 
 Para cabeça, use `slot: "head"` e um dos modelos `helmet`, `cowl`, `wig`, `viking`,
-`beanie`, `headphones` ou `duck`, com `motif: "none"`. As cores usam `#RRGGBB`.
+`beanie`, `headphones`, `duck`, `ninja` ou `anya`, com `motif: "none"`. As cores usam `#RRGGBB`.
 O renderizador cria partes semânticas e o CSS define a silhueta específica de cada
 modelo; todos herdam os mesmos encaixes animados. Fones preservam o cabelo visível.
 O catálogo é validado ao criar o store: IDs duplicados, cores inválidas e pares

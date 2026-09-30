@@ -29,6 +29,11 @@ function motif(item: Accessory) {
   const element = document.createElement("i");
   element.className = `wardrobe-design wardrobe-design--${item.motif}`;
   for (const name of ["badge", "trim", "detail", "extra"]) element.append(detail(`costume-${name}`));
+  if (item.motif === "cruzeiro") {
+    for (let index = 0; index < 5; index++) {
+      element.querySelector(".costume-badge")!.append(detail(`cruzeiro-star cruzeiro-star--${index + 1}`));
+    }
+  }
   return element;
 }
 function clippedSurface(root: HTMLElement, pose: string, id: number, item: Accessory) {

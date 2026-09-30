@@ -94,5 +94,5 @@ assert.deepEqual(upgraded.snapshot.equipped, { body: "suit-vader", head: "hat-du
 assert.equal(upgraded.purchase("suit-vader", wallet), "owned");
 assert.equal(fish, 0, "Upgrading the collection never charges previous buyers");
 assert.equal(upgraded.owns("suit-batman"), false);
-assert.equal(accessoryCatalog.length, 13);
+assert.equal(accessoryCatalog.length, 18);
 assert.throws(() => new WardrobeStore([{ ...paid, kind: "headphones" }]), /Invalid accessory/);

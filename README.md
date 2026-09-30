@@ -12,15 +12,26 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Pressione `Space` para iniciar o Runner.
 - Pressione `M` para abrir a Memória Gelada.
 
-<h1 align="left">Pinguim Pet</h1>
+### IA do Pinguim
 
 ![IA do Pinguim](https://raw.githubusercontent.com/Fabiano-Vaz/pinguin/main/assets/gif%20readme/ia.gif)
+
+## 🆕 Novidades da versão 2.3
+
+- **👕 Guarda-roupa**: 8 roupas e 10 acessórios de cabeça comprados com peixes.
+- Novas peças: camisetas de Minion, Cruzeiro e Naruto, cabelo com bandana do Naruto
+  e peruca rosa da Anya (Spy × Family).
+- Navegação do guarda-roupa por setas `‹` e `›`, com prévia grátis antes de comprar.
+- Poses redesenhadas em HTML/CSS, sem SVG, com as roupas acompanhando as animações.
+- Nova personalidade local, com humor, necessidades e rotinas encadeadas.
+- Estoque de peixes com validade de 24 horas por peixe, salvo entre sessões.
 
 ## ✨ Por que instalar
 
 - Dá vida ao seu VS Code sem atrapalhar seu fluxo.
 - Tem comportamento dinâmico e imprevisível (não fica repetitivo).
 - Recompensa a interação com mini games integrados ao sistema de peixes.
+- Permite personalizar o pinguim com roupas e acessórios comprados com peixes.
 - Funciona como um “companheiro de mesa” enquanto você programa.
 
 ## 💙 Tudo que ele faz
@@ -62,6 +73,14 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Sessão de pesca com ganho progressivo de peixes.
 - Frases de fome e convite para jogar quando está sem peixe.
 - O estoque também funciona como recompensa e recurso nos mini games.
+
+### Guarda-roupa
+
+- 8 roupas e 10 acessórios de cabeça, combináveis livremente.
+- Prévia grátis no próprio painel; o peixe só é descontado ao clicar em **Comprar**.
+- Cada peça custa `10` peixes e, depois de comprada, pode ser vestida sem novo custo.
+- O visual escolhido acompanha o pinguim em todas as poses e no Runner.
+- Na pose caveirinha, os acessórios ficam ocultos temporariamente.
 
 ### Minigame Runner integrado
 
@@ -113,6 +132,14 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Encontre pares para ganhar peixes e evite erros para não perder o estoque.
 - Use `Embaralhar novamente` para iniciar uma nova rodada.
 - `M` ou `Esc`: sair do jogo.
+
+### No Guarda-roupa
+
+- Clique em `👕 Guarda-roupa` para abrir o painel.
+- Use `‹` e `›` em **Roupa** e **Cabeça** para ver as peças; a prévia é grátis.
+- Clique em `Comprar` para adquirir a peça ou em `Vestir` se ela já for sua.
+- Escolha `Sem roupa` ou `Sem acessório` e clique em `Retirar` para tirar a peça.
+- `×` ou `Esc`: fechar o painel.
 
 ## 🚀 Como usar
 
@@ -186,11 +213,14 @@ O painel de depuração existente mostra humor, necessidades e intenção atual.
 
 ## Guarda-roupa e base para acessórios
 
-O botão **👕 Guarda-roupa** permite combinar **8 roupas e 10 acessórios de cabeça**, todos em HTML/CSS:
-Darth Vader, Batman, palhaço, patinho amarelo, moletom com raio, capacete viking
-com chifres, dois gorrinhos e fone de DJ. A coleção também inclui camisetas de
-Minion, Cruzeiro e Naruto, além do cabelo loiro com bandana do Naruto
-e da peruca rosa da Anya de Spy × Family, com enfeites pretos e dourados. Cabeça e corpo são vendidos separadamente.
+O botão **👕 Guarda-roupa** permite combinar **8 roupas e 10 acessórios de cabeça**, todos em HTML/CSS.
+Cabeça e corpo são vendidos separadamente.
+
+| Categoria | Peças |
+| --------- | ----- |
+| Roupa     | Darth Vader, Batman, Palhaço Pipoquinha, Patinho de borracha, Moletom turbo, Camiseta Minion, Camiseta Cruzeiro, Camiseta Naruto |
+| Cabeça    | Capacete do Vader, Máscara do Batman, Peruca de circo, Viking do gelo, Gorrinho framboesa, Gorrinho aurora, DJ do iceberg, Patinho na cabeça, Naruto: cabelo e bandana, Peruca da Anya |
+
 Compras da coleção anterior são convertidas em peças da coleção nova sem custo.
 Cada peça custa **10 peixes**, descontados apenas ao clicar em **Comprar**.
 Experimentar é grátis; peças compradas podem ser vestidas novamente sem cobrança.
@@ -201,6 +231,8 @@ frente, lado, costas e deitado. As trocas entre ações continuam diretas.
 
 O catálogo e o inventário ficam separados da renderização, com APIs para conceder,
 equipar e remover itens. Novas variações dos modelos existentes precisam apenas de uma entrada no catálogo. A loja usa o saldo de peixes do próprio jogo.
+As peças são escolhidas por setas `‹` e `›`, com a opção sem peça no início da lista.
+Ao abrir o painel, a seleção começa na peça que o pinguim está usando.
 O painel compacto mantém as duas categorias, suas setas e os botões visíveis sem rolagem
 em telas pequenas. Em painéis muito baixos, a prévia fica oculta para dar espaço
 à navegação.
@@ -224,3 +256,12 @@ outras extensões instaladas. Essa opção vale para a sessão de teste; não de
 extensões nem altera as preferências globais. O pinguim em desenvolvimento continua
 habilitado. Para testar apenas a interface no navegador, execute `npm run dev` e
 abra o endereço mostrado no terminal.
+
+Outros comandos úteis:
+
+| Comando                | O que faz                                              |
+| ---------------------- | ------------------------------------------------------ |
+| `npm test`             | Executa os testes automatizados                        |
+| `npm run lint`         | Verifica os tipos da extensão e executa os testes      |
+| `npm run dev:artwork`  | Abre a galeria de poses e roupas no navegador          |
+| `npm run package:vsix` | Compila e gera `release/pinguin-pet-<versão>.vsix`     |

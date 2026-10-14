@@ -42,4 +42,7 @@ const routine = planner.chooseNextBehavior();
 const first = routine(); first[0].state = "corrupted";
 assert.notEqual(routine()[0].state, "corrupted", "each execution must own its steps");
 assert.ok(routine().some(step => step.state === "fishing"));
+const fishingBrain = new PersonalityBrain({}, () => 0.5);
+assert.ok(fishingBrain.score("fish", { state: "idle", fishStock: 3 }) > fishingBrain.score("explore", { state: "idle", fishStock: 3 }), "At three fish the penguin should prioritize replenishing stock");
+assert.ok(fishingBrain.score("fish", { state: "idle", fishStock: 20 }) < fishingBrain.score("explore", { state: "idle", fishStock: 20 }), "With enough fish, exploration should take priority over fishing");
 console.log("personality needs, memory, priorities and interruption-safe plan tests passed");

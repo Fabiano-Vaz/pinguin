@@ -51,10 +51,11 @@ const createFishEconomy = (deps) => {
   const storage: FishStockStorage = deps?.storage || createFishStockStorage();
   let saved: unknown;
   try { saved = storage.load(); } catch { /* Storage unavailable: keep the session usable. */ }
-  const ledger = new FishStockLedger(saved, settings.initialFishStock, now);
+  let ledger = new FishStockLedger(saved, settings.initialFishStock, now);
   let remainingFish = ledger.balance;
   let expirationTimeoutId = null;
   let disposed = false;
+  let unsubscribeStorage: (() => void) | undefined;
   const persistStock = () => {
     try { storage.save(ledger.snapshot); } catch { /* Keep the current session balance. */ }
   };
@@ -555,6 +556,7 @@ const createFishEconomy = (deps) => {
     refreshExpiration();
     const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
     if (!ledger.spend(safeAmount)) return false;
+    storage.change?.(-safeAmount);
     syncStock();
     announceFishIfNeeded();
     return true;
@@ -563,7 +565,10 @@ const createFishEconomy = (deps) => {
   const addFishStock = (amount = 1) => {
     refreshExpiration();
     const safeAmount = Math.max(1, Math.round(Number(amount) || 1));
-    if (ledger.add(safeAmount)) syncStock();
+    if (ledger.add(safeAmount)) {
+      storage.change?.(safeAmount);
+      syncStock();
+    }
     return remainingFish;
   };
 
@@ -599,12 +604,18 @@ const createFishEconomy = (deps) => {
     remainingFish = ledger.balance;
     mountFishStockHud();
     syncStock();
+    unsubscribeStorage = storage.subscribe?.((snapshot) => {
+      if (disposed) return;
+      ledger = new FishStockLedger(snapshot, 0, now);
+      syncStock();
+    });
     document.addEventListener?.("visibilitychange", refreshExpiration);
     window.addEventListener?.("focus", refreshExpiration);
   };
 
   const dispose = () => {
     disposed = true;
+    unsubscribeStorage?.();
     if (expirationTimeoutId !== null) clearTimeout(expirationTimeoutId);
     document.removeEventListener?.("visibilitychange", refreshExpiration);
     window.removeEventListener?.("focus", refreshExpiration);

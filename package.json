@@ -2,7 +2,7 @@
   "name": "pinguin-pet",
   "displayName": "Penguin Pet",
   "description": "Um pinguim animado que anda no VS Code enquanto o editor estiver aberto.",
-  "version": "2.3.1",
+  "version": "2.3.4",
   "publisher": "Pingocode",
   "icon": "icon.png",
   "engines": {
@@ -26,12 +26,12 @@
     "build:extension": "tsc -p tsconfig.json",
     "build:webview": "vite build",
     "build": "npm run build:extension && npm run build:webview",
-    "package:vsix": "npm run build && vsce package --allow-missing-repository -o release/pinguin-pet-${npm_package_version}.vsix",
+    "package:vsix": "npm run build && vsce package --no-dependencies --allow-missing-repository -o release/pinguin-pet-${npm_package_version}.vsix",
     "lint:extension": "tsc -p tsconfig.json --noEmit",
-    "lint:webview": "npm run test",
+    "lint:webview": "tsc -p tsconfig.webview.json && npm run test",
     "lint": "npm run lint:extension && npm run lint:webview",
-    "test": "node --experimental-strip-types tests/run-tests.ts",
-    "test:core": "node --experimental-strip-types tests/penguin-core.test.ts",
+    "test": "node --require ./tests/register-typescript.cjs tests/run-tests.ts",
+    "test:core": "node --require ./tests/register-typescript.cjs tests/penguin-core.test.ts",
     "dev:artwork": "vite --host 127.0.0.1 --open /artwork-preview.html"
   },
   "devDependencies": {

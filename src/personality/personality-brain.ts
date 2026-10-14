@@ -74,7 +74,7 @@ export class PersonalityBrain {
       play: n.energy > 40 && n.calm > 40 ? 12 + n.energy * 0.35 : 0.1,
       bond: 12 + n.affection * 0.2 + (context.pointerNearby ? 30 : 0),
       relax: 9 + (100 - n.calm) * 0.8 + (context.raining ? 25 : 0),
-      fish: context.fishStock === 0 ? 1000 : context.fishStock != null && context.fishStock < 3 ? 40 : 0.4,
+      fish: context.fishStock === 0 ? 1000 : context.fishStock != null && context.fishStock < 10 ? 80 : 22,
     };
     return scores[intent];
   }

@@ -2,7 +2,12 @@ export const FISH_LIFETIME_MS = 24 * 60 * 60 * 1000;
 export const FISH_STOCK_KEY = "penguin.fish-stock.v1";
 export interface FishBatch { amount: number; expiresAt: number }
 export interface FishStockSnapshot { version: 1; batches: FishBatch[] }
-export interface FishStockStorage { load(): unknown; save(snapshot: FishStockSnapshot): void }
+export interface FishStockStorage {
+  load(): unknown;
+  save(snapshot: FishStockSnapshot): void;
+  change?(amount: number): void;
+  subscribe?(listener: (snapshot: FishStockSnapshot) => void): () => void;
+}
 
 /** Empty is a valid saved balance; expired fish must never become a new welcome gift. */
 export function parseFishStock(raw: unknown): FishStockSnapshot | undefined {

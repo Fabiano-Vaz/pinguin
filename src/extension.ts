@@ -2,8 +2,9 @@ import * as vscode from "vscode";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { buildAssetPaths, getMergedConfig } from "./manifest";
+import { GitProductivityTracker, PRODUCTIVITY_KEY, type ProductivityState } from "./services/git-productivity-tracker";
 
-import { FISH_STOCK_KEY, parseFishStock } from "./runtime/fish-stock-ledger";
+import { FISH_STOCK_KEY, FishStockLedger, parseFishStock } from "./runtime/fish-stock-ledger";
 
 const SIDEBAR_VIEW_ID = "pinguinPet.sidebar";
 type RuntimeFlags = {
@@ -48,19 +49,70 @@ class PenguinSidebarProvider implements vscode.WebviewViewProvider {
   constructor(
     private readonly context: vscode.ExtensionContext,
     private readonly runtimeFlags: RuntimeFlags,
-  ) {}
+  ) {
+    this.ledger = new FishStockLedger(context.globalState.get(FISH_STOCK_KEY));
+    this.persistStock();
+    const tracker = new GitProductivityTracker({
+      load: () => context.globalState.get<ProductivityState>(PRODUCTIVITY_KEY),
+      save: (state) => context.globalState.update(PRODUCTIVITY_KEY, state),
+      award: (amount) => {
+        this.ledger.add(amount);
+        this.persistStock();
+        this.publishStock();
+      },
+    });
+    const scan = () => tracker.scan(
+      (vscode.workspace.workspaceFolders ?? [])
+        .filter(folder => folder.uri.scheme === "file")
+        .map(folder => folder.uri.fsPath),
+    );
+    void scan();
+    const timer = setInterval(() => { void scan(); }, 10000);
+    context.subscriptions.push({ dispose: () => { clearInterval(timer); tracker.dispose(); } });
+  }
+
+  private readonly ledger: FishStockLedger;
+  private view: vscode.WebviewView | undefined;
+  private acknowledgedRequestId = 0;
+
+  private persistStock(): void {
+    void this.context.globalState.update(FISH_STOCK_KEY, this.ledger.snapshot);
+  }
+
+  private publishStock(): void {
+    void this.view?.webview.postMessage({
+      type: "penguin:fish-stock",
+      snapshot: this.ledger.snapshot,
+      requestId: this.acknowledgedRequestId,
+    });
+  }
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     const extensionUri = this.context.extensionUri;
-    const listener = webviewView.webview.onDidReceiveMessage(async (message: unknown) => {
+    this.view = webviewView;
+    this.acknowledgedRequestId = 0;
+    const listener = webviewView.webview.onDidReceiveMessage((message: unknown) => {
       if (!message || typeof message !== "object") return;
-      const incoming = message as { type?: string; snapshot?: unknown };
-      if (incoming.type !== "penguin:save-fish-stock") return;
-      const snapshot = parseFishStock(incoming.snapshot);
-      if (snapshot) await this.context.globalState.update(FISH_STOCK_KEY, snapshot);
+      const incoming = message as { type?: string; amount?: number; requestId?: number };
+      if (incoming.type === "penguin:request-fish-stock") {
+        this.publishStock();
+        return;
+      }
+      if (incoming.type !== "penguin:change-fish-stock") return;
+      const { amount, requestId } = incoming;
+      if (!Number.isSafeInteger(amount) || !amount || !Number.isSafeInteger(requestId) ||
+          requestId! <= this.acknowledgedRequestId) return;
+      if (amount > 0) this.ledger.add(amount);
+      else this.ledger.spend(-amount);
+      this.acknowledgedRequestId = requestId!;
+      this.persistStock();
+      this.publishStock();
     });
     this.context.subscriptions.push(listener);
-    webviewView.onDidDispose(() => listener.dispose());
+    webviewView.onDidDispose(() => {
+      listener.dispose();
+      if (this.view === webviewView) this.view = undefined;
+    });
     webviewView.webview.options = {
       enableScripts: true,
       localResourceRoots: [
@@ -73,7 +125,7 @@ class PenguinSidebarProvider implements vscode.WebviewViewProvider {
       webviewView.webview,
       extensionUri,
       this.runtimeFlags,
-      parseFishStock(this.context.globalState.get(FISH_STOCK_KEY)) ?? null,
+      this.ledger.snapshot,
     );
   }
 }

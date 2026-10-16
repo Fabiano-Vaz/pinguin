@@ -67,7 +67,7 @@ Ele vive no seu Explorer, reage ao que você faz, muda com o clima, caça comida
 - Cada peixe expira 24 horas depois de ser ganho; ganhar mais não renova os anteriores.
 - Compras, alimentação e jogos gastam os peixes mais antigos primeiro.
 - Ganhe **1 peixe por linha adicionada em um novo commit** na branch acompanhada. O primeiro acompanhamento estabelece a base; commits já existentes não dão prêmio retroativo. Cada commit é premiado uma única vez por repositório, mesmo ao trocar de branch ou recarregar o VS Code. Linhas removidas e arquivos binários não rendem peixes. Novos commits são verificados a cada 10 segundos, mesmo com o painel oculto.
-- O pinguim pesca mais frequentemente por conta própria, com prioridade maior enquanto o estoque estiver abaixo de 10 peixes.
+- A pesca segue a frequência original: ocasional com 3 ou mais peixes, mais provável abaixo de 3 e prioritária quando o estoque zera. O acúmulo por desempenho vem dos novos commits.
 - Sem consumo automático por fome por padrão; o presente inicial de 5 peixes é dado uma única vez.
 - Botões rápidos para comer, pescar e acessar os mini games.
 - Queda de peixe no cenário para coleta.
